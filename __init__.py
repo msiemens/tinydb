@@ -27,9 +27,10 @@ class TinyDB(object):
 
     _table_cache = {}
 
-    def __init__(self, path, storage=JSONStorage):
+    def __init__(self, *args, **kwargs):
+        storage = kwargs.pop('storage', JSONStorage)
         #: :type: Storage
-        self._storage = storage(path)
+        self._storage = storage(*args, **kwargs)
         self._table = self.table('_default')
 
     def table(self, name='_default'):

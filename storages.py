@@ -37,7 +37,6 @@ class JSONStorage(Storage):
 
     def __init__(self, path):
         super(JSONStorage, self).__init__()
-
         touch(path)  # Create file if not exists
         self.path = path
         self._handle = open(path, 'r+')
@@ -62,10 +61,12 @@ class MemoryStorage(Storage):
 
     def __init__(self, path=None):
         super(MemoryStorage, self).__init__()
-        self.memory = ''
+        self.memory = None
 
     def write(self, data):
-        self.memory = json.dumps(data)
+        self.memory = data
 
     def read(self):
-        return json.loads(self.memory)
+        if self.memory is None:
+            raise ValueError
+        return self.memory

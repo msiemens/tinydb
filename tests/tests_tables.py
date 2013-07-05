@@ -9,7 +9,7 @@ db = None
 
 def setup():
     global db
-    db = TinyDB('<memory>', storage=MemoryStorage)
+    db = TinyDB(storage=MemoryStorage)
 
 
 def test_one_table():
