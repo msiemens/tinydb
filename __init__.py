@@ -1,4 +1,4 @@
-from tinydb.storages import Storage, YAMLStorage
+from tinydb.storages import Storage, JSONStorage
 from tinydb.queries import field
 
 __all__ = ('TinyDB',)
@@ -27,7 +27,7 @@ class TinyDB(object):
 
     _table_cache = {}
 
-    def __init__(self, path, storage=YAMLStorage):
+    def __init__(self, path, storage=JSONStorage):
         #: :type: Storage
         self._storage = storage(path)
         self._table = self.table('_default')
@@ -64,10 +64,13 @@ class TinyDB(object):
         """
 
         if not table:
-            return self._storage.read() or {}
+            try:
+                return self._storage.read()
+            except ValueError:
+                return {}
 
         try:
-            return self._storage.read()[table]
+            return self._read()[table]
         except (KeyError, TypeError):
             return []
 

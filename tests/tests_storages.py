@@ -5,7 +5,7 @@ random.seed()
 
 from nose.tools import *
 
-from tinydb.storages import YAMLStorage, MemoryStorage
+from tinydb.storages import JSONStorage, MemoryStorage
 
 path = None
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
@@ -30,7 +30,7 @@ def teardown():
 
 def test_yaml():
     # Write contents
-    backend = YAMLStorage(path)
+    backend = JSONStorage(path)
     backend.write(element)
 
     # Verify contents
