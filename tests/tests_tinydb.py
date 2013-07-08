@@ -37,6 +37,8 @@ def test_insert():
 def test_insert_multiple():
     db.purge()
 
+    assert_equal(len(db.search(field('int') == 1)), 0)
+
     db.insert({'int': 1, 'char': 'a'})
     db.insert({'int': 1, 'char': 'b'})
     db.insert({'int': 1, 'char': 'c'})
@@ -55,6 +57,16 @@ def test_remove():
     db.remove(field('char') == 'b')
 
     assert_equal(len(db), 2)
+    assert_equal(len(db.search(field('int') == 1)), 2)
+
+
+def test_remove_multiple():
+    db.insert({'int': 1, 'char': 'a'})
+    db.insert({'int': 1, 'char': 'b'})
+    db.insert({'int': 1, 'char': 'c'})
+
+    db.remove(field('int') == 1)
+    assert_equal(len(db), 0)
 
 
 def test_search():
@@ -70,6 +82,25 @@ def test_search():
     assert_equal(results[0]['char'], 'a')
     assert_equal(results[1]['char'], 'b')
     assert_equal(results[2]['char'], 'c')
+
+
+def test_contians():
+    db.purge()
+
+    db.insert({'int': 1, 'char': 'a'})
+    db.insert({'int': 1, 'char': 'b'})
+    db.insert({'int': 1, 'char': 'c'})
+
+    if (field('int') == 1) in db:
+        assert_true(True, True)
+    else:
+        assert_true(True, False)
+
+    if (field('int') == 0) in db:
+        assert_true(True, False)
+    else:
+        assert_true(True, True)
+
 
 def test_get():
     db.purge()

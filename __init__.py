@@ -100,6 +100,12 @@ class TinyDB(object):
         """
         return len(self._table)
 
+    def __contains__(self, item):
+        """
+        A shorthand for ``field(...) == ... in db.table()``
+        """
+        return item in self.table()
+
     def __getattr__(self, name):
         return getattr(self._table, name)
 
@@ -120,6 +126,7 @@ class Table(object):
         """
         self.name = name
         self._db = db
+        self._queries_cache = {}
 
         try:
             self._last_id = self._read().pop()['id']
@@ -144,6 +151,7 @@ class Table(object):
         :type values: list
         """
 
+        self._clear_query_cache()
         self._db._write(values, self.name)
 
     def __len__(self):
@@ -191,8 +199,8 @@ class Table(object):
         :type where: has
         """
 
-        to_remove = self.get(where)
-        self._write([e for e in self._read() if e != to_remove])
+        to_remove = self.search(where)
+        self._write([e for e in self._read() if e not in to_remove])
 
     def purge(self):
         """
@@ -211,7 +219,13 @@ class Table(object):
         :rtype: list
         """
 
-        return [e for e in self._read() if where(e)]
+        if where in self._queries_cache:
+            return self._queries_cache[where]
+        else:
+            elems = [e for e in self._read() if where(e)]
+            self._queries_cache[where] = elems
+
+            return elems
 
     def get(self, where):
         """
@@ -227,3 +241,9 @@ class Table(object):
         for el in self._read():
             if where(el):
                 return el
+
+    def _clear_query_cache(self):
+        """
+
+        """
+        self._queries_cache = {}

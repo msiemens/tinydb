@@ -203,6 +203,9 @@ class query(AndOrMixin):
     def __repr__(self):
         return self._repr
 
+    def __hash__(self):
+        return hash(repr(self))
+
 field = query
 
 
