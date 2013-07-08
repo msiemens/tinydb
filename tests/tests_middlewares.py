@@ -70,6 +70,5 @@ def test_caching_write():
     backend = None  # Delete backend
 
     # Verify contents: Storage shouldn't be empty
-    print storage.memory
     assert_not_equal('', storage.memory)
     assert_not_equal('{}', storage.memory)

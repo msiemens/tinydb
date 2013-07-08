@@ -23,7 +23,7 @@ class Middleware(Storage):
         This method has to return a reference to ``self`` and construct the
         storage from the given arguments.
         """
-        pass
+        raise NotImplementedError('To be overriden!')
 
 
 class CachingMiddleware(Middleware):
@@ -62,7 +62,4 @@ class CachingMiddleware(Middleware):
             self._cache_modified_count = 0
 
     def read(self):
-        if self.cache is None:
-            self.cache = self.storage.read()
-
         return self.cache
