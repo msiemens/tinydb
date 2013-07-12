@@ -61,7 +61,7 @@ class TinyDB(object):
         tables' dict.
         :type table: dict or None
         :returns: all values
-        :rtype: list
+        :rtype: dict
         """
 
         if not table:
@@ -73,7 +73,7 @@ class TinyDB(object):
         try:
             return self._read()[table]
         except (KeyError, TypeError):
-            return []
+            return {}
 
     def _write(self, values, table=None):
         """
@@ -83,7 +83,7 @@ class TinyDB(object):
         tables' dict.
         :type table: dict or None
         :param values: the new values to write
-        :type values: list
+        :type values: dict
         """
 
         if not table:
@@ -129,7 +129,7 @@ class Table(object):
         self._queries_cache = {}
 
         try:
-            self._last_id = self._read().pop()['id']
+            self._last_id = self._read().keys().pop()
         except IndexError:
             self._last_id = 0
 
@@ -138,7 +138,7 @@ class Table(object):
         Reading access to the DB.
 
         :returns: all values
-        :rtype: list
+        :rtype: dict
         """
 
         return self._db._read(self.name)
@@ -148,7 +148,7 @@ class Table(object):
         Writing access to the DB.
 
         :param values: the new values to write
-        :type values: list
+        :type values: dict
         """
 
         self._clear_query_cache()
@@ -170,11 +170,11 @@ class Table(object):
         """
         Get all elements stored in the table.
 
-        :returns: a list of al elements.
+        :returns: a list of all elements.
         :rtype: list
         """
 
-        return self._read()
+        return self._read().values()
 
     def insert(self, element):
         """
@@ -184,12 +184,12 @@ class Table(object):
         """
 
         self._last_id += 1
-        element['id'] = self._last_id
+        next_id = self._last_id
 
-        values = self._read()
-        values.append(element)
+        data = self._read()
+        data[next_id] = element
 
-        self._write(values)
+        self._write(data)
 
     def remove(self, where):
         """
@@ -200,13 +200,18 @@ class Table(object):
         """
 
         to_remove = self.search(where)
-        self._write([e for e in self._read() if e not in to_remove])
+        new_values = dict(
+            [(id, val) for id, val in self._read().iteritems()
+             if val not in to_remove]
+        )  # We don't use the new dict comprehension to support Python 2.6 :/
+
+        self._write(new_values)
 
     def purge(self):
         """
         Purge the table by removing all elements.
         """
-        self._write([])
+        self._write({})
 
     def search(self, where):
         """
@@ -222,7 +227,7 @@ class Table(object):
         if where in self._queries_cache:
             return self._queries_cache[where]
         else:
-            elems = [e for e in self._read() if where(e)]
+            elems = [e for e in self.all() if where(e)]
             self._queries_cache[where] = elems
 
             return elems
@@ -238,7 +243,7 @@ class Table(object):
         :rtype: dict or None
         """
 
-        for el in self._read():
+        for el in self.all():
             if where(el):
                 return el
 

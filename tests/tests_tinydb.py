@@ -80,10 +80,6 @@ def test_search():
     results = db.search(field('int') == 1)
     assert_equal(len(results), 3)
 
-    assert_equal(results[0]['char'], 'a')
-    assert_equal(results[1]['char'], 'b')
-    assert_equal(results[2]['char'], 'c')
-
 
 def test_contians():
     db.purge()
