@@ -92,11 +92,14 @@ class CachingMiddleware(Middleware):
         self._cache_modified_count += 1
 
         if self._cache_modified_count >= self.WRITE_CACHE_SIZE:
-            self.storage.write(data)
-            self._cache_modified_count = 0
+            self.flush()
 
     def read(self):
         return self.cache
+
+    def flush(self):
+        self.storage.write(self.cache)
+        self._cache_modified_count = 0
 
 
 class ConcurrencyMiddleware(Middleware):
