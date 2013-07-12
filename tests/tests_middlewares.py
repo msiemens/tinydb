@@ -48,6 +48,27 @@ def test_caching_write_many():
     assert_not_equal('{}', backend.memory)
 
 
+def setup_caching_flush():
+    global backend
+    _backend = CachingMiddleware(MemoryStorage)
+    backend = _backend()  # Initialize MemoryStorage
+
+
+@with_setup(setup_caching_flush)
+def test_caching_flush():
+    # Write contents
+    global backend
+
+    for x in xrange(5):
+        backend.write(element)
+
+    backend.flush()
+
+    # Verify contents: Storage shouldn't be empty
+    assert_not_equal('', backend.memory)
+    assert_not_equal('{}', backend.memory)
+
+
 def setup_caching_write():
     global backend
     _backend = CachingMiddleware(MemoryStorage)

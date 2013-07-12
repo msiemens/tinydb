@@ -84,8 +84,7 @@ class CachingMiddleware(Middleware):
         """
         There may still be some data in the cache. Clear it.
         """
-        if self._cache_modified_count:
-            self.storage.write(self.cache)
+        self.flush()
 
     def write(self, data):
         self.cache = data
