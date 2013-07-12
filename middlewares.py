@@ -28,8 +28,8 @@ class Middleware(Storage):
 
             self._storage = storage(*args, **kwargs)
 
-        As we can see, ``storage(...)`` runs the constructor and returns the new
-        storage instance.
+        As we can see, ``storage(...)`` runs the constructor and returns the
+        new storage instance.
 
 
         Using Middlewares, the user will call:
