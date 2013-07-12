@@ -49,7 +49,7 @@ class query(AndOrMixin):
 
     def __init__(self, key):
         self._key = key
-        self._repr = 'has \'{}\''.format(key)
+        self._repr = 'has \'{0}\''.format(key)
 
     def matches(self, regex):
         """
@@ -198,7 +198,7 @@ class query(AndOrMixin):
 
     def _update_repr(self, operator, value):
         """ Update the current test's ``repr``. """
-        self._repr = '\'{}\' {} {}'.format(self._key, operator, value)
+        self._repr = '\'{0}\' {1} {2}'.format(self._key, operator, value)
 
     def __repr__(self):
         return self._repr
@@ -229,7 +229,7 @@ class query_not(AndOrMixin):
         return not self._cond(element)
 
     def __repr__(self):
-        return 'not ({})'.format(self._cond)
+        return 'not ({0})'.format(self._cond)
 
 
 class query_or(AndOrMixin):
@@ -247,7 +247,7 @@ class query_or(AndOrMixin):
         return self._cond_1(element) or self._cond_2(element)
 
     def __repr__(self):
-        return '({}) or ({})'.format(self._cond_1, self._cond_2)
+        return '({0}) or ({1})'.format(self._cond_1, self._cond_2)
 
 
 class query_and(AndOrMixin):
@@ -265,7 +265,7 @@ class query_and(AndOrMixin):
         return self._cond_1(element) and self._cond_2(element)
 
     def __repr__(self):
-        return '({}) and ({})'.format(self._cond_1, self._cond_2)
+        return '({0}) and ({1})'.format(self._cond_1, self._cond_2)
 
 
 class query_regex(AndOrMixin):
@@ -284,7 +284,7 @@ class query_regex(AndOrMixin):
                     and re.match(self.regex, element[self._key]))
 
     def __repr__(self):
-        return '\'{}\' ~= {} '.format(self._key, self.regex)
+        return '\'{0}\' ~= {1} '.format(self._key, self.regex)
 
 
 class query_custom(AndOrMixin):
@@ -303,4 +303,4 @@ class query_custom(AndOrMixin):
         return self._key in element and self.test(element[self._key])
 
     def __repr__(self):
-        return '\'{}\'.test({})'.format(self._key, self.test)
+        return '\'{0}\'.test({1})'.format(self._key, self.test)
