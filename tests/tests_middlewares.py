@@ -15,8 +15,8 @@ element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
 
 def setup_caching():
     global backend
-    backend = CachingMiddleware(MemoryStorage)
-    backend()  # Initialize MemoryStorage
+    _backend = CachingMiddleware(MemoryStorage)
+    backend = _backend()  # Initialize MemoryStorage
 
 
 @with_setup(setup_caching)
@@ -50,8 +50,8 @@ def test_caching_write_many():
 
 def setup_caching_write():
     global backend
-    backend = CachingMiddleware(MemoryStorage)
-    backend()  # Initialize MemoryStorage
+    _backend = CachingMiddleware(MemoryStorage)
+    backend = _backend()  # Initialize MemoryStorage
 
 
 @with_setup(setup_caching_write)
@@ -70,8 +70,8 @@ def test_caching_write():
 
 def setup_concurrency():
     global backend
-    backend = ConcurrencyMiddleware(MemoryStorage)
-    backend()  # Initialize MemoryStorage
+    _backend = ConcurrencyMiddleware(MemoryStorage)
+    backend = _backend()  # Initialize MemoryStorage
 
 
 @with_setup(setup_concurrency)
@@ -100,3 +100,19 @@ def test_concurrency():
 
     # Verify contents: Storage shouldn't be empty
     assert_equal(len(backend.memory), run_count)
+
+
+def setup_nested():
+    global backend
+    _backend = ConcurrencyMiddleware(CachingMiddleware(MemoryStorage))
+    backend = _backend()  # Initialize MemoryStorage
+
+
+@with_setup(setup_nested)
+def test_nested():
+    global backend
+    # Write contents
+    backend.write(element)
+
+    # Verify contents
+    assert_equal(element, backend.read())

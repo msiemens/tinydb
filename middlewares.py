@@ -16,10 +16,52 @@ class Middleware(Storage):
     """
 
     def __call__(self, *args, **kwargs):
+        """
+        Create the storage instance and store it as self.storage.
+
+        Usually, when the user creates a new TinyDB instance, he does it like
+        this:
+
+            TinyDB(storage=StorageClass)
+
+        The storage kwarg is used by TinyDB this way:
+
+            self._storage = storage(*args, **kwargs)
+
+        As we can see, ``storage(...)`` runs the constructor and returns the new
+        storage instance.
+
+
+        Using Middlewares, the user will call:
+
+                                       The 'real' storage class
+                                       v
+            TinyDB(storage=Middleware(StorageClass))
+                           ^
+                           Already an instance!
+
+        So, when running ``self._storage = storage(*args, **kwargs)`` Python
+        now will call ``__call__`` and TinyDB will expect the return value to
+        be the storage (or Middleware) instance. Returning the instance is
+        simple, but we also got the underlying (*real*) StorageClass as an
+        __init__ argument that still is not an instance.
+        So, we initialize it in __call__ forwarding any arguments we recieve
+        from TinyDB (``TinyDB(arg1, kwarg1=value, storage=...)``).
+
+        In case of nested Middlewares, calling the instance as if it was an
+        class results in calling ``__call__`` what initializes the next
+        nested Middleware that itself will initialize the next Middleware and
+        so on.
+        """
         self.storage = self._storage_cls(*args, **kwargs)
 
+        return self
+
     def __getattr__(self, name):
-        return getattr(self.storage, name)
+        """
+        Forward all unknown attribute calls to the underlying storage.
+        """
+        return getattr(self.__dict__['storage'], name)
 
 
 class CachingMiddleware(Middleware):
