@@ -61,6 +61,31 @@ def test_remove():
     assert_equal(len(db.search(field('int') == 1)), 2)
 
 
+def test_remove_by_id():
+    db.purge()
+
+    db.insert({'int': 1, 'char': 'a'})
+    db.insert({'int': 1, 'char': 'b'})
+    db.insert({'int': 1, 'char': 'c'})
+
+    db.remove(db._last_id - 1)
+
+    assert_equal(len(db), 2)
+
+
+def test_remove_by_id_list():
+    db.purge()
+
+    db.insert({'int': 1, 'char': 'a'})
+    db.insert({'int': 1, 'char': 'b'})
+    db.insert({'int': 1, 'char': 'c'})
+
+    ids = db.all(as_dict=True).keys()[0:-1]  # Don't delete the last one
+    db.remove(ids)
+
+    assert_equal(len(db), 1)
+
+
 def test_remove_multiple():
     db.insert({'int': 1, 'char': 'a'})
     db.insert({'int': 1, 'char': 'b'})
@@ -79,6 +104,19 @@ def test_search():
 
     results = db.search(field('int') == 1)
     assert_equal(len(results), 3)
+
+
+def test_search_by_ids():
+    db.purge()
+
+    db.insert({'int': 1, 'char': 'a'})
+    db.insert({'int': 1, 'char': 'b'})
+    db.insert({'int': 1, 'char': 'c'})
+
+    ids = db.all(as_dict=True).keys()[0:-1]  # Don't search fot the last ID
+
+    results = db.search(ids)
+    assert_equal(len(results), 2)
 
 
 def test_contians():
@@ -106,5 +144,17 @@ def test_get():
     db.insert({'int': 1, 'char': 'b'})
     db.insert({'int': 1, 'char': 'c'})
 
-    assert_equal(db.get(field('int') == 1)['char'], 'a')
     assert_equal(db.get(field('char') == 'b')['char'], 'b')
+
+
+def test_get_by_id():
+    db.purge()
+
+    db.insert({'int': 1, 'char': 'a'})
+    db.insert({'int': 1, 'char': 'b'})
+    db.insert({'int': 1, 'char': 'c'})
+
+    data = db.all(as_dict=True)
+
+    for id in data.keys():
+        assert_equal(db.get(id)['int'], 1)

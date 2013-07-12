@@ -1,5 +1,5 @@
 from tinydb.storages import Storage, JSONStorage
-from tinydb.queries import field
+from tinydb.queries import query, field
 
 __all__ = ('TinyDB',)
 
@@ -166,15 +166,20 @@ class Table(object):
         """
         return bool(self.search(where))
 
-    def all(self):
+    def all(self, as_dict=False):
         """
         Get all elements stored in the table.
 
-        :returns: a list of all elements.
-        :rtype: list
+        :param as_dict: Wether to return the data as a dict with the IDs as
+        the keys or a plain list of all values.
+        :returns: a list or dict with all elements.
+        :rtype: list, dict
         """
 
-        return self._read().values()
+        if as_dict:
+            return self._read()
+        else:
+            return self._read().values()
 
     def insert(self, element):
         """
@@ -191,21 +196,35 @@ class Table(object):
 
         self._write(data)
 
-    def remove(self, where):
+    def remove(self, id):
         """
         Remove the element matching the condition.
 
-        :param where: the condition
-        :type where: has
+        :param id: the condition or ID or a list of IDs
+        :type id: query, int, list
         """
 
-        to_remove = self.search(where)
-        new_values = dict(
-            [(id, val) for id, val in self._read().iteritems()
-             if val not in to_remove]
-        )  # We don't use the new dict comprehension to support Python 2.6 :/
+        if isinstance(id, field):
+            # Got a query
+            where = id
 
-        self._write(new_values)
+            to_remove = self.search(where)
+            new_values = dict(
+                [(id, val) for id, val in self._read().iteritems()
+                 if val not in to_remove]
+            )  # We don't use the new dict comprehension to support Python 2.6
+
+            self._write(new_values)
+        elif isinstance(id, list):
+            # Got a list of IDs
+            ids = id
+            for id in ids:
+                self.remove(id)
+        else:
+            # Got an id
+            data = self._read()
+            del data[id]
+            self._write(data)
 
     def purge(self):
         """
@@ -215,37 +234,49 @@ class Table(object):
 
     def search(self, where):
         """
-        Search for all elements matching a 'where' condition.
+        Search for all elements matching a 'where' condition or get elements
+        by a list of IDs.
 
-        :param where: the condition
-        :type where: has
+        :param where: the condition or a list of IDs
+        :type where: has, list
 
         :returns: list of matching elements
         :rtype: list
         """
 
-        if where in self._queries_cache:
-            return self._queries_cache[where]
+        if isinstance(where, list):
+            # Got a list of IDs
+            ids = where
+            return [self.get(id) for id in ids]
         else:
-            elems = [e for e in self.all() if where(e)]
-            self._queries_cache[where] = elems
+            # Got a query
+            if where in self._queries_cache:
+                return self._queries_cache[where]
+            else:
+                elems = [e for e in self.all() if where(e)]
+                self._queries_cache[where] = elems
 
-            return elems
+                return elems
 
-    def get(self, where):
+    def get(self, id):
         """
         Search for exactly one element matching a 'where' condition.
 
-        :param where: the condition
-        :type where: has
+        :param id: the condition or ID
+        :type id: query, int
 
         :returns: the element or None
         :rtype: dict or None
         """
 
-        for el in self.all():
-            if where(el):
-                return el
+        if isinstance(id, query):
+            where = id
+
+            for el in self.all():
+                if where(el):
+                    return el
+        else:
+            return self._read()[id]
 
     def _clear_query_cache(self):
         """
