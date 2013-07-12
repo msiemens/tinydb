@@ -262,6 +262,9 @@ class Table(object):
         """
         Search for exactly one element matching a 'where' condition.
 
+        PLEASE NOTE: If there multiple elements matching, you might get a
+        random one because Python's dict is not ordered!
+
         :param id: the condition or ID
         :type id: query, int
 
