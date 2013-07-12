@@ -1,4 +1,3 @@
-from abc import ABCMeta, abstractmethod
 from threading import RLock
 
 from tinydb.storages import Storage
@@ -12,19 +11,15 @@ class Middleware(Storage):
     This may include caching/compression or a totally custom storage format.
 
     To use Middlewares, your ``__init__`` method has to accept exactly one
-    argument which is the class of the "real" storage. In addition,
-    you need a ``__call__(*args, **kwargs)`` that passes ``args`` and
-    ``kwargs`` to the storage's ``__init__``.
+    argument which is the class of the "real" storage. It has to be stored as
+     self._storage_cls (see implementations below).
     """
-    __metaclass__ = ABCMeta
 
-    @abstractmethod
     def __call__(self, *args, **kwargs):
-        """
-        This method has to return a reference to ``self`` and construct the
-        storage from the given arguments.
-        """
-        raise NotImplementedError('To be overriden!')
+        self.storage = self._storage_cls(*args, **kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self.storage, name)
 
 
 class CachingMiddleware(Middleware):
@@ -50,10 +45,6 @@ class CachingMiddleware(Middleware):
         if self._cache_modified_count:
             self.storage.write(self.cache)
 
-    def __call__(self, *args, **kwargs):
-        self.storage = self._storage_cls(*args, **kwargs)
-        return self
-
     def write(self, data):
         self.cache = data
         self._cache_modified_count += 1
@@ -76,10 +67,6 @@ class ConcurrencyMiddleware(Middleware):
     def __init__(self, storage_cls):
         self.lock = RLock()
         self._storage_cls = storage_cls
-
-    def __call__(self, *args, **kwargs):
-        # TODO: Refactor __call__ to Middleware()
-        self.storage = self._storage_cls(*args, **kwargs)
 
     def write(self, data):
         with self.lock:

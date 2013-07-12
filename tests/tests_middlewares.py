@@ -43,11 +43,9 @@ def test_caching_write_many():
     for x in xrange(4):
         backend.write(element)
 
-    storage = backend.storage
-
     # Verify contents: Storage shouldn't be empty
-    assert_not_equal('', storage.memory)
-    assert_not_equal('{}', storage.memory)
+    assert_not_equal('', backend.memory)
+    assert_not_equal('{}', backend.memory)
 
 
 def setup_caching_write():
@@ -101,4 +99,4 @@ def test_concurrency():
         t.join()
 
     # Verify contents: Storage shouldn't be empty
-    assert_equal(len(backend.storage.memory), run_count)
+    assert_equal(len(backend.memory), run_count)
