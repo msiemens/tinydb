@@ -27,6 +27,7 @@ def test_le():
     assert_true(query({'value': 1}))
     assert_false(query({'value': 2}))
 
+
 def test_gt():
     query = field('value') > 1
     assert_true(query({'value': 2}))

@@ -50,7 +50,6 @@ def test_caching_write_many():
     assert_not_equal('{}', storage.memory)
 
 
-
 def setup_caching_write():
     global backend
     backend = CachingMiddleware(MemoryStorage)

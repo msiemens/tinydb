@@ -6,6 +6,7 @@ from nose.tools import *
 #: :type: TinyDB
 db = None
 
+
 def setup():
     global db
     db = TinyDB(storage=MemoryStorage)
