@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from threading import RLock
 
 from tinydb.storages import Storage
 
@@ -63,3 +64,27 @@ class CachingMiddleware(Middleware):
 
     def read(self):
         return self.cache
+
+
+class ConcurrencyMiddleware(Middleware):
+    """
+    Makes TinyDB working with multithreading.
+
+    Uses a lock so write/read operations are virtually atomic.
+    """
+
+    def __init__(self, storage_cls):
+        self.lock = RLock()
+        self._storage_cls = storage_cls
+
+    def __call__(self, *args, **kwargs):
+        # TODO: Refactor __call__ to Middleware()
+        self.storage = self._storage_cls(*args, **kwargs)
+
+    def write(self, data):
+        with self.lock:
+            self.storage.write(data)
+
+    def read(self):
+        with self.lock:
+            return self.storage.read()

@@ -1,13 +1,10 @@
-import os
-import tempfile
-import random
-from tinydb.middlewares import CachingMiddleware
+from threading import Thread
 
-random.seed()
+from tinydb.middlewares import CachingMiddleware, ConcurrencyMiddleware
+from tinydb.storages import MemoryStorage
 
 from nose.tools import *
 
-from tinydb.storages import JSONStorage, MemoryStorage
 
 backend = None
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
@@ -72,3 +69,37 @@ def test_caching_write():
     # Verify contents: Storage shouldn't be empty
     assert_not_equal('', storage.memory)
     assert_not_equal('{}', storage.memory)
+
+
+def setup_concurrency():
+    global backend
+    backend = ConcurrencyMiddleware(MemoryStorage)
+    backend()  # Initialize MemoryStorage
+
+
+@with_setup(setup_concurrency)
+def test_concurrency():
+    global backend
+    threads = []
+    run_count = 42
+
+    class WriteThread(Thread):
+        def run(self):
+            try:
+                current_contents = backend.read()
+            except ValueError:
+                current_contents = []
+            backend.write(current_contents + [element])
+
+    # Start threads
+    for i in xrange(run_count):
+        thread = WriteThread()
+        threads.append(thread)
+        thread.start()
+
+    # Wait for all threads to finish
+    for t in threads:
+        t.join()
+
+    # Verify contents: Storage shouldn't be empty
+    assert_equal(len(backend.storage.memory), run_count)
