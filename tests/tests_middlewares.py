@@ -102,7 +102,7 @@ def setup_concurrency():
 def test_concurrency():
     global backend
     threads = []
-    run_count = 42
+    run_count = 5
 
     class WriteThread(Thread):
         def run(self):
