@@ -166,20 +166,15 @@ class Table(object):
         """
         return bool(self.search(condition))
 
-    def all(self, as_dict=False):
+    def all(self):
         """
         Get all elements stored in the table.
 
-        :param as_dict: Wether to return the data as a dict with the IDs as
-        the keys or a plain list of all values.
-        :returns: a list or dict with all elements.
-        :rtype: list, dict
+        :returns: a list with all elements.
+        :rtype: list
         """
 
-        if as_dict:
-            return self._read()
-        else:
-            return self._read().values()
+        return self._read().values()
 
     def insert(self, element):
         """
@@ -204,27 +199,13 @@ class Table(object):
         :type cond: query, int, list
         """
 
-        if isinstance(cond, query):
-            # Got a query
-            where = cond
+        to_remove = self.search(cond)
+        new_values = dict(
+            [(cond, val) for cond, val in self._read().iteritems()
+             if val not in to_remove]
+        )    # We don't use the new dict comprehension to support Python 2.6
 
-            to_remove = self.search(where)
-            new_values = dict(
-                [(cond, val) for cond, val in self._read().iteritems()
-                 if val not in to_remove]
-            )  # We don't use the new dict comprehension to support Python 2.6
-
-            self._write(new_values)
-        elif isinstance(cond, list):
-            # Got a list of IDs
-            ids = cond
-            for cond in ids:
-                self.remove(cond)
-        else:
-            # Got an id
-            data = self._read()
-            del data[cond]
-            self._write(data)
+        self._write(new_values)
 
     def purge(self):
         """
@@ -237,49 +218,35 @@ class Table(object):
         Search for all elements matching a 'where' cond or get elements
         by a list of IDs.
 
-        :param cond: the cond or a list of IDs
-        :type cond: has, list
+        :param cond: the condition to check against
+        :type cond: query
 
         :returns: list of matching elements
         :rtype: list
         """
 
-        if isinstance(cond, list):
-            # Got a list of IDs
-            ids = cond
-            return [self.get(id_) for id_ in ids]
+        if cond in self._queries_cache:
+            return self._queries_cache[where]
         else:
-            # Got a query
-            if cond in self._queries_cache:
-                return self._queries_cache[where]
-            else:
-                elems = [e for e in self.all() if cond(e)]
-                self._queries_cache[where] = elems
+            elems = [e for e in self.all() if cond(e)]
+            self._queries_cache[where] = elems
 
-                return elems
+            return elems
 
     def get(self, cond):
         """
         Search for exactly one element matching a 'where' condition.
 
-        PLEASE NOTE: If there multiple elements matching, you might get a
-        random one because Python's dict is not ordered!
-
-        :param cond: the condition or ID
-        :type cond: query, int
+        :param cond: the condition to check against
+        :type cond: query
 
         :returns: the element or None
         :rtype: dict or None
         """
 
-        if isinstance(cond, query):
-            where = cond
-
-            for el in self.all():
-                if where(el):
-                    return el
-        else:
-            return self._read()[cond]
+        for el in self.all():
+            if cond(el):
+                return el
 
     def _clear_query_cache(self):
         """
