@@ -5,6 +5,9 @@ from tinydb.storages import MemoryStorage
 
 from nose.tools import *
 
+if not 'xrange' in dir(__builtins__):
+    xrange = range  # Python 3 support
+
 
 backend = None
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
