@@ -61,7 +61,7 @@ class TinyDB(object):
         tables' dict.
         :type table: str or None
         :returns: all values
-        :rtype: dict
+        :rtype: dict, list
         """
 
         if not table:
@@ -73,17 +73,17 @@ class TinyDB(object):
         try:
             return self._read()[table]
         except (KeyError, TypeError):
-            return {}
+            return []
 
     def _write(self, values, table=None):
         """
-        Writing access to the backend
+        Writing access to the backend.
 
         :param table: The table, we want to write, or None to write the 'all
         tables' dict.
         :type table: str or None
         :param values: the new values to write
-        :type values: dict
+        :type values: list, dict
         """
 
         if not table:
@@ -129,7 +129,7 @@ class Table(object):
         self._queries_cache = {}
 
         try:
-            self._last_id = self._read().keys().pop()
+            self._last_id = self._read().pop()['_id']
         except IndexError:
             self._last_id = 0
 
@@ -138,7 +138,7 @@ class Table(object):
         Reading access to the DB.
 
         :returns: all values
-        :rtype: dict
+        :rtype: list
         """
 
         return self._db._read(self.name)
@@ -148,7 +148,7 @@ class Table(object):
         Writing access to the DB.
 
         :param values: the new values to write
-        :type values: dict
+        :type values: list
         """
 
         self._clear_query_cache()
@@ -174,7 +174,7 @@ class Table(object):
         :rtype: list
         """
 
-        return self._read().values()
+        return self._read()
 
     def insert(self, element):
         """
@@ -186,8 +186,10 @@ class Table(object):
         self._last_id += 1
         next_id = self._last_id
 
+        element['_id'] = next_id
+
         data = self._read()
-        data[next_id] = element
+        data.append(element)
 
         self._write(data)
 
@@ -200,18 +202,13 @@ class Table(object):
         """
 
         to_remove = self.search(cond)
-        new_values = dict(
-            [(cond, val) for cond, val in self._read().iteritems()
-             if val not in to_remove]
-        )    # We don't use the new dict comprehension to support Python 2.6
-
-        self._write(new_values)
+        self._write([e for e in self.all() if e not in to_remove])
 
     def purge(self):
         """
         Purge the table by removing all elements.
         """
-        self._write({})
+        self._write([])
 
     def search(self, cond):
         """
