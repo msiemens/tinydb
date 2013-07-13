@@ -15,7 +15,7 @@ class AndOrMixin(object):
         Combines this query and another with logical or.
 
         Example:
-        >>> (field('f1') == 5) | (field('f2') != 2)
+        >>> (where('f1') == 5) | (where('f2') != 2)
         ('f1' == 5) or ('f2' != 2)
 
         See :class:`query_or`.
@@ -27,7 +27,7 @@ class AndOrMixin(object):
         Combines this query and another with logical and.
 
         Example:
-        >>> (field('f1') == 5) & (field('f2') != 2)
+        >>> (where('f1') == 5) & (where('f2') != 2)
         ('f1' == 5) and ('f2' != 2)
 
         See :class:`query_and`.
@@ -40,10 +40,10 @@ class query(AndOrMixin):
     Provides methods to do tests on dict fields.
 
     Any type of comparison will be called in this class. In addition,
-    it is aliased to :data:`field` to provide a more intuitive syntax.
+    it is aliased to :data:`where` to provide a more intuitive syntax.
 
     Example:
-    >>> ((field('f1') == 5) & (field('f2') != 2)) | field('s').matches('^\w+$')
+    >>> ((where('f1') == 5) & (where('f2') != 2)) | where('s').matches('^\w+$')
     (('f1' == 5) and ('f2' != 2)) or ('s' ~= ^\w+$ )
     """
 
@@ -55,7 +55,7 @@ class query(AndOrMixin):
         """
         Run a regex test against a dict value.
 
-        >>> field('f1').matches('^\w+$')
+        >>> where('f1').matches('^\w+$')
         'f1' ~= ^\w+$
 
         :param regex: The regular expression to pass to ``re.match``
@@ -69,7 +69,7 @@ class query(AndOrMixin):
         >>> def test_func(val):
         ...     return val == 42
         ...
-        >>> field('f1').test(test_func)
+        >>> where('f1').test(test_func)
         'f1'.test(<function test_func at 0x029950F0>)
 
         :param func: The function to run. Has to accept one parameter and
@@ -81,7 +81,7 @@ class query(AndOrMixin):
         """
         Test a dict value for equality.
 
-        >>> field('f1') == 42
+        >>> where('f1') == 42
         'f1' == 42
         """
         self._value_eq = other
@@ -92,7 +92,7 @@ class query(AndOrMixin):
         """
         Test a dict value for inequality.
 
-        >>> field('f1') != 42
+        >>> where('f1') != 42
         'f1' != 42
         """
         self._value_ne = other
@@ -103,7 +103,7 @@ class query(AndOrMixin):
         """
         Test a dict value for being lower than another value.
 
-        >>> field('f1') < 42
+        >>> where('f1') < 42
         'f1' < 42
         """
         self._value_lt = other
@@ -114,7 +114,7 @@ class query(AndOrMixin):
         """
         Test a dict value for being lower than or equal to another value.
 
-        >>> field('f1') <= 42
+        >>> where('f1') <= 42
         'f1' <= 42
         """
         self._value_le = other
@@ -125,7 +125,7 @@ class query(AndOrMixin):
         """
         Test a dict value for being greater than another value.
 
-        >>> field('f1') > 42
+        >>> where('f1') > 42
         'f1' > 42
         """
         self._value_gt = other
@@ -136,7 +136,7 @@ class query(AndOrMixin):
         """
         Test a dict value for being greater than or equal to another value.
 
-        >>> field('f1') >= 42
+        >>> where('f1') >= 42
         'f1' >= 42
         """
         self._value_ge = other
@@ -147,7 +147,7 @@ class query(AndOrMixin):
         """
         Negates a query.
 
-        >>> ~(field('f1') >= 42)
+        >>> ~(where('f1') >= 42)
         not ('f1' >= 42)
 
         See :class:`query_not`.
@@ -206,14 +206,14 @@ class query(AndOrMixin):
     def __hash__(self):
         return hash(repr(self))
 
-field = query
+where = query
 
 
 class query_not(AndOrMixin):
     """
     Negates a query.
 
-    >>> ~(field('f1') >= 42)
+    >>> ~(where('f1') >= 42)
     not ('f1' >= 42)
     """
     def __init__(self, cond):

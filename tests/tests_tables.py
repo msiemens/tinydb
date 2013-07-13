@@ -1,4 +1,4 @@
-from tinydb import TinyDB, field
+from tinydb import TinyDB, where
 from tinydb.storages import MemoryStorage
 
 from nose.tools import *
@@ -21,8 +21,8 @@ def test_one_table():
     table1.insert({'int': 1, 'char': 'b'})
     table1.insert({'int': 1, 'char': 'c'})
 
-    assert_equal(table1.get(field('int') == 1)['char'], 'a')
-    assert_equal(table1.get(field('char') == 'b')['char'], 'b')
+    assert_equal(table1.get(where('int') == 1)['char'], 'a')
+    assert_equal(table1.get(where('char') == 'b')['char'], 'b')
 
 
 def test_multiple_tables():
@@ -36,9 +36,9 @@ def test_multiple_tables():
     table2.insert({'int': 1, 'char': 'b'})
     table3.insert({'int': 1, 'char': 'c'})
 
-    assert_equal(len(table1.search(field('int') == 1)), 1)
-    assert_equal(len(table2.search(field('int') == 1)), 1)
-    assert_equal(len(table3.search(field('int') == 1)), 1)
+    assert_equal(len(table1.search(where('int') == 1)), 1)
+    assert_equal(len(table2.search(where('int') == 1)), 1)
+    assert_equal(len(table3.search(where('int') == 1)), 1)
 
 
 def test_caching():
@@ -50,5 +50,5 @@ def test_caching():
     table1.insert({'int': 1, 'char': 'a'})
     table2.insert({'int': 1, 'char': 'b'})
 
-    assert_equal(len(table1.search(field('int') == 1)), 2)
-    assert_equal(len(table2.search(field('int') == 1)), 2)
+    assert_equal(len(table1.search(where('int') == 1)), 2)
+    assert_equal(len(table2.search(where('int') == 1)), 2)

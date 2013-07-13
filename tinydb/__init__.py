@@ -1,7 +1,7 @@
 from tinydb.storages import Storage, JSONStorage
-from tinydb.queries import query, field
+from tinydb.queries import query, where
 
-__all__ = ('TinyDB',)
+__all__ = ('TinyDB', 'where')
 
 
 class TinyDB(object):
@@ -13,13 +13,13 @@ class TinyDB(object):
 
     >>> db = TinyDB('<memory>', backend=MemoryBackend)
     >>> db.insert({'data': 5})  # Insert into '_default' table
-    >>> db.search(field('data') == 5)
+    >>> db.search(where('data') == 5)
     [{'data': 5, '_id': 1}]
     >>> # Now let's use a table
     >>> tbl = db.table('our_table')
     >>> for i in range(10):
     ...     tbl.insert({'data': i % 2})
-    >>> len(tbl.search(field('data') == 0))
+    >>> len(tbl.search(where('data') == 0))
     5
     >>>
 
@@ -59,7 +59,7 @@ class TinyDB(object):
 
         :param table: The table, we want to read, or None to read the 'all
         tables' dict.
-        :type table: dict or None
+        :type table: str or None
         :returns: all values
         :rtype: dict
         """
@@ -81,7 +81,7 @@ class TinyDB(object):
 
         :param table: The table, we want to write, or None to write the 'all
         tables' dict.
-        :type table: dict or None
+        :type table: str or None
         :param values: the new values to write
         :type values: dict
         """
@@ -102,7 +102,7 @@ class TinyDB(object):
 
     def __contains__(self, item):
         """
-        A shorthand for ``field(...) == ... in db.table()``
+        A shorthand for ``query(...) == ... in db.table()``
         """
         return item in self.table()
 
@@ -160,11 +160,11 @@ class Table(object):
         """
         return len(self.all())
 
-    def __contains__(self, where):
+    def __contains__(self, condition):
         """
-        Equals to bool(table.search(where)))
+        Equals to bool(table.search(condition)))
         """
-        return bool(self.search(where))
+        return bool(self.search(condition))
 
     def all(self, as_dict=False):
         """
@@ -196,34 +196,34 @@ class Table(object):
 
         self._write(data)
 
-    def remove(self, id):
+    def remove(self, cond):
         """
         Remove the element matching the condition.
 
-        :param id: the condition or ID or a list of IDs
-        :type id: query, int, list
+        :param cond: the condition or ID or a list of IDs
+        :type cond: query, int, list
         """
 
-        if isinstance(id, field):
+        if isinstance(cond, query):
             # Got a query
-            where = id
+            where = cond
 
             to_remove = self.search(where)
             new_values = dict(
-                [(id, val) for id, val in self._read().iteritems()
+                [(cond, val) for cond, val in self._read().iteritems()
                  if val not in to_remove]
             )  # We don't use the new dict comprehension to support Python 2.6
 
             self._write(new_values)
-        elif isinstance(id, list):
+        elif isinstance(cond, list):
             # Got a list of IDs
-            ids = id
-            for id in ids:
-                self.remove(id)
+            ids = cond
+            for cond in ids:
+                self.remove(cond)
         else:
             # Got an id
             data = self._read()
-            del data[id]
+            del data[cond]
             self._write(data)
 
     def purge(self):
@@ -232,54 +232,54 @@ class Table(object):
         """
         self._write({})
 
-    def search(self, where):
+    def search(self, cond):
         """
-        Search for all elements matching a 'where' condition or get elements
+        Search for all elements matching a 'where' cond or get elements
         by a list of IDs.
 
-        :param where: the condition or a list of IDs
-        :type where: has, list
+        :param cond: the cond or a list of IDs
+        :type cond: has, list
 
         :returns: list of matching elements
         :rtype: list
         """
 
-        if isinstance(where, list):
+        if isinstance(cond, list):
             # Got a list of IDs
-            ids = where
-            return [self.get(id) for id in ids]
+            ids = cond
+            return [self.get(id_) for id_ in ids]
         else:
             # Got a query
-            if where in self._queries_cache:
+            if cond in self._queries_cache:
                 return self._queries_cache[where]
             else:
-                elems = [e for e in self.all() if where(e)]
+                elems = [e for e in self.all() if cond(e)]
                 self._queries_cache[where] = elems
 
                 return elems
 
-    def get(self, id):
+    def get(self, cond):
         """
         Search for exactly one element matching a 'where' condition.
 
         PLEASE NOTE: If there multiple elements matching, you might get a
         random one because Python's dict is not ordered!
 
-        :param id: the condition or ID
-        :type id: query, int
+        :param cond: the condition or ID
+        :type cond: query, int
 
         :returns: the element or None
         :rtype: dict or None
         """
 
-        if isinstance(id, query):
-            where = id
+        if isinstance(cond, query):
+            where = cond
 
             for el in self.all():
                 if where(el):
                     return el
         else:
-            return self._read()[id]
+            return self._read()[cond]
 
     def _clear_query_cache(self):
         """
