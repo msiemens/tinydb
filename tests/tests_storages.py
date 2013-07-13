@@ -25,6 +25,12 @@ def setup():
 
 def teardown():
     # Cleanup
+    # Fix for pypy: Run garbace collection because otherwise pypy didn't
+    # destroy the backend object and thus keeping open handles on the temp
+    # directory.
+    import gc
+    gc.collect()
+
     os.unlink(path)
 
 

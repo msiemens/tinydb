@@ -23,7 +23,10 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Topic :: Database",
         "Topic :: Database :: Database Engines/Servers",
-        "Topic :: Utilities"
+        "Topic :: Utilities",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python:: 2.7",
+        "Programming Language :: Python :: 3.3"
     ],
 
     long_description = open('README.rst', 'r').read()
