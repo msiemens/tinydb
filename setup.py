@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = "TinyDB",
+    name = "tinydb",
     version = "0.0.1",
     packages = find_packages(),
 
@@ -12,16 +12,17 @@ setup(
     # metadata for upload to PyPI
     author = "Markus Siemens",
     author_email = "markus@m-siemens.de",
-    description = "A tiny, intuitive database written in pure Python",
+    description = "TinyDB is a tiny, document oriented database optimized for your happiness :)",
     license = "MIT",
     keywords = "database",
     url = "https://github.com/msiemens/TinyDB",
     classifiers  = [
-        "Development Status :: 4 - Beta",
-        "Environment :: Console",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
+        "Intended Audience :: System Administrators",
         "License :: OSI Approved :: MIT License",
-        "Topic :: Software Development :: Version Control",
+        "Topic :: Database",
+        "Topic :: Database :: Database Engines/Servers",
         "Topic :: Utilities"
     ],
 

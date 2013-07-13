@@ -116,6 +116,8 @@ def test_concurrency():
     for i in xrange(run_count):
         thread = WriteThread()
         threads.append(thread)
+
+    for thread in threads:
         thread.start()
 
     # Wait for all threads to finish
