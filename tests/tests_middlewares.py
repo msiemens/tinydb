@@ -9,7 +9,7 @@ if not 'xrange' in dir(__builtins__):
     xrange = range  # Python 3 support
 
 
-backend = None
+storage = None
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
            'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
            'dict': {'hp': 13, 'sp': 5},
@@ -17,100 +17,100 @@ element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
 
 
 def setup_caching():
-    global backend
-    _backend = CachingMiddleware(MemoryStorage)
-    backend = _backend()  # Initialize MemoryStorage
+    global storage
+    _storage = CachingMiddleware(MemoryStorage)
+    storage = _storage()  # Initialize MemoryStorage
 
 
 @with_setup(setup_caching)
 def test_caching():
     # Write contents
-    backend.write(element)
+    storage.write(element)
 
     # Verify contents
-    assert_equal(element, backend.read())
+    assert_equal(element, storage.read())
 
 
 def setup_caching_write_many():
-    global backend
-    backend = CachingMiddleware(MemoryStorage)
-    backend.WRITE_CACHE_SIZE = 3
-    backend()  # Initialize MemoryStorage
+    global storage
+    storage = CachingMiddleware(MemoryStorage)
+    storage.WRITE_CACHE_SIZE = 3
+    storage()  # Initialize MemoryStorage
 
 
 @with_setup(setup_caching_write_many)
 def test_caching_write_many():
     # Write contents
-    global backend
+    global storage
 
     for x in xrange(4):
-        backend.write(element)
-
-    # Verify contents: Storage shouldn't be empty
-    assert_not_equal('', backend.memory)
-    assert_not_equal('{}', backend.memory)
-
-
-def setup_caching_flush():
-    global backend
-    _backend = CachingMiddleware(MemoryStorage)
-    backend = _backend()  # Initialize MemoryStorage
-
-
-@with_setup(setup_caching_flush)
-def test_caching_flush():
-    # Write contents
-    global backend
-
-    for x in xrange(5):
-        backend.write(element)
-
-    backend.flush()
-
-    # Verify contents: Storage shouldn't be empty
-    assert_not_equal('', backend.memory)
-    assert_not_equal('{}', backend.memory)
-
-
-def setup_caching_write():
-    global backend
-    _backend = CachingMiddleware(MemoryStorage)
-    backend = _backend()  # Initialize MemoryStorage
-
-
-@with_setup(setup_caching_write)
-def test_caching_write():
-    # Write contents
-    global backend
-    backend.write(element)
-
-    storage = backend.storage
-    backend = None  # Delete backend
+        storage.write(element)
 
     # Verify contents: Storage shouldn't be empty
     assert_not_equal('', storage.memory)
     assert_not_equal('{}', storage.memory)
 
 
+def setup_caching_flush():
+    global storage
+    _storage = CachingMiddleware(MemoryStorage)
+    storage = _storage()  # Initialize MemoryStorage
+
+
+@with_setup(setup_caching_flush)
+def test_caching_flush():
+    # Write contents
+    global storage
+
+    for x in xrange(5):
+        storage.write(element)
+
+    storage.flush()
+
+    # Verify contents: Storage shouldn't be empty
+    assert_not_equal('', storage.memory)
+    assert_not_equal('{}', storage.memory)
+
+
+def setup_caching_write():
+    global storage
+    _storage = CachingMiddleware(MemoryStorage)
+    storage = _storage()  # Initialize MemoryStorage
+
+
+@with_setup(setup_caching_write)
+def test_caching_write():
+    # Write contents
+    global storage
+    storage.write(element)
+
+    _storage = storage.storage
+    storage = None  # Delete storage
+
+    # Verify contents: Storage shouldn't be empty
+    assert_not_equal('', _storage.memory)
+    assert_not_equal('{}', _storage.memory)
+
+
 def setup_concurrency():
-    global backend
-    _backend = ConcurrencyMiddleware(MemoryStorage)
-    backend = _backend()  # Initialize MemoryStorage
+    global storage
+    _storage = ConcurrencyMiddleware(MemoryStorage)
+    storage = _storage()  # Initialize MemoryStorage
 
 
 @with_setup(setup_concurrency)
 def test_concurrency():
-    global backend
+    global storage
     threads = []
     run_count = 5
 
     class WriteThread(Thread):
         def run(self):
             try:
-                current_contents = backend.read()
+                current_contents = storage.read()
             except ValueError:
                 current_contents = []
-            backend.write(current_contents + [element])
+            storage.write(current_contents + [element])
 
     # Start threads
     for i in xrange(run_count):
@@ -125,20 +125,20 @@ def test_concurrency():
         t.join()
 
     # Verify contents: Storage shouldn't be empty
-    assert_equal(len(backend.memory), run_count)
+    assert_equal(len(storage.memory), run_count)
 
 
 def setup_nested():
-    global backend
-    _backend = ConcurrencyMiddleware(CachingMiddleware(MemoryStorage))
-    backend = _backend()  # Initialize MemoryStorage
+    global storage
+    _storage = ConcurrencyMiddleware(CachingMiddleware(MemoryStorage))
+    storage = _storage()  # Initialize MemoryStorage
 
 
 @with_setup(setup_nested)
 def test_nested():
-    global backend
+    global storage
     # Write contents
-    backend.write(element)
+    storage.write(element)
 
     # Verify contents
-    assert_equal(element, backend.read())
+    assert_equal(element, storage.read())

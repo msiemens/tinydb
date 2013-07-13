@@ -13,7 +13,7 @@ def setup():
 
 
 def test_one_table():
-    db.purge_all()
+    db.purge_tables()
 
     table1 = db.table('table1')
 
@@ -26,7 +26,7 @@ def test_one_table():
 
 
 def test_multiple_tables():
-    db.purge_all()
+    db.purge_tables()
 
     table1 = db.table('table1')
     table2 = db.table('table2')
@@ -42,7 +42,7 @@ def test_multiple_tables():
 
 
 def test_caching():
-    db.purge_all()
+    db.purge_tables()
 
     table1 = db.table('table1')
     table2 = db.table('table1')

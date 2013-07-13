@@ -1,3 +1,8 @@
+"""
+Contains the :class:`base class <tinydb.middlewares.Middleware>` for
+middlewares and two implementations.
+"""
+
 from threading import RLock
 
 from tinydb.storages import Storage
@@ -5,14 +10,15 @@ from tinydb.storages import Storage
 
 class Middleware(Storage):
     """
-    This is the base class for all Middlewares.
+    The base class for all Middlewares.
 
-    Middlewares allow you to customize the way TinyDB writes and reads data.
-    This may include caching/compression or a totally custom storage format.
+    Middlewares hook into the read/write process of TinyDB allowing you to
+    extend the behaviour by adding caching, logging, ...
 
-    To use Middlewares, your ``__init__`` method has to accept exactly one
+    Your middleware's ``__init__`` method has to accept exactly one
     argument which is the class of the "real" storage. It has to be stored as
-     self._storage_cls (see implementations below).
+    ``_storage_cls`` (see :class:`~tinydb.middlewares.CachingMiddleware` for an
+    example).
     """
 
     def __call__(self, *args, **kwargs):
@@ -20,11 +26,11 @@ class Middleware(Storage):
         Create the storage instance and store it as self.storage.
 
         Usually, when the user creates a new TinyDB instance, he does it like
-        this:
+        this:::
 
             TinyDB(storage=StorageClass)
 
-        The storage kwarg is used by TinyDB this way:
+        The storage kwarg is used by TinyDB this way:::
 
             self._storage = storage(*args, **kwargs)
 
@@ -32,7 +38,7 @@ class Middleware(Storage):
         new storage instance.
 
 
-        Using Middlewares, the user will call:
+        Using Middlewares, the user will call:::
 
                                        The 'real' storage class
                                        v
@@ -59,7 +65,8 @@ class Middleware(Storage):
 
     def __getattr__(self, name):
         """
-        Forward all unknown attribute calls to the underlying storage.
+        Forward all unknown attribute calls to the underlying storage so we
+        remain as transparent as possible.
         """
         return getattr(self.__dict__['storage'], name)
 
@@ -81,10 +88,7 @@ class CachingMiddleware(Middleware):
         self._storage_cls = storage_cls
 
     def __del__(self):
-        """
-        There may still be some data in the cache. Clear it.
-        """
-        self.flush()
+        self.flush()  # Flush potentially unwritten data
 
     def write(self, data):
         self.cache = data
@@ -94,9 +98,14 @@ class CachingMiddleware(Middleware):
             self.flush()
 
     def read(self):
+        if self.cache is None:
+            raise ValueError
         return self.cache
 
     def flush(self):
+        """
+        Flush all unwritten data to disk.
+        """
         self.storage.write(self.cache)
         self._cache_modified_count = 0
 

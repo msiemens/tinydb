@@ -1,3 +1,26 @@
+"""
+TinyDB is a tiny, document oriented database optimized for your happiness :)
+
+TinyDB stores differrent types of python data types using a configurable
+backend. It has support for handy querying and tables.
+
+.. codeauthor:: Markus Siemens <markus@m-siemens.de>
+
+Usage example:
+
+    >>> db = TinyDB(storage=MemoryStorage)
+    >>> db.insert({'data': 5})  # Insert into '_default' table
+    >>> db.search(where('data') == 5)
+    [{'data': 5, '_id': 1}]
+    >>> # Now let's create a new table
+    >>> tbl = db.table('our_table')
+    >>> for i in range(10):
+    ...     tbl.insert({'data': i})
+    ...
+    >>> len(tbl.search(where('data') < 5))
+    5
+"""
+
 from tinydb.storages import Storage, JSONStorage
 from tinydb.queries import query, where
 
@@ -6,28 +29,21 @@ __all__ = ('TinyDB', 'where')
 
 class TinyDB(object):
     """
-    A plain & simple DB.
+    The main class of TinyDB.
 
-    TinyDB stores all types of python objects using a configurable backend.
-    It has support for handy querying and tables.
-
-    >>> db = TinyDB('<memory>', backend=MemoryBackend)
-    >>> db.insert({'data': 5})  # Insert into '_default' table
-    >>> db.search(where('data') == 5)
-    [{'data': 5, '_id': 1}]
-    >>> # Now let's use a table
-    >>> tbl = db.table('our_table')
-    >>> for i in range(10):
-    ...     tbl.insert({'data': i % 2})
-    >>> len(tbl.search(where('data') == 0))
-    5
-    >>>
-
+    Gives access to the database, provides methods to insert/search/remove
+    and getting tables.
     """
 
     _table_cache = {}
 
     def __init__(self, *args, **kwargs):
+        """
+        Create a new instance of TinyDB.
+
+        All arguments and keyword arguments will be passed to the underlying
+        storage class (default: :class:`~tinydb.storages.JSONStorage`).
+        """
         storage = kwargs.pop('storage', JSONStorage)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
@@ -36,6 +52,9 @@ class TinyDB(object):
     def table(self, name='_default'):
         """
         Get access to a specific table.
+
+        Creates a new table, if it hasn't been created before, otherwise it
+        returns the cached :class:`~tinydb.Table` object.
 
         :param name: The name of the table.
         :type name: str
@@ -47,11 +66,12 @@ class TinyDB(object):
         self._table_cache[name] = table
         return table
 
-    def purge_all(self):
+    def purge_tables(self):
         """
-        Purge all tables from the database. CANT BE REVERSED!
+        Purge all tables from the database. **CANT BE REVERSED!**
         """
         self._write({})
+        self._table_cache.clear()
 
     def _read(self, table=None):
         """
@@ -97,16 +117,26 @@ class TinyDB(object):
     def __len__(self):
         """
         Get the total number of elements in the DB.
+
+        >>> len(db)
+        0
         """
         return len(self._table)
 
     def __contains__(self, item):
         """
-        A shorthand for ``query(...) == ... in db.table()``
+        A shorthand for ``query(...) == ... in db.table()``. Intendet to be
+        used in if-clauses (avoiding ``if len(db.serach(...)):``)
+
+        >>> if where('field') == 'value' in db:
+        ...     print True
         """
-        return item in self.table()
+        return item in self._table
 
     def __getattr__(self, name):
+        """
+        Forward all unknown attribute calls to the underlying standard table.
+        """
         return getattr(self._table, name)
 
 
@@ -162,13 +192,15 @@ class Table(object):
 
     def __contains__(self, condition):
         """
-        Equals to bool(table.search(condition)))
+        Equals to ``bool(table.search(condition)))``.
         """
         return bool(self.search(condition))
 
     def all(self):
         """
         Get all elements stored in the table.
+
+        Note: all elements will have an `_id` key.
 
         :returns: a list with all elements.
         :rtype: list
@@ -183,8 +215,8 @@ class Table(object):
         element has to be a dict, not containing the key 'id'.
         """
 
-        self._last_id += 1
         next_id = self._last_id
+        self._last_id += 1
 
         element['_id'] = next_id
 
@@ -197,7 +229,7 @@ class Table(object):
         """
         Remove the element matching the condition.
 
-        :param cond: the condition or ID or a list of IDs
+        :param cond: the condition to check against
         :type cond: query, int, list
         """
 
@@ -212,8 +244,9 @@ class Table(object):
 
     def search(self, cond):
         """
-        Search for all elements matching a 'where' cond or get elements
-        by a list of IDs.
+        Search for all elements matching a 'where' cond.
+
+        Note: all elements will have an `_id` key.
 
         :param cond: the condition to check against
         :type cond: query
@@ -234,6 +267,8 @@ class Table(object):
         """
         Search for exactly one element matching a 'where' condition.
 
+        Note: all elements will have an `_id` key.
+
         :param cond: the condition to check against
         :type cond: query
 
@@ -247,6 +282,6 @@ class Table(object):
 
     def _clear_query_cache(self):
         """
-
+        Clear query cache.
         """
         self._queries_cache = {}

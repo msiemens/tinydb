@@ -1,21 +1,34 @@
-TinyDB |Build Status|
-======================
+TinyDB
+======
 
-``TinyDB`` is a tiny, document oriented database optimized for your happiness :) It's written in pure Python and has no external requirements. The target are small apps that would be blown away by a SQL-DB or an external database server.
- ``TinyDB`` is:
+|Build Status| |Version|
 
-- **tiny**: The current source code has 800 lines of code (+ 500 lines tests) what makes about 100 KB. For comparison: Buzhug_ has about 2000 lines of code (w/o tests), CodernityDB_ has about 8000 lines of code (w/o tests).
-- **document oriented**: Like `MongoDB <http://mongodb.org/>`_, you can store any document (represented as ``dict``) in ``TinyDB``.
-- **optimized for your happiness**: ``TinyDB`` is designed to be simple and fun to use. It's not bloated and has a simple and clean API.
-- **written in pure Python**: ``TinyDB`` neither needs an external server (as e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any packages from PyPI. Just install ``TinyDB`` and you're ready to go.
-- **easily extensible**: You can easily extend ``TinyDB`` by writing new storages or modify the behaviour of storages with ``Middlewares``. ``TinyDB`` provides ``Middlewares`` for caching and concurrency handling.
-- **nearly 100% code coverage**: If you don't count that ``__repr__`` methods and some abstract methods are not tested, ``TinyDB`` has a code coverage of 100%.
+TinyDB is a tiny, document oriented database optimized for your happiness :)
+It's written in pure Python and has no external requirements. The target are
+small apps that would be blown away by a SQL-DB or an external database server.
 
+ TinyDB is:
 
-Is it stable?
--------------
+- **tiny**: The current source code has 800 lines of code (+ 500 lines tests)
+  what makes about 100 KB. For comparison: Buzhug_ has about 2000 lines of code
+  (w/o tests), CodernityDB_ has about 8000 lines of code (w/o tests).
 
-**Not yet.** I'm still working on the API, but as soon as I'll release it to PyPI, you can consider it stable.
+- **document oriented**: Like `MongoDB <http://mongodb.org/>`_, you can store
+  any document (represented as ``dict``) in TinyDB.
+
+- **optimized for your happiness**: TinyDB is designed to be simple and fun to
+  use. It's not bloated and has a simple and clean API.
+
+- **written in pure Python**: TinyDB neither needs an external server (as e.g.
+  `PyMongo <http://api.mongodb.org/python/current/>`_) nor any packages from
+  PyPI. Just install TinyDB and you're ready to go.
+
+- **easily extensible**: You can easily extend TinyDB by writing new storages
+  or modify the behaviour of storages with Middlewares. TinyDB provides
+  Middlewares for caching and concurrency handling.
+
+- **nearly 100% code coverage**: If you don't count that ``__repr__`` methods
+  and some abstract methods are not tested, TinyDB has a code coverage of 100%.
 
 
 Example Code
@@ -71,7 +84,7 @@ Using Middlewares
 Supported Python Versions
 -------------------------
 
-``TinyDB`` has been tested with Python 2.6, 2.7, 3.2, 3.3 and pypy.
+TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3 and pypy.
 
 
 Limitations
@@ -80,19 +93,31 @@ Limitations
 JSON Serialization
 ^^^^^^^^^^^^^^^^^^
 
-``TinyDB`` serializes all data using the `Python JSON <http://docs.python.org/2/library/json.html>`_ module by default. It serializes most basic Python data types very well, but fails serializing classes. If you need a better serializer, you can write your own storage, that e.g. uses the more powerfull (but also slower) `pickle  <http://docs.python.org/library/pickle.html>`_ or `PyYAML  <http://pyyaml.org/>`_.
+TinyDB serializes all data using the
+`Python JSON <http://docs.python.org/2/library/json.html>`_ module by default.
+It serializes most basic Python data types very well, but fails serializing
+classes. If you need a better serializer, you can write your own storage,
+that e.g. uses the more powerfull (but also slower)
+`pickle  <http://docs.python.org/library/pickle.html>`_
+or `PyYAML  <http://pyyaml.org/>`_.
 
 Performance
 ^^^^^^^^^^^
 
-``TinyDB`` is NOT designed to be used in environments, where performance might be an issue. Altough you can improve the ``TinyDB`` performance as described below, you should consider using a DB that is optimized for speed like Buzhug_ or CodernityDB_.
+TinyDB is NOT designed to be used in environments, where performance might be
+an issue. Altough you can improve the TinyDB performance as described below,
+you should consider using a DB that is optimized for speed like Buzhug_ or
+CodernityDB_.
 
-How to Improve ``TinyDB`` Performance
+How to Improve TinyDB Performance
 `````````````````````````````````````
 
-The default storage serializes the data using JSON. To improve performance, you can install `ujson <http://pypi.python.org/pypi/ujson>`_ , a extremely fast JSON implementation. ``TinyDB`` will auto-detect and use it if possible.
+The default storage serializes the data using JSON. To improve performance,
+you can install `ujson <http://pypi.python.org/pypi/ujson>`_ , a extremely
+fast JSON implementation. TinyDB will auto-detect and use it if possible.
 
-In addition, you can wrap the storage with the ``CachingMiddleware`` which reduces disk I/O (see `Using Middlewares`_)
+In addition, you can wrap the storage with the ``CachingMiddleware`` which
+reduces disk I/O (see `Using Middlewares`_)
 
 
 .. image:: http://i.imgur.com/if4JI70.png
@@ -100,7 +125,26 @@ In addition, you can wrap the storage with the ``CachingMiddleware`` which reduc
    :align: center
 
 
+Version Numbering
+-----------------
+
+TinyDB follows the SemVer versioning guidelines. For more information,
+see `semver.org <http://semver.org/>`_
+
+
+Changelog
+---------
+
+**v1.0.0** (2013-07-20)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- First official release – consider TinyDB stable now.
+
+
+
 .. |Build Status| image:: https://travis-ci.org/msiemens/TinyDB.png?branch=master
    :target: https://travis-ci.org/msiemens/TinyDB
+.. |Version| image:: https://pypip.in/v/tinydb/badge.png
+   :target: https://crate.io/packages/tinydb
 .. _Buzhug: http://buzhug.sourceforge.net/
 .. _CodernityDB: http://labs.codernity.com/codernitydb/

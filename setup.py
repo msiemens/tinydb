@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "tinydb",
-    version = "0.0.1",
+    version = "1.0.0",
     packages = find_packages(),
 
     # development metadata
@@ -14,10 +14,10 @@ setup(
     author_email = "markus@m-siemens.de",
     description = "TinyDB is a tiny, document oriented database optimized for your happiness :)",
     license = "MIT",
-    keywords = "database",
-    url = "https://github.com/msiemens/TinyDB",
+    keywords = "database nosql",
+    url = "https://github.com/msiemens/tinydb",
     classifiers  = [
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
         "License :: OSI Approved :: MIT License",
@@ -25,10 +25,13 @@ setup(
         "Topic :: Database :: Database Engines/Servers",
         "Topic :: Utilities",
         "Programming Language :: Python :: 2.6",
-        "Programming Language :: Python:: 2.7",
-        "Programming Language :: Python :: 3.3"
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.3",
+        "Operating System :: OS Independent"
     ],
 
-    long_description = open('README.rst', 'r').read()
-    # could also include download_url etc.
+    long_description = open('README.rst', 'r').read(),
+
+    test_suite="nose.collector",
+    tests_require="nose"
 )

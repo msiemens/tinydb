@@ -26,7 +26,7 @@ def setup():
 def teardown():
     # Cleanup
     # Fix for pypy: Run garbace collection because otherwise pypy didn't
-    # destroy the backend object and thus keeping open handles on the temp
+    # destroy the storage object and thus keeping open handles on the temp
     # directory.
     import gc
     gc.collect()
@@ -34,19 +34,19 @@ def teardown():
     os.unlink(path)
 
 
-def test_yaml():
+def test_json():
     # Write contents
-    backend = JSONStorage(path)
-    backend.write(element)
+    storage = JSONStorage(path)
+    storage.write(element)
 
     # Verify contents
-    assert_equal(element, backend.read())
+    assert_equal(element, storage.read())
 
 
 def test_in_memory():
     # Write contents
-    backend = MemoryStorage()
-    backend.write(element)
+    storage = MemoryStorage()
+    storage.write(element)
 
     # Verify contents
-    assert_equal(element, backend.read())
+    assert_equal(element, storage.read())

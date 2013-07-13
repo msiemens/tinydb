@@ -1,6 +1,24 @@
+"""
+Contains the querying interface.
+
+Starting with :class:`~tinydb.queries.query` you can construct complex
+queries:
+
+>>> ((where('f1') == 5) & (where('f2') != 2)) | where('s').matches('^\w+$')
+(('f1' == 5) and ('f2' != 2)) or ('s' ~= ^\w+$ )
+
+Queries are executed by using the ``__call__``:
+
+>>> q = where('val') == 5
+>>> q({'val': 5})
+True
+>>> q({'val': 1})
+False
+"""
+
 import re
 
-__all__ = 'has'
+__all__ = ('query',)
 
 
 class AndOrMixin(object):
@@ -18,7 +36,7 @@ class AndOrMixin(object):
         >>> (where('f1') == 5) | (where('f2') != 2)
         ('f1' == 5) or ('f2' != 2)
 
-        See :class:`query_or`.
+        See :class:`~tinydb.queries.query_or`.
         """
         return query_or(self, other)
 
@@ -30,7 +48,7 @@ class AndOrMixin(object):
         >>> (where('f1') == 5) & (where('f2') != 2)
         ('f1' == 5) and ('f2' != 2)
 
-        See :class:`query_and`.
+        See :class:`~tinydb.queries.query_and`.
         """
         return query_and(self, other)
 
@@ -42,9 +60,8 @@ class query(AndOrMixin):
     Any type of comparison will be called in this class. In addition,
     it is aliased to :data:`where` to provide a more intuitive syntax.
 
-    Example:
-    >>> ((where('f1') == 5) & (where('f2') != 2)) | where('s').matches('^\w+$')
-    (('f1' == 5) and ('f2' != 2)) or ('s' ~= ^\w+$ )
+    When not using any comparison operation, this simply tests for existence
+    of the given key.
     """
 
     def __init__(self, key):
@@ -72,8 +89,7 @@ class query(AndOrMixin):
         >>> where('f1').test(test_func)
         'f1'.test(<function test_func at 0x029950F0>)
 
-        :param func: The function to run. Has to accept one parameter and
-        return a boolean.
+        :param func: The function to run. Has to accept one parameter and return a boolean.
         """
         return query_custom(self._key, func)
 
@@ -150,7 +166,7 @@ class query(AndOrMixin):
         >>> ~(where('f1') >= 42)
         not ('f1' >= 42)
 
-        See :class:`query_not`.
+        See :class:`~tinydb.queries.query_not`.
         """
         return query_not(self)
 
