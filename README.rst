@@ -1,7 +1,8 @@
 TinyDB |Build Status|
 ======================
 
-``TinyDB`` is a tiny, document oriented database optimized for your happiness :) It's written in pure Python and has no external requirements. ``TinyDB`` is:
+``TinyDB`` is a tiny, document oriented database optimized for your happiness :) It's written in pure Python and has no external requirements. The target are small apps that would be blown away by a SQL-DB or an external database server.
+ ``TinyDB`` is:
 
 - **tiny**: The current source code has 800 lines of code (+ 500 lines tests) what makes about 100 KB. For comparison: Buzhug_ has about 2000 lines of code (w/o tests), CodernityDB_ has about 8000 lines of code (w/o tests).
 - **document oriented**: Like `MongoDB <http://mongodb.org/>`_, you can store any document (represented as ``dict``) in ``TinyDB``.
@@ -45,7 +46,7 @@ Query Language
     [{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
 
     >>> # More possible comparisons:  !=  <  >  <=  >=
-    >>> # More possible checks: field(...).matches(regex), field(...).test(your_test_func)
+    >>> # More possible checks: where(...).matches(regex), where(...).test(your_test_func)
 
 Tables
 ^^^^^^
@@ -65,6 +66,13 @@ Using Middlewares
     >>> from tinydb.storages import JSONStorage
     >>> from tinydb.middlewares import CachingMiddleware
     >>> db = TinyDB('/path/to/db.json', storage=CachingMiddleware(JSONStorage))
+
+
+Supported Python Versions
+-------------------------
+
+``TinyDB`` has been tested with Python 2.6, 2.7, 3.2, 3.3 and pypy.
+
 
 Limitations
 -----------
