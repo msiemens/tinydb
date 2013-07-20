@@ -81,6 +81,12 @@ Using Middlewares
     >>> db = TinyDB('/path/to/db.json', storage=CachingMiddleware(JSONStorage))
 
 
+Documentation
+-------------
+
+The documentation for TinyDB is hosted at ``Read the Docs``: https://tinydb.readthedocs.org/en/latest/
+
+
 Supported Python Versions
 -------------------------
 
