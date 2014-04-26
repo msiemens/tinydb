@@ -141,7 +141,7 @@ see `semver.org <http://semver.org/>`_
 Changelog
 ---------
 
-**v1.0.1** (2013-07-20)
+**v1.0.1** (2014-04-26)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - Fixed a bug in ``JSONStorage`` that broke the database when removing entries.
