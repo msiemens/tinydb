@@ -77,6 +77,7 @@ class JSONStorage(Storage):
         self._handle.seek(0)
         json.dump(data, self._handle)
         self._handle.flush()
+        self._handle.truncate()
 
     def read(self):
         self._handle.seek(0)

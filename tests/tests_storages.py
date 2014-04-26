@@ -5,6 +5,7 @@ random.seed()
 
 from nose.tools import *
 
+from tinydb import TinyDB, where
 from tinydb.storages import JSONStorage, MemoryStorage
 
 path = None
@@ -15,7 +16,7 @@ element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
 
 
 def setup():
-    global path, element
+    global path
 
     # Generate temp file
     tmp = tempfile.NamedTemporaryFile(delete=False)
@@ -41,6 +42,32 @@ def test_json():
 
     # Verify contents
     assert_equal(element, storage.read())
+
+
+def test_json_readwrite():
+    # Generate temp file
+    tmp = tempfile.NamedTemporaryFile(delete=False)
+    tmp.file.close()  # Close file handle
+
+    # Create TinyDB instance
+    db = TinyDB(tmp.name, storage=JSONStorage)
+
+    item = {'name': 'A very long entry'}
+    item2 = {'name': 'A short one'}
+
+    get = lambda s: db.get(where('name') == s)
+
+    db.insert(item)
+    assert_equal(get('A very long entry'), item)
+
+    db.remove(where('name') == 'A very long entry')
+    assert_equal(get('A very long entry'), None)
+
+    db.insert(item2)
+    assert_equal(get('A short one'), item2)
+
+    db.remove(where('name') == 'A short one')
+    assert_equal(get('A short one'), None)
 
 
 def test_in_memory():

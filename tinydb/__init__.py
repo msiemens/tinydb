@@ -59,6 +59,7 @@ class TinyDB(object):
         :param name: The name of the table.
         :type name: str
         """
+
         if name in self._table_cache:
             return self._table_cache[name]
 
