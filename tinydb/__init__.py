@@ -35,8 +35,6 @@ class TinyDB(object):
     and getting tables.
     """
 
-    _table_cache = {}
-
     def __init__(self, *args, **kwargs):
         """
         Create a new instance of TinyDB.
@@ -47,6 +45,8 @@ class TinyDB(object):
         storage = kwargs.pop('storage', JSONStorage)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
+
+        self._table_cache = {}
         self._table = self.table('_default')
 
     def table(self, name='_default'):
