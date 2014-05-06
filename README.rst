@@ -160,9 +160,9 @@ Changelog
 
 
 
-.. |Build Status| image:: https://travis-ci.org/msiemens/tinydb.png?branch=master
+.. |Build Status| image:: http://img.shields.io/travis/msiemens/tinydb.svg?style=flat
    :target: https://travis-ci.org/msiemens/TinyDB
-.. |Version| image:: https://pypip.in/v/tinydb/badge.png?version=latest
+.. |Version| image:: http://img.shields.io/pypi/v/tinydb.svg?style=flat
    :target: https://crate.io/packages/tinydb
 .. _Buzhug: http://buzhug.sourceforge.net/
 .. _CodernityDB: http://labs.codernity.com/codernitydb/
