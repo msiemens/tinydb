@@ -105,11 +105,13 @@ Use a custom test function:
 
 >>> test_func = lambda c: c == 'a'
 >>> db.search(where('char').test(test_func))
+[{'char': 'a', 'int': 1}]
 
 
 Also, if you want to get only one element, you can use:
 
 >>> db.get(where('value'))
+{'int': 1, 'value': 5.0}
 
 .. caution::
 
@@ -146,7 +148,7 @@ Advanced Usage
 Tables
 ::::::
 
-You can use TinyDB with multiple tables. They behave exactly as descibred
+You can use TinyDB with multiple tables. They behave exactly as described
 above:
 
 >>> table = db.table('name')
@@ -158,19 +160,6 @@ above:
 In addition, you can remove all tables by using:
 
 >>> db.purge_tables()
-
-
-above:
-
->>> table = db.table('name')
->>> table.insert({'value': True})
->>> table.all()
-[{'value': True}]
-
-
-In addition, you can remove all tables by using:
-
->>> db.purge_all()
 
 .. hint::
 
