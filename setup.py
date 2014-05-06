@@ -2,21 +2,22 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = "tinydb",
-    version = "1.0.1",
-    packages = find_packages(),
+    name="tinydb",
+    version="1.1.0",
+    packages=find_packages(),
 
     # development metadata
-    zip_safe = True,
+    zip_safe=True,
 
     # metadata for upload to PyPI
-    author = "Markus Siemens",
-    author_email = "markus@m-siemens.de",
-    description = "TinyDB is a tiny, document oriented database optimized for your happiness :)",
-    license = "MIT",
-    keywords = "database nosql",
-    url = "https://github.com/msiemens/tinydb",
-    classifiers  = [
+    author="Markus Siemens",
+    author_email="markus@m-siemens.de",
+    description="TinyDB is a tiny, document oriented database optimized for "
+                "your happiness :)",
+    license="MIT",
+    keywords="database nosql",
+    url="https://github.com/msiemens/tinydb",
+    classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
@@ -30,7 +31,7 @@ setup(
         "Operating System :: OS Independent"
     ],
 
-    long_description = open('README.rst', 'r').read(),
+    long_description=open('README.rst', 'r').read(),
 
     test_suite="nose.collector",
     tests_require="nose"
