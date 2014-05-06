@@ -1,11 +1,13 @@
 import os
 import tempfile
 import random
+from tinydb.database import TinyDB
+
 random.seed()
 
 from nose.tools import *
 
-from tinydb import TinyDB, where
+from tinydb import where
 from tinydb.storages import JSONStorage, MemoryStorage
 
 path = None

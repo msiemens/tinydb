@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to TinyDB!
-==================================
+==================
 
 >>> from tinydb import TinyDB, where
 >>> db = TinyDB('/path/to/db.json')

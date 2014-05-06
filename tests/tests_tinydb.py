@@ -107,3 +107,21 @@ def test_get():
     db.insert({'int': 1, 'char': 'c'})
 
     assert_equal(db.get(where('char') == 'b')['char'], 'b')
+
+
+def setup_multiple_dbs():
+    global db1, db2
+    db1 = TinyDB(storage=MemoryStorage)
+    db2 = TinyDB(storage=MemoryStorage)
+
+
+@with_setup(setup_multiple_dbs)
+def test_multiple_dbs():
+    db1.insert({'int': 1, 'char': 'a'})
+    db1.insert({'int': 1, 'char': 'b'})
+    db1.insert({'int': 1, 'value': 5.0})
+
+    db2.insert({'color': 'blue', 'animal': 'turtle'})
+
+    assert_equal(len(db1), 3)
+    assert_equal(len(db2), 1)

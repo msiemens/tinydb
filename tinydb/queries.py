@@ -1,7 +1,7 @@
 """
 Contains the querying interface.
 
-Starting with :class:`~tinydb.queries.query` you can construct complex
+Starting with :class:`~tinydb.queries.Query` you can construct complex
 queries:
 
 >>> ((where('f1') == 5) & (where('f2') != 2)) | where('s').matches('^\w+$')
@@ -18,14 +18,14 @@ False
 
 import re
 
-__all__ = ('query',)
+__all__ = ('Query',)
 
 
 class AndOrMixin(object):
     """
-    A mixin providing methods calls '&' and '|'.
+    A mixin providing methods calls ``&`` and ``|``.
 
-    All queries can be combined with '&' and '|'. Thus, we provide a mixin
+    All queries can be combined with ``&`` and ``|``. Thus, we provide a mixin
     here to prevent repeating this code all the time.
     """
     def __or__(self, other):
@@ -33,27 +33,29 @@ class AndOrMixin(object):
         Combines this query and another with logical or.
 
         Example:
+
         >>> (where('f1') == 5) | (where('f2') != 2)
         ('f1' == 5) or ('f2' != 2)
 
-        See :class:`~tinydb.queries.query_or`.
+        :rtype: :class:`~tinydb.queries.QueryOr`
         """
-        return query_or(self, other)
+        return QueryOr(self, other)
 
     def __and__(self, other):
         """
         Combines this query and another with logical and.
 
         Example:
+
         >>> (where('f1') == 5) & (where('f2') != 2)
         ('f1' == 5) and ('f2' != 2)
 
-        See :class:`~tinydb.queries.query_and`.
+        :rtype: :class:`~tinydb.queries.QueryAnd`
         """
-        return query_and(self, other)
+        return QueryAnd(self, other)
 
 
-class query(AndOrMixin):
+class Query(AndOrMixin):
     """
     Provides methods to do tests on dict fields.
 
@@ -76,8 +78,9 @@ class query(AndOrMixin):
         'f1' ~= ^\w+$
 
         :param regex: The regular expression to pass to ``re.match``
+        :rtype: :class:`~tinydb.queries.QueryRegex`
         """
-        return query_regex(self._key, regex)
+        return QueryRegex(self._key, regex)
 
     def test(self, func):
         """
@@ -89,9 +92,11 @@ class query(AndOrMixin):
         >>> where('f1').test(test_func)
         'f1'.test(<function test_func at 0x029950F0>)
 
-        :param func: The function to run. Has to accept one parameter and return a boolean.
+        :param func: The function to run. Has to accept one parameter and
+            return a boolean.
+        :rtype: :class:`~tinydb.queries.QueryCustom`
         """
-        return query_custom(self._key, func)
+        return QueryCustom(self._key, func)
 
     def __eq__(self, other):
         """
@@ -166,9 +171,9 @@ class query(AndOrMixin):
         >>> ~(where('f1') >= 42)
         not ('f1' >= 42)
 
-        See :class:`~tinydb.queries.query_not`.
+        :rtype: :class:`~tinydb.queries.QueryNot`
         """
-        return query_not(self)
+        return QueryNot(self)
 
     def __call__(self, element):
         """
@@ -222,10 +227,10 @@ class query(AndOrMixin):
     def __hash__(self):
         return hash(repr(self))
 
-where = query
+where = Query
 
 
-class query_not(AndOrMixin):
+class QueryNot(AndOrMixin):
     """
     Negates a query.
 
@@ -248,8 +253,10 @@ class query_not(AndOrMixin):
         return 'not ({0})'.format(self._cond)
 
 
-class query_or(AndOrMixin):
+class QueryOr(AndOrMixin):
     """
+    Combines this query and another with logical or.
+
     See :meth:`AndOrMixin.__or__`.
     """
     def __init__(self, where1, where2):
@@ -258,7 +265,7 @@ class query_or(AndOrMixin):
 
     def __call__(self, element):
         """
-        See :meth:`query.__call__`.
+        See :meth:`Query.__call__`.
         """
         return self._cond_1(element) or self._cond_2(element)
 
@@ -266,8 +273,10 @@ class query_or(AndOrMixin):
         return '({0}) or ({1})'.format(self._cond_1, self._cond_2)
 
 
-class query_and(AndOrMixin):
+class QueryAnd(AndOrMixin):
     """
+    Combines this query and another with logical and.
+
     See :meth:`AndOrMixin.__and__`.
     """
     def __init__(self, where1, where2):
@@ -276,7 +285,7 @@ class query_and(AndOrMixin):
 
     def __call__(self, element):
         """
-        See :meth:`query.__call__`.
+        See :meth:`Query.__call__`.
         """
         return self._cond_1(element) and self._cond_2(element)
 
@@ -284,9 +293,11 @@ class query_and(AndOrMixin):
         return '({0}) and ({1})'.format(self._cond_1, self._cond_2)
 
 
-class query_regex(AndOrMixin):
+class QueryRegex(AndOrMixin):
     """
-    See :meth:`query.regex`.
+    Run a regex test against a dict value.
+
+    See :meth:`Query.matches`.
     """
     def __init__(self, key, regex):
         self.regex = regex
@@ -294,7 +305,7 @@ class query_regex(AndOrMixin):
 
     def __call__(self, element):
         """
-        See :meth:`query.__call__`.
+        See :meth:`Query.__call__`.
         """
         return bool(self._key in element
                     and re.match(self.regex, element[self._key]))
@@ -303,9 +314,11 @@ class query_regex(AndOrMixin):
         return '\'{0}\' ~= {1} '.format(self._key, self.regex)
 
 
-class query_custom(AndOrMixin):
+class QueryCustom(AndOrMixin):
     """
-    See :meth:`query.test`.
+    Run an user defined test function against a dict value.
+
+    See :meth:`Query.test`.
     """
 
     def __init__(self, key, test):
@@ -314,7 +327,7 @@ class query_custom(AndOrMixin):
 
     def __call__(self, element):
         """
-        See :meth:`query.__call__`.
+        See :meth:`Query.__call__`.
         """
         return self._key in element and self.test(element[self._key])
 

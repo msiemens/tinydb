@@ -1,21 +1,22 @@
 API Documentation
 =================
 
-``tinydb``
-----------
+``tinydb.database``
+-------------------
 
-.. automodule:: tinydb
+.. automodule:: tinydb.database
     :members:
     :special-members:
-    :exclude-members: __dict__,__weakref__
+    :exclude-members: __dict__, __weakref__
     :member-order: bysource
 
 ``tinydb.queries``
 ------------------
 
 .. automodule:: tinydb.queries
-    :members:
+    :members: Query, AndOrMixin
     :special-members:
+    :exclude-members: __weakref__
     :member-order: bysource
 
 ``tinydb.storage``

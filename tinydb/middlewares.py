@@ -25,12 +25,11 @@ class Middleware(Storage):
         """
         Create the storage instance and store it as self.storage.
 
-        Usually, when the user creates a new TinyDB instance, he does it like
-        this:::
+        Usually a user creates a new TinyDB instance like this::
 
             TinyDB(storage=StorageClass)
 
-        The storage kwarg is used by TinyDB this way:::
+        The storage kwarg is used by TinyDB this way::
 
             self._storage = storage(*args, **kwargs)
 
@@ -38,7 +37,7 @@ class Middleware(Storage):
         new storage instance.
 
 
-        Using Middlewares, the user will call:::
+        Using Middlewares, the user will call::
 
                                        The 'real' storage class
                                        v
