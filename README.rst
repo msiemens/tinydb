@@ -141,6 +141,12 @@ see `semver.org <http://semver.org/>`_
 Changelog
 ---------
 
+**v1.1.1** (2014-06-14)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Merged `PR #5 <https://github.com/msiemens/tinydb/pull/5>`_: Fix minor
+  documentation typos and style issues.
+
 **v1.1.0** (2014-05-06)
 ^^^^^^^^^^^^^^^^^^^^^^^
 

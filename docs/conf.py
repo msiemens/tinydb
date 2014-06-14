@@ -43,7 +43,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'TinyDB'
-copyright = u'2013, Markus Siemens'
+copyright = u'2014, Markus Siemens'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
