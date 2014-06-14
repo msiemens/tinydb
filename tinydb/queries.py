@@ -84,7 +84,7 @@ class Query(AndOrMixin):
 
     def test(self, func):
         """
-        Run an user defined test function against a dict value.
+        Run a user-defined test function against a dict value.
 
         >>> def test_func(val):
         ...     return val == 42
@@ -316,7 +316,7 @@ class QueryRegex(AndOrMixin):
 
 class QueryCustom(AndOrMixin):
     """
-    Run an user defined test function against a dict value.
+    Run a user-defined test function against a dict value.
 
     See :meth:`Query.test`.
     """

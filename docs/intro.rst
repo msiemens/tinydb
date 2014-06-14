@@ -40,7 +40,7 @@ TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3 and pypy.
 Why **not** using TinyDB?
 -----------------------------
 
-- You need **advanced features** like multiple indexes, a HTTP server,
+- You need **advanced features** like multiple indexes, an HTTP server,
   relationships, or similar.
 - You are really concerned about **high performance** and need a high speed
   database.

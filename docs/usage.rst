@@ -60,7 +60,7 @@ Getting the database size (number of elements stored):
 3
 
 
-Search for all elements, that have the ``value`` key defined:
+Search for all elements that have the ``value`` key defined:
 
 >>> db.search(where('value'))
 [{'int': 1, 'value': 5.0}]
@@ -185,7 +185,7 @@ TinyDB ships with these middlewares:
   read operations and writes data to disk every
   ``CachingMiddleware.WRITE_CACHE_SIZE`` write operations.
 - **ConcurrencyMiddleware**: Allows you to use TinyDB in multithreaded
-  environments by using a lock on read and write operations making
+  environments by using a lock on read and write operations, making
   them virtually atomic.
 
 .. hint::
