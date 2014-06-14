@@ -42,7 +42,7 @@ To write a custom storage, subclass :class:`~tinydb.middlewares.Middleware`:
 
         To access the underlying storage's
         read method, use
-        :func:`self.stroage.read <tinydb.storages.Storage.read>`.
+        :func:`self.storage.read <tinydb.storages.Storage.read>`.
 
     .. function:: write(self, data)
 
@@ -50,7 +50,7 @@ To write a custom storage, subclass :class:`~tinydb.middlewares.Middleware`:
 
         To access the underlying storage's
         read method, use
-        :func:`self.stroage.read <tinydb.storages.Storage.write>`.
+        :func:`self.storage.read <tinydb.storages.Storage.write>`.
 
 To use your middleware, use:
 

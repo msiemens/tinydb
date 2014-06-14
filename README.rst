@@ -119,7 +119,7 @@ How to Improve TinyDB Performance
 `````````````````````````````````
 
 The default storage serializes the data using JSON. To improve performance,
-you can install `ujson <http://pypi.python.org/pypi/ujson>`_ , a extremely
+you can install `ujson <http://pypi.python.org/pypi/ujson>`_ , an extremely
 fast JSON implementation. TinyDB will auto-detect and use it if possible.
 
 In addition, you can wrap the storage with the ``CachingMiddleware`` which
