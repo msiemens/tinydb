@@ -183,7 +183,7 @@ class Table(object):
         Note: all elements will have an `_id` key.
 
         :returns: a list with all elements.
-        :rtype: list
+        :rtype: list[dict]
         """
 
         return self._read()
@@ -200,7 +200,7 @@ class Table(object):
 
         element['_id'] = next_id
 
-        data = self._read()
+        data = self.all()
         data.append(element)
 
         self._write(data)
@@ -215,6 +215,25 @@ class Table(object):
 
         to_remove = self.search(cond)
         self._write([e for e in self.all() if e not in to_remove])
+
+    def update(self, fields, cond):
+        """
+        Update all elements matching the condition to have a given set of
+        fields.
+
+        :param fields: the fields that the matching elements will have
+        :type fields: dict
+        :param cond: which elements to update
+        :type cond: query
+        """
+        data = []
+
+        for el in self.all():
+            if cond(el):
+                el.update(fields)
+            data.append(el)
+
+        self._write(data)
 
     def purge(self):
         """

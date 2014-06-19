@@ -141,6 +141,24 @@ You also can purge all entries:
 >>> len(db)
 0
 
+
+Updating
+::::::::
+
+You can update elements matching a query. Assuming you have these elements in the
+database:
+
+>>> db.insert({'int': 1, 'char': 'a'})
+>>> db.insert({'int': 1, 'char': 'b'})
+>>> db.insert({'int': 1, 'value': 5.0})
+
+Then you can update selected elements like this:
+
+>>> db.update({'int': 2}, where('char') == 'a')
+>>> db.all()
+[{'int': 2, 'char': 'a'}, {'int': 1, 'char': 'b'}, {'int': 1, 'value': 5.0}]
+
+
 Advanced Usage
 --------------
 

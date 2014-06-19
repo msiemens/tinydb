@@ -70,6 +70,21 @@ def test_remove_multiple():
     assert_equal(len(db), 0)
 
 
+def test_update():
+    db.purge()
+
+    db.insert({'int': 1, 'char': 'a'})
+    db.insert({'int': 1, 'char': 'b'})
+    db.insert({'int': 1, 'char': 'c'})
+
+    assert_equal(len(db.search(where('int') == 1)), 3)
+
+    db.update({'int': 2}, where('char') == 'a')
+
+    assert_equal(len(db.search(where('int') == 2)), 1)
+    assert_equal(len(db.search(where('int') == 1)), 2)
+
+
 def test_search():
     db.purge()
 
