@@ -48,11 +48,6 @@ copyright = u'2014, Markus Siemens'
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
-#
-
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
 import pkg_resources
 try:
     release = pkg_resources.get_distribution('tinydb').version

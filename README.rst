@@ -141,6 +141,11 @@ see `semver.org <http://semver.org/>`_
 Changelog
 ---------
 
+**v1.2.0** (2014-06-19)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Added ``update`` method (see `Issue #6 <https://github.com/msiemens/tinydb/issues/6>`_).
+
 **v1.1.1** (2014-06-14)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
