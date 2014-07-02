@@ -37,7 +37,7 @@ class AndOrMixin(object):
         >>> (where('f1') == 5) | (where('f2') != 2)
         ('f1' == 5) or ('f2' != 2)
 
-        :rtype: :class:`~tinydb.queries.QueryOr`
+        :rtype: QueryOr
         """
         return QueryOr(self, other)
 
@@ -50,7 +50,7 @@ class AndOrMixin(object):
         >>> (where('f1') == 5) & (where('f2') != 2)
         ('f1' == 5) and ('f2' != 2)
 
-        :rtype: :class:`~tinydb.queries.QueryAnd`
+        :rtype: QueryAnd
         """
         return QueryAnd(self, other)
 
@@ -78,7 +78,7 @@ class Query(AndOrMixin):
         'f1' ~= ^\w+$
 
         :param regex: The regular expression to pass to ``re.match``
-        :rtype: :class:`~tinydb.queries.QueryRegex`
+        :rtype: QueryRegex
         """
         return QueryRegex(self._key, regex)
 
@@ -94,7 +94,7 @@ class Query(AndOrMixin):
 
         :param func: The function to run. Has to accept one parameter and
             return a boolean.
-        :rtype: :class:`~tinydb.queries.QueryCustom`
+        :rtype: QueryCustom
         """
         return QueryCustom(self._key, func)
 
@@ -171,7 +171,7 @@ class Query(AndOrMixin):
         >>> ~(where('f1') >= 42)
         not ('f1' >= 42)
 
-        :rtype: :class:`~tinydb.queries.QueryNot`
+        :rtype: tinydb.queries.QueryNot
         """
         return QueryNot(self)
 

@@ -4,7 +4,6 @@ two implementations.
 """
 
 from abc import ABCMeta, abstractmethod
-
 import os
 
 try:
@@ -70,8 +69,11 @@ class JSONStorage(Storage):
         self.path = path
         self._handle = open(path, 'r+')
 
-    def __del__(self):
+    def close(self):
         self._handle.close()
+
+    def __del__(self):
+        self.close()
 
     def write(self, data):
         self._handle.seek(0)

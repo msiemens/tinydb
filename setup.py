@@ -32,7 +32,4 @@ setup(
     ],
 
     long_description=open('README.rst', 'r').read(),
-
-    test_suite="nose.collector",
-    tests_require="nose"
 )

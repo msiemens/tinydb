@@ -8,4 +8,4 @@ python:
   - "2.6"
 # command to run tests, e.g. python setup.py test
 install: #empty
-script: nosetests -v
+script: py.test -v

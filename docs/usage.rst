@@ -69,7 +69,32 @@ Search for all elements that have the ``value`` key defined:
 Search for a specific value:
 
 >>> db.search(where('int') == 1)
-[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
+[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}, {'int': 1, 'value': 5.0}]
+
+Count the number of elements matching a query:
+
+>>> db.count(where('int') == 1)
+3
+
+Check whether a specific element is in the database:
+
+>>> db.contains(where('int') == 1)
+True
+>>> db.contains(where('int') == 0)
+False
+
+
+
+Alternative syntax for ``db.contains``:
+
+>>> if where('value') == 0.5 in db: print 'Found!'
+Found!
+
+.. warning::
+    .. deprecated:: 1.3.0
+       This syntax will propably be removed soon. Please use
+       the ``db.contains(...)`` syntax instead.
+
 
 Other comparison operators you can use:
 
@@ -117,13 +142,6 @@ Also, if you want to get only one element, you can use:
 
     If multiple elements match the query, only one of them will
     be returned!
-
-
-In addition, TinyDB provides an alternative query syntax to be used in
-if-clauses:
-
->>> if where('value') == 0.5 in db: print 'Found!'
-Found!
 
 
 Removing

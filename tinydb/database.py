@@ -3,6 +3,8 @@ Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
 
+import warnings
+
 from tinydb import JSONStorage, where
 
 
@@ -111,7 +113,24 @@ class TinyDB(object):
         >>> if where('field') == 'value' in db:
         ...     print True
         """
+        warnings.warn('The `where(...) in db` syntax will '
+                      'propably be deprecated soon. Please use '
+                      '`db.contains(where(...))` instead.',
+                      DeprecationWarning)
+
         return item in self._table
+
+    def __enter__(self):
+        """
+        See :meth:`Table.__enter__`
+        """
+        return self._table.__enter__()
+
+    def __exit__(self, *args):
+        """
+        See :meth:`Table.__exit__`
+        """
+        return self._table.__exit__(*args)
 
     def __getattr__(self, name):
         """
@@ -174,6 +193,11 @@ class Table(object):
         """
         Equals to ``bool(table.search(condition)))``.
         """
+        warnings.warn('The `where(...) in db` syntax will '
+                      'propably be deprecated soon. Please use '
+                      '`db.contains(where(...))` instead.',
+                      DeprecationWarning)
+
         return bool(self.search(condition))
 
     def all(self):
@@ -264,7 +288,7 @@ class Table(object):
 
     def get(self, cond):
         """
-        Search for exactly one element matching a 'where' condition.
+        Search for exactly one element matching a condition.
 
         Note: all elements will have an `_id` key.
 
@@ -279,8 +303,45 @@ class Table(object):
             if cond(el):
                 return el
 
+    def count(self, cond):
+        """
+        Count the elements matching a condition.
+
+        :param cond: the condition use
+        :type cond: Query
+        """
+        return len(self.search(cond))
+
+    def contains(self, cond):
+        """
+        Check wether the database contains an element matching a condition.
+
+        :param cond: the condition use
+        :type cond: Query
+        """
+        return self.count(cond) > 0
+
     def _clear_query_cache(self):
         """
         Clear query cache.
         """
         self._queries_cache = {}
+
+    def __enter__(self):
+        """
+        Allow the database to be used as a context manager.
+
+        :return: the table instance
+        """
+        return self
+
+    def __exit__(self, *args):
+        """
+        Try to close the storage after being used as a context manager.
+        """
+        _ = args
+
+        try:
+            self._db._storage.close()
+        except AttributeError:
+            pass
