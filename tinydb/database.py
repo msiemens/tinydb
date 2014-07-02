@@ -195,10 +195,10 @@ class Table(object):
         element has to be a dict, not containing the key 'id'.
         """
 
-        next_id = self._last_id
-        self._last_id += 1
+        current_id = self._last_id + 1
+        self._last_id = current_id
 
-        element['_id'] = next_id
+        element['_id'] = current_id
 
         data = self.all()
         data.append(element)

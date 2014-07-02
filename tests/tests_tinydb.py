@@ -1,3 +1,7 @@
+import tempfile
+import os
+import gc
+
 from tinydb import TinyDB, where
 from tinydb.storages import MemoryStorage
 
@@ -140,3 +144,23 @@ def test_multiple_dbs():
 
     assert_equal(len(db1), 3)
     assert_equal(len(db2), 1)
+
+
+def setup_bug_repeated_ids():
+    global path
+    tmp = tempfile.NamedTemporaryFile(delete=False)
+    tmp.close()
+
+    path = tmp.name
+
+
+@with_setup(setup_bug_repeated_ids)
+def test_bug_repeated_ids():
+    TinyDB(path).insert({'x': 1})
+    TinyDB(path).insert({'x': 2})
+    data = TinyDB(path).all()
+
+    assert_not_equal(data[0]['_id'], data[1]['_id'])
+
+    gc.collect()  # Let TinyDB close the file handles. FIXME: Better solution
+    os.unlink(path)
