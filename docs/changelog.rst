@@ -12,7 +12,7 @@ see `semver.org <http://semver.org/>`_
 
 - Fixed `bug #7 <https://github.com/msiemens/tinydb/issues/7>`_: IDs not unique.
 - Extended the API: ``db.count(where(...))`` and ``db.contains(where(...))``
-- The syntax ``where(...) in db`` is now **deprecated** and replaced
+- The syntax ``query in db`` is now **deprecated** and replaced
   by ``db.contains``.
 
 **v1.2.0** (2014-06-19)
