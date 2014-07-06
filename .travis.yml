@@ -6,6 +6,9 @@ python:
   - "3.2"
   - "2.7"
   - "2.6"
-# command to run tests, e.g. python setup.py test
-install: #empty
-script: py.test -v
+install:
+  pip install coveralls
+script:
+  py.test -v -cov tinydb
+after_success:
+  coveralls

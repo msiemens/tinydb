@@ -62,7 +62,11 @@ def test_update(db):
 
 
 def test_search(db):
-    assert db.count(where('int') == 1) == 3
+    assert not db._queries_cache
+    assert len(db.search(where('int') == 1)) == 3
+
+    assert len(db._queries_cache) == 1
+    assert len(db.search(where('int') == 1)) == 3  # Query result from cache
 
 
 def test_contians(db):

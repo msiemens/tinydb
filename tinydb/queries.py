@@ -105,9 +105,12 @@ class Query(AndOrMixin):
         >>> where('f1') == 42
         'f1' == 42
         """
-        self._value_eq = other
-        self._update_repr('==', other)
-        return self
+        if isinstance(other, Query):
+            return self._repr == other._repr
+        else:
+            self._value_eq = other
+            self._update_repr('==', other)
+            return self
 
     def __ne__(self, other):
         """

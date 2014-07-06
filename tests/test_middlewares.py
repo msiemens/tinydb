@@ -1,5 +1,6 @@
 from threading import Thread
 
+from tinydb import TinyDB
 from tinydb.middlewares import CachingMiddleware, ConcurrencyMiddleware
 from tinydb.storages import MemoryStorage
 
@@ -19,6 +20,11 @@ def test_caching(storage):
 
     # Verify contents
     assert element == storage.read()
+
+
+def test_caching_read():
+    db = TinyDB(storage=CachingMiddleware(MemoryStorage))
+    assert db.all() == []
 
 
 def test_caching_write_many(storage):

@@ -105,7 +105,7 @@ class TinyDB(object):
         """
         return len(self._table)
 
-    def __contains__(self, item):
+    def __contains__(self, condition):  # pragma: no cover
         """
         A shorthand for ``query(...) == ... in db.table()``. Intendet to be
         used in if-clauses (avoiding ``if len(db.serach(...)):``)
@@ -118,7 +118,7 @@ class TinyDB(object):
                       '`db.contains(where(...))` instead.',
                       DeprecationWarning)
 
-        return item in self._table
+        return self.contains(condition)
 
     def __enter__(self):
         """
@@ -189,7 +189,7 @@ class Table(object):
         """
         return len(self.all())
 
-    def __contains__(self, condition):
+    def __contains__(self, condition):  # pragma: no cover
         """
         Equals to ``bool(table.search(condition)))``.
         """
@@ -198,7 +198,7 @@ class Table(object):
                       '`db.contains(where(...))` instead.',
                       DeprecationWarning)
 
-        return bool(self.search(condition))
+        return self.contains(condition)
 
     def all(self):
         """
@@ -279,10 +279,10 @@ class Table(object):
         """
 
         if cond in self._queries_cache:
-            return self._queries_cache[where]
+            return self._queries_cache[cond]
         else:
             elems = [e for e in self.all() if cond(e)]
-            self._queries_cache[where] = elems
+            self._queries_cache[cond] = elems
 
             return elems
 

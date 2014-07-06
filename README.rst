@@ -1,13 +1,13 @@
 TinyDB
 ======
 
-|Build Status| |Version|
+|Build Status| |Coverage| |Version|
 
 TinyDB is a tiny, document oriented database optimized for your happiness :)
 It's written in pure Python and has no external requirements. The target are
 small apps that would be blown away by a SQL-DB or an external database server.
 
- TinyDB is:
+TinyDB is:
 
 - **tiny**: The current source code has 800 lines of code (+ 500 lines tests)
   what makes about 100 KB. For comparison: Buzhug_ has about 2000 lines of code
@@ -181,6 +181,8 @@ Changelog
 
 .. |Build Status| image:: http://img.shields.io/travis/msiemens/tinydb.svg?style=flat
    :target: https://travis-ci.org/msiemens/TinyDB
+.. |Coverage| image:: http://img.shields.io/coveralls/msiemens/tinydb.svg?style=flat
+   :target: https://coveralls.io/r/msiemens/tinydb
 .. |Version| image:: http://img.shields.io/pypi/v/tinydb.svg?style=flat
    :target: https://crate.io/packages/tinydb
 .. _Buzhug: http://buzhug.sourceforge.net/

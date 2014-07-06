@@ -21,9 +21,15 @@ def test_multiple_tables(db):
     table2.insert({'int': 1, 'char': 'b'})
     table3.insert({'int': 1, 'char': 'c'})
 
-    assert len(table1.search(where('int') == 1)) == 1
-    assert len(table2.search(where('int') == 1)) == 1
-    assert len(table3.search(where('int') == 1)) == 1
+    assert table1.count(where('char') == 'a') == 1
+    assert table2.count(where('char') == 'b') == 1
+    assert table3.count(where('char') == 'c') == 1
+
+    db.purge_tables()
+
+    assert len(table1) == 0
+    assert len(table2) == 0
+    assert len(table3) == 0
 
 
 def test_caching(db):

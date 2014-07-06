@@ -5,9 +5,7 @@ from tinydb.database import TinyDB
 
 random.seed()
 
-import pytest
-
-from tinydb import where
+from tinydb import TinyDB, where
 from tinydb.storages import JSONStorage, MemoryStorage
 
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
@@ -57,3 +55,8 @@ def test_in_memory():
 
     # Verify contents
     assert element == storage.read()
+
+
+def test_in_memory_close():
+    with TinyDB(storage=MemoryStorage) as db:
+        db.insert({})
