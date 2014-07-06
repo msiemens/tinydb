@@ -10,6 +10,6 @@ install:
   - pip install coveralls
   - pip install pytest-cov
 script:
-  py.test -v -cov tinydb
+  py.test -v --cov tinydb
 after_success:
   coveralls
