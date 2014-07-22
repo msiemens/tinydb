@@ -4,9 +4,8 @@ from tinydb import where
 def test_one_table(db):
     table1 = db.table('table1')
 
-    table1.insert({'int': 1, 'char': 'a'})
-    table1.insert({'int': 1, 'char': 'b'})
-    table1.insert({'int': 1, 'char': 'c'})
+    docs = [{'int':1, 'char':x} for x in 'abc']
+    table1.insert_multiple(docs)
 
     assert table1.get(where('int') == 1)['char'] == 'a'
     assert table1.get(where('char') == 'b')['char'] == 'b'

@@ -229,6 +229,15 @@ class Table(object):
 
         self._write(data)
 
+    def insert_multiple(self, documents):
+        """
+        Insert multiple elements into the table.
+        Uses ``Table.insert``internally, so refer to the docs.
+        """
+
+        for item in documents:
+            self.insert(item)
+
     def remove(self, cond):
         """
         Remove the element matching the condition.
