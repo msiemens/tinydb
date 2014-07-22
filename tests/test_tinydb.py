@@ -26,10 +26,7 @@ def test_insert(db):
 
     assert db.count(where('int') == 1) == 1
 
-
-def test_insert_multiple(db):
     db.purge()
-    assert not db.contains(where('int') == 1)
 
     db.insert({'int': 1, 'char': 'a'})
     db.insert({'int': 1, 'char': 'b'})
@@ -37,6 +34,40 @@ def test_insert_multiple(db):
 
     assert db.count(where('int') == 1) == 3
     assert db.count(where('char') == 'a') == 1
+
+
+def test_insert_multiple(db):
+    db.purge()
+    assert not db.contains(where('int') == 1)
+
+    # Insert multiple from lis
+    db.insert_multiple([{'int': 1, 'char': 'a'},
+                        {'int': 1, 'char': 'b'},
+                        {'int': 1, 'char': 'c'}])
+
+    assert db.count(where('int') == 1) == 3
+    assert db.count(where('char') == 'a') == 1
+
+    # Insert multiple from generator function
+    def generator():
+        for i in range(10):
+            yield {'int': i}
+
+    db.purge()
+
+    db.insert_multiple(generator())
+
+    for i in range(10):
+        assert db.count(where('int') == i) == 1
+    assert db.count(where('int')) == 10
+
+    # Insert multiple from inline generator
+    db.purge()
+
+    db.insert_multiple({'int': i} for i in range(10))
+
+    for i in range(10):
+        assert db.count(where('int') == i) == 1
 
 
 def test_remove(db):

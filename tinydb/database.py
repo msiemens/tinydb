@@ -216,7 +216,7 @@ class Table(object):
         """
         Insert a new element into the table.
 
-        element has to be a dict, not containing the key 'id'.
+        :param element: a dict. Shall not containing the key ``_id``!
         """
 
         current_id = self._last_id + 1
@@ -229,14 +229,14 @@ class Table(object):
 
         self._write(data)
 
-    def insert_multiple(self, documents):
+    def insert_multiple(self, elements):
         """
         Insert multiple elements into the table.
-        Uses ``Table.insert``internally, so refer to the docs.
-        """
 
-        for item in documents:
-            self.insert(item)
+        :param elements: a list of elements to insert
+        """
+        for element in elements:
+            self.insert(element)
 
     def remove(self, cond):
         """

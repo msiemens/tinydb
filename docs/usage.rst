@@ -30,7 +30,13 @@ As a document-oriented database, TinyDB uses ``dict``\ s to store data:
 
 >>> db.insert({'int': 1, 'char': 'a'})
 >>> db.insert({'int': 1, 'char': 'b'})
->>> db.insert({'int': 1, 'value': 5.0})
+>>> db.insert({'int': 1, 'value': 0})
+>>> db.insert({'int': 1, 'value': 1})
+
+You can also insert multiple elements at once:
+
+>>> db.insert_multiple([{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}])
+>>> db.insert_multiple({'int': 1, 'value': i} for i in range(2))
 
 
 Getting Data
@@ -41,40 +47,40 @@ Getting Data
     Throughout this section, the return values are stripped of the ``_id``
     key for clarity reasons. So::
 
-        [{'int': 1, 'value': 5.0}]
+        [{'int': 1, 'value': 0}]
 
     would actually be some something like::
 
-        [{'int': 1, 'value': 5.0, '_id': 3}]
+        [{'int': 1, 'value': 0, '_id': 3}]
 
 
 Getting all data stored:
 
 >>> db.all()
-[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}, {'int': 1, 'value': 5.0}]
+[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}, {'int': 1, 'value': 0}, {'int': 1, 'value': 1}]
 
 
 Getting the database size (number of elements stored):
 
 >>> len(db)
-3
+4
 
 
 Search for all elements that have the ``value`` key defined:
 
 >>> db.search(where('value'))
-[{'int': 1, 'value': 5.0}]
+[{'int': 1, 'value': 0}, {'int': 1, 'value': 1}]
 
 
 Search for a specific value:
 
->>> db.search(where('int') == 1)
-[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}, {'int': 1, 'value': 5.0}]
+>>> db.search(where('value') == 1)
+[{'int': 1, 'value': 1}]
 
 Count the number of elements matching a query:
 
 >>> db.count(where('int') == 1)
-3
+4
 
 Check whether a specific element is in the database:
 
@@ -136,7 +142,7 @@ Use a custom test function:
 Also, if you want to get only one element, you can use:
 
 >>> db.get(where('value'))
-{'int': 1, 'value': 5.0}
+{'int': 1, 'value': 0}
 
 .. caution::
 

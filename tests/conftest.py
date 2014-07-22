@@ -9,9 +9,7 @@ from tinydb import TinyDB
 def db():
     db = TinyDB(storage=MemoryStorage)
 
-    db.insert({'int': 1, 'char': 'a'})
-    db.insert({'int': 1, 'char': 'b'})
-    db.insert({'int': 1, 'char': 'c'})
+    db.insert_multiple({'int': 1, 'char': c} for c in 'abc')
 
     return db
 
