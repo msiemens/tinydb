@@ -141,7 +141,7 @@ see `semver.org <http://semver.org/>`_
 Changelog
 ---------
 
-**v1.4.0** (2014-07-XX)
+**v1.4.0** (2014-07-22)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - Added ``insert_multiple`` function (see `issue #8 <https://github.com/msiemens/tinydb/issues/8>`_).
