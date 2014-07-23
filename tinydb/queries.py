@@ -361,6 +361,9 @@ class QueryCustom(AndOrMixin):
 
 
 class QueryAny(Query):
+    """
+    Run a Query object against the data in the dict value.
+    """
     def __init__(self, key, query):
         self._key = key
         self._query = query
@@ -373,10 +376,16 @@ class QueryAny(Query):
     __le__ = methodproxy('_query', '__le__')
 
     def matches(self, *args, **kwargs):
+        """
+        Overrides the internal Query object with a QueryRegex object.
+        """
         self._query = self._query.matches(*args, **kwargs)
         return self
 
     def test(self, *args, **kwargs):
+        """
+        Overrides the internal Query object with a QueryCustom object.
+        """
         self._query = self._query.test(*args, **kwargs)
         return self
 
