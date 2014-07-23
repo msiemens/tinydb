@@ -188,9 +188,6 @@ class Table(object):
 
         if not self._smart_cache:
             self._clear_query_cache()
-        else:
-            for query, results in self._queries_cache.items():
-                results.extend(e for e in values if query(e))
         self._db._write(values, self.name)
 
     def __len__(self):
@@ -236,6 +233,11 @@ class Table(object):
 
         data = self.all()
         data.append(element)
+
+        if self._smart_cache:
+            for query, results in self._queries_cache.items():
+                if query(element):
+                    results.append(element)
 
         self._write(data)
 
