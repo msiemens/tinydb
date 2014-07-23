@@ -103,3 +103,11 @@ def test_custom():
     assert not query({'val': 40})
     assert not query({'val': '44'})
     assert not query({'': None})
+
+
+def test_nested_query():
+    query = where('user.name') == 'john'
+
+    assert query({'user':{'name':'john'}})
+    assert not query({'user':{'name':'don'}})
+    assert not query({})
