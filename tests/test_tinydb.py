@@ -110,6 +110,12 @@ def test_get(db):
     assert item['char'] == 'b'
 
 
+def test_get_by_id(db):
+    el = db.all()[0]
+    assert db.get_by_id(el.eid) == el
+    assert db.get_by_id(float('NaN')) is None
+
+
 def test_count(db):
     assert db.count(where('int') == 1) == 3
     assert db.count(where('char') == 'd') == 0
@@ -149,4 +155,4 @@ def test_bug_repeated_ids(tmpdir):
     with TinyDB(path) as _db:
         data = _db.all()
 
-        assert data[0]['_id'] != data[1]['_id']
+        assert data[0].eid != data[1].eid
