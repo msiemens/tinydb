@@ -21,20 +21,6 @@ import re
 __all__ = ('Query',)
 
 
-def methodproxy(attribute, method):
-    """
-    Utility function for delegating a specific method to another
-    given attribute.
-
-    :param attribute: The instance attribute to delegate to
-    :param method: A method that the attribute object must have
-    """
-    def fn(self, *args, **kwargs):
-        getattr(getattr(self, attribute), method)(*args, **kwargs)
-        return self
-    return fn
-
-
 def haskey(key, datum):
     """
     Checks whether a nested key is in a datum.
@@ -94,18 +80,6 @@ class AndOrMixin(object):
         :rtype: QueryAnd
         """
         return QueryAnd(self, other)
-
-    def any(self, key):
-        """
-        Create a compound query that will check if any of the
-        data under a given key (which must be an iterable) is
-        said to be correct with a given query function.
-
-        Example:
-        >>> (where('key').any('a') == 2)({'key': {'a': [1,2,3]}})
-        True
-        """
-        return QueryAny(self._key, Query(key))
 
 
 class Query(AndOrMixin):
@@ -231,6 +205,16 @@ class Query(AndOrMixin):
         :rtype: tinydb.queries.QueryNot
         """
         return QueryNot(self)
+
+    def any(self, function):
+        self._func = lambda x: hasattr(x,'__iter__') and any(function(e) for e in x)
+        self._repr = '\'{0}\'.any({1})'.format(self._key, function)
+        return self
+
+    def each(self, function):
+        self._func = lambda x: hasattr(x,'__iter__') and all(function(e) for e in x)
+        self._repr = '\'{0}\'.each({1})'.format(self._key, function)
+        return self
 
     def __call__(self, element):
         """
@@ -358,46 +342,3 @@ class QueryCustom(AndOrMixin):
 
     def __repr__(self):
         return '\'{0}\'.test({1})'.format(self._key, self._func)
-
-
-class QueryAny(Query):
-    """
-    Run a Query object against the data in the dict value.
-    """
-    def __init__(self, key, query):
-        self._key = key
-        self._query = query
-
-    __eq__ = methodproxy('_query', '__eq__')
-    __ne__ = methodproxy('_query', '__ne__')
-    __gt__ = methodproxy('_query', '__gt__')
-    __ge__ = methodproxy('_query', '__ge__')
-    __lt__ = methodproxy('_query', '__lt__')
-    __le__ = methodproxy('_query', '__le__')
-
-    def matches(self, *args, **kwargs):
-        """
-        Overrides the internal Query object with a QueryRegex object.
-        """
-        self._query = self._query.matches(*args, **kwargs)
-        return self
-
-    def test(self, *args, **kwargs):
-        """
-        Overrides the internal Query object with a QueryCustom object.
-        """
-        self._query = self._query.test(*args, **kwargs)
-        return self
-
-    def __repr__(self):
-        return "'{0}'.each({1})".format(self._key, self._query)
-
-    def __call__(self, element):
-        if haskey(self._key, element):
-            datum = getkey(self._key, element)
-            if haskey(self._query._key, datum):
-                iterable = getkey(self._query._key, datum)
-                if not hasattr(iterable, '__iter__'):
-                    return False
-                return any(self._query._func(e) for e in iterable)
-        return False

@@ -113,18 +113,18 @@ def test_nested_query():
     assert not query({})
 
 
-def test_each_query():
-    query = where('user').any('followers') == 'don'
+def test_any_query():
+    query = where('user.followers').any(where('name') == 'don')
 
-    assert query({'user':{'followers':['john', 'don']}})
+    assert query({'user': {'followers': [{'name': 'don'}, {'name': 'john'}]}})
     assert not query({'user':{'followers':1}})
     assert not query({})
 
-    query = ~query
-    assert query({})
+    query = where('user.followers').any(where('num').matches('\\d+'))
+    assert query({'user': {'followers': [{'num': '12'}]}})
 
-    query = where('user').any('followers').matches('\\d+')
-    assert query({'user':{'followers':['12']}})
 
-    query = where('user').any('followers').test(lambda x:x)
-    assert query({'user':{'followers':[0,1,0]}})
+def test_each_query():
+    query = where('user.followers').each(where('name') == 'don')
+    assert not query({'user': {'followers': [{'name': 'don'}, {'name': 'john'}]}})
+    assert query({'user': {'followers': [{'name':'don'}]}})
