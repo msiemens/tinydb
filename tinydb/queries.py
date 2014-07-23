@@ -21,6 +21,20 @@ import re
 __all__ = ('Query',)
 
 
+def methodproxy(attribute, method):
+    """
+    Utility function for delegating a specific method to another
+    given attribute.
+
+    :param attribute: The instance attribute to delegate to
+    :param method: A method that the attribute object must have
+    """
+    def fn(self, *args, **kwargs):
+        getattr(getattr(self, attribute), method)(*args, **kwargs)
+        return self
+    return fn
+
+
 def haskey(key, datum):
     """
     Checks whether a nested key is in a datum.
@@ -80,6 +94,18 @@ class AndOrMixin(object):
         :rtype: QueryAnd
         """
         return QueryAnd(self, other)
+
+    def any(self, key):
+        """
+        Create a compound query that will check if any of the
+        data under a given key (which must be an iterable) is
+        said to be correct with a given query function.
+
+        Example:
+        >>> (where('key').any('a') == 2)({'key': {'a': [1,2,3]}})
+        True
+        """
+        return QueryAny(self._key, Query(key))
 
 
 class Query(AndOrMixin):
@@ -300,14 +326,14 @@ class QueryRegex(AndOrMixin):
     """
     def __init__(self, key, regex):
         self.regex = regex
+        self._func = lambda x: re.match(self.regex, x)
         self._key = key
 
     def __call__(self, element):
         """
         See :meth:`Query.__call__`.
         """
-        return bool(haskey(self._key, element)
-                    and re.match(self.regex, getkey(self._key, element)))
+        return haskey(self._key, element) and self._func(getkey(self._key, element))
 
     def __repr__(self):
         return '\'{0}\' ~= {1} '.format(self._key, self.regex)
@@ -321,14 +347,48 @@ class QueryCustom(AndOrMixin):
     """
 
     def __init__(self, key, test):
-        self.test = test
+        self._func = test
         self._key = key
 
     def __call__(self, element):
         """
         See :meth:`Query.__call__`.
         """
-        return haskey(self._key, element) and self.test(getkey(self._key, element))
+        return haskey(self._key, element) and self._func(getkey(self._key, element))
 
     def __repr__(self):
-        return '\'{0}\'.test({1})'.format(self._key, self.test)
+        return '\'{0}\'.test({1})'.format(self._key, self._func)
+
+
+class QueryAny(Query):
+    def __init__(self, key, query):
+        self._key = key
+        self._query = query
+
+    __eq__ = methodproxy('_query', '__eq__')
+    __ne__ = methodproxy('_query', '__ne__')
+    __gt__ = methodproxy('_query', '__gt__')
+    __ge__ = methodproxy('_query', '__ge__')
+    __lt__ = methodproxy('_query', '__lt__')
+    __le__ = methodproxy('_query', '__le__')
+
+    def matches(self, *args, **kwargs):
+        self._query = self._query.matches(*args, **kwargs)
+        return self
+
+    def test(self, *args, **kwargs):
+        self._query = self._query.test(*args, **kwargs)
+        return self
+
+    def __repr__(self):
+        return "'{0}'.each({1})".format(self._key, self._query)
+
+    def __call__(self, element):
+        if haskey(self._key, element):
+            datum = getkey(self._key, element)
+            if haskey(self._query._key, datum):
+                iterable = getkey(self._query._key, datum)
+                if not hasattr(iterable, '__iter__'):
+                    return False
+                return any(self._query._func(e) for e in iterable)
+        return False
