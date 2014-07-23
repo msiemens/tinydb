@@ -176,7 +176,7 @@ class Table(object):
         self._queries_cache = {}
 
         try:
-            self._last_id = sorted(self._read().keys())[-1]
+            self._last_id = int(sorted(self._read().keys())[-1])
         except IndexError:
             self._last_id = 0
 
@@ -238,7 +238,7 @@ class Table(object):
         Insert a new element into the table.
         """
 
-        current_id = int(self._last_id) + 1
+        current_id = self._last_id + 1
         self._last_id = current_id
 
         data = self._read()
