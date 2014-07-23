@@ -20,7 +20,7 @@ class Element(dict):
             self.eid = eid
 
     def __repr__(self):
-        return 'Element(eid={}, data={})'.format(self.eid, dict(self))
+        return 'Element(eid={}, value={})'.format(self.eid, dict(self))
 
     def __str__(self):
         return str(dict(self))
