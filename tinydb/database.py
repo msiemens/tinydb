@@ -30,7 +30,7 @@ class TinyDB(object):
         self._table_cache = {}
         self._table = self.table('_default')
 
-    def table(self, name='_default'):
+    def table(self, name='_default', **options):
         """
         Get access to a specific table.
 
@@ -44,7 +44,7 @@ class TinyDB(object):
         if name in self._table_cache:
             return self._table_cache[name]
 
-        table = Table(name, self)
+        table = Table(name, self, **options)
         self._table_cache[name] = table
         return table
 
@@ -144,7 +144,7 @@ class Table(object):
     Represents a single TinyDB Table.
     """
 
-    def __init__(self, name, db):
+    def __init__(self, name, db, smart_cache=False, cache_size=10):
         """
         Get access to a table.
 
@@ -152,10 +152,16 @@ class Table(object):
         :type name: str
         :param db: The parent database.
         :type db: tinydb.database.TinyDB
+        :param smart_cache: Whether to use smart query caching.
+        :type smart_cache: bool
+        :param cache_size: Maximum size of query cache.
+        :type smart_cache: bool
         """
         self.name = name
         self._db = db
         self._queries_cache = {}
+        self._cache_size = cache_size
+        self._smart_cache = smart_cache
 
         try:
             self._last_id = self._read().pop()['_id']
@@ -180,7 +186,11 @@ class Table(object):
         :type values: list
         """
 
-        self._clear_query_cache()
+        if not self._smart_cache:
+            self._clear_query_cache()
+        else:
+            for query, results in self._queries_cache.items():
+                results.extend(e for e in values if query(e))
         self._db._write(values, self.name)
 
     def __len__(self):
@@ -289,11 +299,12 @@ class Table(object):
 
         if cond in self._queries_cache:
             return self._queries_cache[cond]
-        else:
-            elems = [e for e in self.all() if cond(e)]
-            self._queries_cache[cond] = elems
+        elems = [e for e in self.all() if cond(e)]
+        self._queries_cache[cond] = elems
+        if len(self._queries_cache) > self._cache_size:
+            self._queries_cache.popitem()
 
-            return elems
+        return elems
 
     def get(self, cond):
         """
