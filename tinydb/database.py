@@ -305,8 +305,7 @@ class Table(object):
         elems = [e for e in self.all() if cond(e)]
         self._queries_cache[cond] = elems
 
-        if (self._cache_size > 0 and
-                len(self._queries_cache) > self._cache_size):
+        if self._cache_size and len(self._queries_cache) > self._cache_size:
             self._queries_cache.popitem()
 
         return elems
