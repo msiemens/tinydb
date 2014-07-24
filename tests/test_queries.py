@@ -105,6 +105,23 @@ def test_custom():
     assert not query({'': None})
 
 
+def test_any_query():
+    query = where('followers').any(where('name') == 'don')
+
+    assert query({'followers': [{'name': 'don'}, {'name': 'john'}]})
+    assert not query({'followers':1})
+    assert not query({})
+
+    query = where('followers').any(where('num').matches('\\d+'))
+    assert query({'followers': [{'num': '12'}]})
+
+
+def test_each_query():
+    query = where('followers').each(where('name') == 'don')
+    assert not query({'followers': [{'name': 'don'}, {'name': 'john'}]})
+    assert query({'followers': [{'name':'don'}]})
+
+
 def test_has():
     query = where('key1').has('key2')
 

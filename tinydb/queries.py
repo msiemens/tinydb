@@ -21,6 +21,33 @@ import re
 __all__ = ('Query',)
 
 
+def haskey(key, datum):
+    """
+    Checks whether a nested key is in a datum.
+
+    :param key: A sequence of keys splitted by '.'
+    :param datum: The datum to test
+    """
+    keys = key.split('.')
+    for key in keys[:-1]:
+        if not isinstance(datum, dict) or key not in datum:
+            return False
+        datum = datum[key]
+    return keys[-1] in datum
+
+
+def getkey(key, datum):
+    """
+    Provides nested fetching of values.
+
+    :param key: A sequence of keys splitted by '.'
+    :param datum: The datum to select from
+    """
+    for item in key.split('.'):
+        datum = datum[item]
+    return datum
+
+
 class AndOrMixin(object):
     """
     A mixin providing methods calls ``&`` and ``|``.
@@ -68,6 +95,7 @@ class Query(AndOrMixin):
 
     def __init__(self, key):
         self._key = key
+        self._func = lambda x: True
         self._repr = 'has \'{0}\''.format(key)
 
     def matches(self, regex):
@@ -120,7 +148,7 @@ class Query(AndOrMixin):
         if isinstance(other, Query):
             return self._repr == other._repr
         else:
-            self._value_eq = other
+            self._func = lambda x: x == other
             self._update_repr('==', other)
             return self
 
@@ -131,7 +159,7 @@ class Query(AndOrMixin):
         >>> where('f1') != 42
         'f1' != 42
         """
-        self._value_ne = other
+        self._func = lambda x: x != other
         self._update_repr('!=', other)
         return self
 
@@ -142,7 +170,7 @@ class Query(AndOrMixin):
         >>> where('f1') < 42
         'f1' < 42
         """
-        self._value_lt = other
+        self._func = lambda x: x < other
         self._update_repr('<', other)
         return self
 
@@ -153,7 +181,7 @@ class Query(AndOrMixin):
         >>> where('f1') <= 42
         'f1' <= 42
         """
-        self._value_le = other
+        self._func = lambda x: x <= other
         self._update_repr('<=', other)
         return self
 
@@ -164,7 +192,7 @@ class Query(AndOrMixin):
         >>> where('f1') > 42
         'f1' > 42
         """
-        self._value_gt = other
+        self._func = lambda x: x > other
         self._update_repr('>', other)
         return self
 
@@ -175,7 +203,7 @@ class Query(AndOrMixin):
         >>> where('f1') >= 42
         'f1' >= 42
         """
-        self._value_ge = other
+        self._func = lambda x: x >= other
         self._update_repr('>=', other)
         return self
 
@@ -190,6 +218,16 @@ class Query(AndOrMixin):
         """
         return QueryNot(self)
 
+    def any(self, function):
+        self._func = lambda x: hasattr(x,'__iter__') and any(function(e) for e in x)
+        self._repr = '\'{0}\'.any({1})'.format(self._key, function)
+        return self
+
+    def each(self, function):
+        self._func = lambda x: hasattr(x,'__iter__') and all(function(e) for e in x)
+        self._repr = '\'{0}\'.each({1})'.format(self._key, function)
+        return self
+
     def __call__(self, element):
         """
         Run the test on the element.
@@ -197,40 +235,8 @@ class Query(AndOrMixin):
         :param element: The dict that we will run our tests against.
         :type element: dict
         """
-        if self._key not in element:
-            return False
-
-        try:
-            return element[self._key] == self._value_eq
-        except AttributeError:
-            pass
-
-        try:
-            return element[self._key] != self._value_ne
-        except AttributeError:
-            pass
-
-        try:
-            return element[self._key] < self._value_lt
-        except AttributeError:
-            pass
-
-        try:
-            return element[self._key] <= self._value_le
-        except AttributeError:
-            pass
-
-        try:
-            return element[self._key] > self._value_gt
-        except AttributeError:
-            pass
-
-        try:
-            return element[self._key] >= self._value_ge
-        except AttributeError:
-            pass
-
-        return True  # _key exists in element (see above)
+        return (haskey(self._key, element)
+                and self._func(getkey(self._key, element)))
 
     def _update_repr(self, operator, value):
         """ Update the current test's ``repr``. """
@@ -316,14 +322,14 @@ class QueryRegex(AndOrMixin):
     """
     def __init__(self, key, regex):
         self.regex = regex
+        self._func = lambda x: re.match(self.regex, x)
         self._key = key
 
     def __call__(self, element):
         """
         See :meth:`Query.__call__`.
         """
-        return bool(self._key in element
-                    and re.match(self.regex, element[self._key]))
+        return haskey(self._key, element) and self._func(getkey(self._key, element))
 
     def __repr__(self):
         return '\'{0}\' ~= {1} '.format(self._key, self.regex)
@@ -337,17 +343,17 @@ class QueryCustom(AndOrMixin):
     """
 
     def __init__(self, key, test):
-        self.test = test
+        self._func = test
         self._key = key
 
     def __call__(self, element):
         """
         See :meth:`Query.__call__`.
         """
-        return self._key in element and self.test(element[self._key])
+        return haskey(self._key, element) and self._func(getkey(self._key, element))
 
     def __repr__(self):
-        return '\'{0}\'.test({1})'.format(self._key, self.test)
+        return '\'{0}\'.test({1})'.format(self._key, self._func)
 
 
 class QueryHas(Query):
