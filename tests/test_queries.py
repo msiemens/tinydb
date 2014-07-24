@@ -103,3 +103,48 @@ def test_custom():
     assert not query({'val': 40})
     assert not query({'val': '44'})
     assert not query({'': None})
+
+
+def test_has():
+    query = where('key1').has('key2')
+
+    assert query({'key1': {'key2': 1}})
+    assert not query({'key1': 3})
+    assert not query({'key1': {'key1': 1}})
+    assert not query({'key2': {'key1': 1}})
+
+    query = where('key1').has('key2') == 1
+
+    assert query({'key1': {'key2': 1}})
+    assert not query({'key1': {'key2': 2}})
+
+    # Nested has: key exists
+    query = where('key1').has('key2').has('key3')
+    assert query({'key1': {'key2': {'key3': 1}}})
+    # Not a dict
+    assert not query({'key1': 1})
+    assert not query({'key1': {'key2': 1}})
+    # Wrong key
+    assert not query({'key1': {'key2': {'key0': 1}}})
+    assert not query({'key1': {'key0': {'key3': 1}}})
+    assert not query({'key0': {'key2': {'key3': 1}}})
+
+    # Nested has: check for value
+    query = where('key1').has('key2').has('key3') == 1
+    assert query({'key1': {'key2': {'key3': 1}}})
+    assert not query({'key1': {'key2': {'key3': 0}}})
+
+    # Test special methods: regex
+    query = where('key1').has('value').matches(r'\d+')
+    assert query({'key1': {'value': '123'}})
+    assert not query({'key2': {'value': '123'}})
+    assert not query({'key2': {'value': 'abc'}})
+
+    # Test special methods: nested has and regex
+    query = where('key1').has('x').has('y').matches(r'\d+')
+    assert query({'key1': {'x': {'y': '123'}}})
+    assert not query({'key1': {'x': {'y': 'abc'}}})
+
+    # Test special methods: custom test
+    query = where('key1').has('int').test(lambda x: x == 3)
+    assert query({'key1': {'int': 3}})

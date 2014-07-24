@@ -98,6 +98,18 @@ class Query(AndOrMixin):
         """
         return QueryCustom(self._key, func)
 
+    def has(self, key):
+        """
+        Run test on a nested dict.
+
+        >>> where('x').has('y') == 2
+        has 'x' => ('y' == 2)
+
+        :param key: the key to search for in the nested dict
+        :rtype: QueryHas
+        """
+        return QueryHas(self._key, key)
+
     def __eq__(self, other):
         """
         Test a dict value for equality.
@@ -336,3 +348,88 @@ class QueryCustom(AndOrMixin):
 
     def __repr__(self):
         return '\'{0}\'.test({1})'.format(self._key, self.test)
+
+
+class QueryHas(Query):
+    """
+    Run a query on a nested dict.
+
+    See :meth:`Query.has`
+    """
+
+    def __init__(self, root, key):
+        super(QueryHas, self).__init__(key)
+        self._special = None
+        self._path = [root]  # Store the path to the element to check
+
+    def matches(self, regex):
+        """
+        See :meth:`Query.matches`.
+        """
+        self._special = QueryRegex(self._key, regex)
+        return self
+
+    def test(self, func):
+        """
+        See :meth:`Query.test`.
+        """
+        self._special = QueryCustom(self._key, func)
+        return self
+
+    def has(self, key):
+        """
+        See :meth:`Query.has`.
+        """
+        # Nested has: Append old key to path and use given key from now on
+        self._path.append(self._key)
+        self._key = key
+        return self
+
+    def __call__(self, element):
+        """
+        See :meth:`Query.__call__`.
+        """
+        # Retrieve value from given path
+        for key in self._path:
+            try:
+                # Check, if requested key exists
+                if not key in element:
+                    return False
+
+            except (KeyError, TypeError):
+                # We can't continue searching because either ...
+                # - the element contains a value instead of a dict (TypeError)
+                # - or doesn't contain the key (KeyError)
+                return False
+
+            # Follow the path and continue searching
+            element = element[key]
+
+        # Verify the element is a dict where we can run the test
+        # Fixes searching for 'x' => 'y' in {'x': {'y': 2}}
+        if not isinstance(element, dict):
+            return False
+
+        if self._special:
+            # Process special test
+            return self._special(element)
+        else:
+            # Process like a normal query
+            return super(QueryHas, self).__call__(element)
+
+    def __repr__(self):
+        path = self._path
+
+        if not self._special and not self._cmp:
+            path += [self._key]
+
+        repr_str = 'has '
+        # 'key1' => 'key2' => ...
+        repr_str += '\'' + '\' => \''.join(path) + '\''
+
+        if self._special:
+            repr_str += ' => ({})'.format(self._special)
+        elif self._cmp:
+            repr_str += ' => ({})'.format(super(QueryHas, self).__repr__())
+
+        return repr_str
