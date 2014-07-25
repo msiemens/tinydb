@@ -34,8 +34,27 @@ def test_caching(db):
     table1 = db.table('table1')
     table2 = db.table('table1')
 
-    table1.insert({'int': 1, 'char': 'a'})
-    table2.insert({'int': 1, 'char': 'b'})
+    assert table1 is table2
 
-    assert len(table1.search(where('int') == 1)) == 2
-    assert len(table2.search(where('int') == 1)) == 2
+
+def test_query_cache_size(db):
+    table = db.table('table3', cache_size=1)
+    query = where('int') == 1
+
+    table.insert({'int': 1})
+    table.insert({'int': 1})
+
+    assert table.count(query) == 2
+    assert table.count(where('int') == 2) == 0
+    assert len(table._queries_cache) == 1
+
+
+def test_smart_query_cache(db):
+    table = db.table('table3', smart_cache=True)
+    query = where('int') == 1
+
+    assert not table.search(query)
+    table.insert({'int': 1})
+
+    assert len(table._queries_cache) == 1
+    assert len(table._queries_cache[query]) == 1
