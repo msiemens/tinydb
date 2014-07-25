@@ -278,6 +278,13 @@ class Table(object):
 
         for eid in data.copy():
             if cond(data[eid]):
+
+                if self._smart_cache:
+
+                    for query, results in self._queries_cache.items():
+                        if query(data[eid]):
+                            results.remove(data[eid])
+
                 data.pop(eid)
 
         self._write(data)
@@ -296,7 +303,20 @@ class Table(object):
 
         for eid in data:
             if cond(data[eid]):
+
+                old_value = data[eid].copy()
                 data[eid].update(fields)
+                new_value = data[eid]
+
+                if self._smart_cache:
+
+                    for query, results in self._queries_cache.items():
+
+                        if query(old_value):
+                            results.remove(old_value)
+
+                        elif query(new_value):
+                            results.append(new_value)
 
         self._write(data)
 

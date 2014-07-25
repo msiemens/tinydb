@@ -54,7 +54,20 @@ def test_smart_query_cache(db):
     query = where('int') == 1
 
     assert not table.search(query)
+
+    # Test insert
     table.insert({'int': 1})
 
     assert len(table._queries_cache) == 1
     assert len(table._queries_cache[query]) == 1
+
+    # Test update
+    table.update({'int': 2}, where('int') == 1)
+
+    assert table.count(query) == 0
+
+    # Test remove
+    table.insert({'int': 1})
+    table.remove(where('int') == 1)
+
+    assert table.count(where('int') == 1) == 0
