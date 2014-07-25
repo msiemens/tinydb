@@ -21,31 +21,8 @@ import re
 __all__ = ('Query',)
 
 
-def haskey(key, datum):
-    """
-    Checks whether a nested key is in a datum.
-
-    :param key: A sequence of keys splitted by '.'
-    :param datum: The datum to test
-    """
-    keys = key.split('.')
-    for key in keys[:-1]:
-        if not isinstance(datum, dict) or key not in datum:
-            return False
-        datum = datum[key]
-    return keys[-1] in datum
-
-
-def getkey(key, datum):
-    """
-    Provides nested fetching of values.
-
-    :param key: A sequence of keys splitted by '.'
-    :param datum: The datum to select from
-    """
-    for item in key.split('.'):
-        datum = datum[item]
-    return datum
+def is_sequence(obj):
+    return hasattr(obj, '__iter__')
 
 
 class AndOrMixin(object):
@@ -95,7 +72,7 @@ class Query(AndOrMixin):
 
     def __init__(self, key):
         self._key = key
-        self._func = lambda x: True
+        self._cmp = None
         self._repr = 'has \'{0}\''.format(key)
 
     def matches(self, regex):
@@ -133,10 +110,58 @@ class Query(AndOrMixin):
         >>> where('x').has('y') == 2
         has 'x' => ('y' == 2)
 
+        Matches::
+
+            {'x': {'y': 2}}
+
         :param key: the key to search for in the nested dict
         :rtype: QueryHas
         """
         return QueryHas(self._key, key)
+
+    def any(self, cond):
+        """
+        Checks if a condition is met by any element in a list.
+
+        >>> where('f1').any(where('f2') == 1)
+        'f1' has any 'f2' == 1
+
+        Matches::
+
+            {'f1': [{'f2': 1}, {'f2': 0}]}
+
+        :param cond: The condition to check
+        :rtype: tinydb.queries.Query
+        """
+
+        def _cmp(value):
+            return is_sequence(value) and any(cond(e) for e in value)
+
+        self._cmp = _cmp
+        self._repr = '\'{0}\' has any {1}'.format(self._key, cond)
+        return self
+
+    def all(self, cond):
+        """
+        Checks if a condition is met by any element in a list.
+
+        >>> where('f1').all(where('f2') == 1)
+        'f1' all have 'f2' == 1
+
+        Matches::
+
+            {'f1': [{'f2': 1}, {'f2': 1}]}
+
+        :param cond: The condition to check
+        :rtype: tinydb.queries.Query
+        """
+
+        def _cmp(value):
+            return is_sequence(value) and all(cond(e) for e in value)
+
+        self._cmp = _cmp
+        self._repr = '\'{0}\' all have {1}'.format(self._key, cond)
+        return self
 
     def __eq__(self, other):
         """
@@ -148,7 +173,7 @@ class Query(AndOrMixin):
         if isinstance(other, Query):
             return self._repr == other._repr
         else:
-            self._func = lambda x: x == other
+            self._cmp = lambda value: value == other
             self._update_repr('==', other)
             return self
 
@@ -159,7 +184,7 @@ class Query(AndOrMixin):
         >>> where('f1') != 42
         'f1' != 42
         """
-        self._func = lambda x: x != other
+        self._cmp = lambda value: value != other
         self._update_repr('!=', other)
         return self
 
@@ -170,7 +195,7 @@ class Query(AndOrMixin):
         >>> where('f1') < 42
         'f1' < 42
         """
-        self._func = lambda x: x < other
+        self._cmp = lambda value: value < other
         self._update_repr('<', other)
         return self
 
@@ -181,7 +206,7 @@ class Query(AndOrMixin):
         >>> where('f1') <= 42
         'f1' <= 42
         """
-        self._func = lambda x: x <= other
+        self._cmp = lambda value: value <= other
         self._update_repr('<=', other)
         return self
 
@@ -192,7 +217,7 @@ class Query(AndOrMixin):
         >>> where('f1') > 42
         'f1' > 42
         """
-        self._func = lambda x: x > other
+        self._cmp = lambda value: value > other
         self._update_repr('>', other)
         return self
 
@@ -203,7 +228,7 @@ class Query(AndOrMixin):
         >>> where('f1') >= 42
         'f1' >= 42
         """
-        self._func = lambda x: x >= other
+        self._cmp = lambda value: value >= other
         self._update_repr('>=', other)
         return self
 
@@ -218,16 +243,6 @@ class Query(AndOrMixin):
         """
         return QueryNot(self)
 
-    def any(self, function):
-        self._func = lambda x: hasattr(x,'__iter__') and any(function(e) for e in x)
-        self._repr = '\'{0}\'.any({1})'.format(self._key, function)
-        return self
-
-    def each(self, function):
-        self._func = lambda x: hasattr(x,'__iter__') and all(function(e) for e in x)
-        self._repr = '\'{0}\'.each({1})'.format(self._key, function)
-        return self
-
     def __call__(self, element):
         """
         Run the test on the element.
@@ -235,8 +250,13 @@ class Query(AndOrMixin):
         :param element: The dict that we will run our tests against.
         :type element: dict
         """
-        return (haskey(self._key, element)
-                and self._func(getkey(self._key, element)))
+        if self._key not in element:
+            return False
+
+        if self._cmp:
+            return self._cmp(element[self._key])
+
+        return True  # Key exists
 
     def _update_repr(self, operator, value):
         """ Update the current test's ``repr``. """
@@ -322,14 +342,14 @@ class QueryRegex(AndOrMixin):
     """
     def __init__(self, key, regex):
         self.regex = regex
-        self._func = lambda x: re.match(self.regex, x)
         self._key = key
 
     def __call__(self, element):
         """
         See :meth:`Query.__call__`.
         """
-        return haskey(self._key, element) and self._func(getkey(self._key, element))
+        return (self._key in element
+                and re.match(self.regex, element[self._key]))
 
     def __repr__(self):
         return '\'{0}\' ~= {1} '.format(self._key, self.regex)
@@ -343,17 +363,17 @@ class QueryCustom(AndOrMixin):
     """
 
     def __init__(self, key, test):
-        self._func = test
+        self.test = test
         self._key = key
 
     def __call__(self, element):
         """
         See :meth:`Query.__call__`.
         """
-        return haskey(self._key, element) and self._func(getkey(self._key, element))
+        return self._key in element and self.test(element[self._key])
 
     def __repr__(self):
-        return '\'{0}\'.test({1})'.format(self._key, self._func)
+        return '\'{0}\'.test({1})'.format(self._key, self.test)
 
 
 class QueryHas(Query):
@@ -399,7 +419,7 @@ class QueryHas(Query):
         for key in self._path:
             try:
                 # Check, if requested key exists
-                if not key in element:
+                if key not in element:
                     return False
 
             except (KeyError, TypeError):
