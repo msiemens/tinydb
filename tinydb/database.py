@@ -48,7 +48,7 @@ class TinyDB(object):
         self._table_cache = {}
         self._table = self.table('_default')
 
-    def table(self, name='_default', **options):
+    def table(self, name='_default', smart_cache=False, **options):
         """
         Get access to a specific table.
 
@@ -57,12 +57,18 @@ class TinyDB(object):
 
         :param name: The name of the table.
         :type name: str
+        :param smart_cache: Use a smarter query caching.
+                            See :class:`tinydb.database.SmartCacheTable`
+        :param cache_size: How many query results to cache.
         """
 
         if name in self._table_cache:
             return self._table_cache[name]
 
-        table = Table(name, self, **options)
+        if smart_cache:
+            table = SmartCacheTable(name, self, **options)
+        else:
+            table = Table(name, self, **options)
         self._table_cache[name] = table
         return table
 
@@ -162,7 +168,7 @@ class Table(object):
     Represents a single TinyDB Table.
     """
 
-    def __init__(self, name, db, smart_cache=False, cache_size=10):
+    def __init__(self, name, db, cache_size=10):
         """
         Get access to a table.
 
@@ -170,16 +176,12 @@ class Table(object):
         :type name: str
         :param db: The parent database.
         :type db: tinydb.database.TinyDB
-        :param smart_cache: Whether to use smart query caching.
-        :type smart_cache: bool
         :param cache_size: Maximum size of query cache.
-        :type smart_cache: bool
         """
         self.name = name
         self._db = db
         self._queries_cache = {}
         self._cache_size = cache_size
-        self._smart_cache = smart_cache
 
         try:
             self._last_id = int(sorted(self._read().keys())[-1])
@@ -209,8 +211,7 @@ class Table(object):
         :type values: dict
         """
 
-        if not self._smart_cache:
-            self._clear_query_cache()
+        self._clear_query_cache()
         self._db._write(values, self.name)
 
     def __len__(self):
@@ -251,11 +252,6 @@ class Table(object):
         data = self._read()
         data[current_id] = element
 
-        if self._smart_cache:
-            for query, results in self._queries_cache.items():
-                if query(element):
-                    results.append(element)
-
         self._write(data)
 
     def insert_multiple(self, elements):
@@ -278,13 +274,6 @@ class Table(object):
 
         for eid in data.copy():
             if cond(data[eid]):
-
-                if self._smart_cache:
-
-                    for query, results in self._queries_cache.items():
-                        if query(data[eid]):
-                            results.remove(data[eid])
-
                 data.pop(eid)
 
         self._write(data)
@@ -303,20 +292,7 @@ class Table(object):
 
         for eid in data:
             if cond(data[eid]):
-
-                old_value = data[eid].copy()
                 data[eid].update(fields)
-                new_value = data[eid]
-
-                if self._smart_cache:
-
-                    for query, results in self._queries_cache.items():
-
-                        if query(old_value):
-                            results.remove(old_value)
-
-                        elif query(new_value):
-                            results.append(new_value)
 
         self._write(data)
 
@@ -417,3 +393,72 @@ class Table(object):
             self._db._storage.close()
         except AttributeError:
             pass
+
+
+class SmartCacheTable(Table):
+    """
+    A Table with a smarter query cache.
+
+    The query cache gets updated on insert/update/remove. Useful when in cases
+    where many searches are done but data isn't changed often.
+    """
+
+    def _write(self, values):
+        self._db._write(values, self.name)
+
+    def insert(self, element):
+        """
+        See :meth:`Table.insert`
+        """
+
+        current_id = self._last_id + 1
+        self._last_id = current_id
+
+        data = self._read()
+        data[current_id] = element
+
+        for query, results in self._queries_cache.items():
+            if query(element):
+                results.append(element)
+
+        self._write(data)
+
+    def update(self, fields, cond):
+        """
+        See :meth:`Table.update`
+        """
+        data = self._read()
+
+        for eid in data:
+            if cond(data[eid]):
+
+                old_value = data[eid].copy()
+                data[eid].update(fields)
+                new_value = data[eid]
+
+                for query, results in self._queries_cache.items():
+
+                    if query(old_value):
+                        results.remove(old_value)
+
+                    elif query(new_value):
+                        results.append(new_value)
+
+        self._write(data)
+
+    def remove(self, cond):
+        """
+        See :meth:`Table.remove`
+        """
+        data = self._read()
+
+        for eid in data.copy():
+            if cond(data[eid]):
+
+                for query, results in self._queries_cache.items():
+                    if query(data[eid]):
+                        results.remove(data[eid])
+
+                data.pop(eid)
+
+        self._write(data)
