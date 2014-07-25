@@ -8,6 +8,24 @@ import warnings
 from tinydb import JSONStorage, where
 
 
+class Element(dict):
+    """
+    Represents an element stored in the database.
+    """
+    def __init__(self, value=None, eid=None, **kwargs):
+        super(Element, self).__init__(**kwargs)
+
+        if value:
+            self.update(value)
+            self.eid = eid
+
+    def __repr__(self):
+        return 'Element(eid={}, value={})'.format(self.eid, dict(self))
+
+    def __str__(self):
+        return str(dict(self))
+
+
 class TinyDB(object):
     """
     The main class of TinyDB.
@@ -63,7 +81,7 @@ class TinyDB(object):
         tables' dict.
         :type table: str or None
         :returns: all values
-        :rtype: dict, list
+        :rtype: dict
         """
 
         if not table:
@@ -75,7 +93,7 @@ class TinyDB(object):
         try:
             return self._read()[table]
         except (KeyError, TypeError):
-            return []
+            return {}
 
     def _write(self, values, table=None):
         """
@@ -158,7 +176,7 @@ class Table(object):
         self._queries_cache = {}
 
         try:
-            self._last_id = self._read().pop()['_id']
+            self._last_id = int(sorted(self._read().keys())[-1])
         except IndexError:
             self._last_id = 0
 
@@ -167,17 +185,22 @@ class Table(object):
         Reading access to the DB.
 
         :returns: all values
-        :rtype: list
+        :rtype: dict
         """
 
-        return self._db._read(self.name)
+        data = self._db._read(self.name)
+
+        for eid in data.copy():
+            data[eid] = Element(data[eid], eid)
+
+        return data
 
     def _write(self, values):
         """
         Writing access to the DB.
 
         :param values: the new values to write
-        :type values: list
+        :type values: dict
         """
 
         self._clear_query_cache()
@@ -204,28 +227,22 @@ class Table(object):
         """
         Get all elements stored in the table.
 
-        Note: all elements will have an `_id` key.
-
         :returns: a list with all elements.
         :rtype: list[dict]
         """
 
-        return self._read()
+        return list(self._read().values())
 
     def insert(self, element):
         """
         Insert a new element into the table.
-
-        :param element: a dict. Shall not containing the key ``_id``!
         """
 
         current_id = self._last_id + 1
         self._last_id = current_id
 
-        element['_id'] = current_id
-
-        data = self.all()
-        data.append(element)
+        data = self._read()
+        data[current_id] = element
 
         self._write(data)
 
@@ -245,9 +262,13 @@ class Table(object):
         :param cond: the condition to check against
         :type cond: query, int, list
         """
+        data = self._read()
 
-        to_remove = self.search(cond)
-        self._write([e for e in self.all() if e not in to_remove])
+        for eid in data.copy():
+            if cond(data[eid]):
+                data.pop(eid)
+
+        self._write(data)
 
     def update(self, fields, cond):
         """
@@ -259,12 +280,11 @@ class Table(object):
         :param cond: which elements to update
         :type cond: query
         """
-        data = []
+        data = self._read()
 
-        for el in self.all():
-            if cond(el):
-                el.update(fields)
-            data.append(el)
+        for eid in data:
+            if cond(data[eid]):
+                data[eid].update(fields)
 
         self._write(data)
 
@@ -272,13 +292,11 @@ class Table(object):
         """
         Purge the table by removing all elements.
         """
-        self._write([])
+        self._write({})
 
     def search(self, cond):
         """
         Search for all elements matching a 'where' cond.
-
-        Note: all elements will have an `_id` key.
 
         :param cond: the condition to check against
         :type cond: Query
@@ -299,8 +317,6 @@ class Table(object):
         """
         Search for exactly one element matching a condition.
 
-        Note: all elements will have an `_id` key.
-
         :param cond: the condition to check against
         :type cond: Query
 
@@ -311,6 +327,18 @@ class Table(object):
         for el in self.all():
             if cond(el):
                 return el
+
+    def get_by_id(self, eid):
+        """
+        Get an element by specifying its id.
+
+        :return: the element or None
+        :rtype: dict or None
+        """
+        try:
+            return self._read()[eid]
+        except KeyError:
+            return None
 
     def count(self, cond):
         """

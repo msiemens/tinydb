@@ -110,6 +110,12 @@ def test_get(db):
     assert item['char'] == 'b'
 
 
+def test_get_by_id(db):
+    el = db.all()[0]
+    assert db.get_by_id(el.eid) == el
+    assert db.get_by_id(float('NaN')) is None
+
+
 def test_count(db):
     assert db.count(where('int') == 1) == 3
     assert db.count(where('char') == 'd') == 0
@@ -134,12 +140,13 @@ def test_multiple_dbs():
     assert len(db2) == 1
 
 
-def test_bug_repeated_ids(tmpdir):
+def test_unique_ids(tmpdir):
     """
     :type tmpdir: py._path.local.LocalPath
     """
     path = str(tmpdir.join('db.json'))
 
+    # Verify ids are unique when reopening the DB and inserting
     with TinyDB(path) as _db:
         _db.insert({'x': 1})
 
@@ -149,4 +156,16 @@ def test_bug_repeated_ids(tmpdir):
     with TinyDB(path) as _db:
         data = _db.all()
 
-        assert data[0]['_id'] != data[1]['_id']
+        assert data[0].eid != data[1].eid
+
+    # Verify ids stay unique when inserting/removing
+    with TinyDB(path) as _db:
+        _db.purge()
+
+        _db.insert_multiple({'x': i} for i in range(5))
+        _db.remove(where('x') == 2)
+
+        assert len(_db) == 4
+
+        ids = [e.eid for e in _db.all()]
+        assert len(ids) == len(set(ids))
