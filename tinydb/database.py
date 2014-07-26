@@ -378,6 +378,7 @@ class Table(object):
         Clear query cache.
         """
         self._queries_cache = {}
+        self._lru = []
 
     def __enter__(self):
         """
