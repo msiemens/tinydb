@@ -182,6 +182,7 @@ class Table(object):
         self._db = db
         self._queries_cache = {}
         self._cache_size = cache_size
+        self._lru = []
 
         try:
             self._last_id = int(sorted(self._read().keys())[-1])
@@ -314,13 +315,16 @@ class Table(object):
         """
 
         if cond in self._queries_cache:
+            self._lru.remove(cond)
+            self._lru.append(cond)
             return self._queries_cache[cond]
 
         elems = [e for e in self.all() if cond(e)]
         self._queries_cache[cond] = elems
+        self._lru.append(cond)
 
         if self._cache_size and len(self._queries_cache) > self._cache_size:
-            self._queries_cache.popitem()
+            self._queries_cache.pop(self._lru.pop(0))
 
         return elems
 
@@ -374,6 +378,7 @@ class Table(object):
         Clear query cache.
         """
         self._queries_cache = {}
+        self._lru = []
 
     def __enter__(self):
         """

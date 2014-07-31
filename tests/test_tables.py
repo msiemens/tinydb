@@ -71,3 +71,16 @@ def test_smart_query_cache(db):
     table.remove(where('int') == 1)
 
     assert table.count(where('int') == 1) == 0
+
+
+def test_lru_cache(db):
+    table = db.table('table3', cache_size=2)
+    query = where('int') == 1
+
+    table.search(query)
+    table.search(where('int') == 2)
+    table.search(where('int') == 3)
+    assert query not in table._queries_cache
+
+    table.remove(where('int') == 1)
+    assert not table._lru
