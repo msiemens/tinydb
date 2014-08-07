@@ -68,7 +68,6 @@ def test_concurrency():
     storage = ConcurrencyMiddleware(MemoryStorage)
     storage()  # Initialization
 
-    threads = []
     run_count = 5
 
     class WriteThread(Thread):
@@ -81,16 +80,10 @@ def test_concurrency():
             storage.write(current_contents + [element])
 
     # Start threads
-    for i in xrange(run_count):
-        thread = WriteThread()
-        threads.append(thread)
+    threads = [WriteThread() for i in xrange(run_count)]
 
-    for thread in threads:
-        thread.start()
-
-    # Wait for all threads to finish
-    for t in threads:
-        t.join()
+    [thread.start() for thread in threads]
+    [thread.join() for thread in threads]
 
     # Verify contents: Storage shouldn't be empty
     assert len(storage.memory) == run_count
