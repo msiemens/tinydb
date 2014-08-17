@@ -65,10 +65,8 @@ class TinyDB(object):
         if name in self._table_cache:
             return self._table_cache[name]
 
-        if smart_cache:
-            table = SmartCacheTable(name, self, **options)
-        else:
-            table = Table(name, self, **options)
+        table_class = SmartCacheTable if smart_cache else Table
+        table = table_class(name, self, **options)
         self._table_cache[name] = table
         return table
 
