@@ -179,7 +179,7 @@ class Table(object):
         self.name = name
         self._db = db
         self._queries_cache = {}
-        self._cache_size = cache_size
+        self._cache_size = cache_size or float('nan')
         self._lru = []
 
         try:
@@ -321,7 +321,7 @@ class Table(object):
         self._queries_cache[cond] = elems
         self._lru.append(cond)
 
-        if self._cache_size and len(self._queries_cache) > self._cache_size:
+        if len(self._queries_cache) > self._cache_size:
             self._queries_cache.pop(self._lru.pop(0))
 
         return elems
@@ -419,7 +419,6 @@ class SmartCacheTable(Table):
         for query, cache in self._queries_cache.items():
             if query(element):
                 cache.append(element)
-
 
     def update(self, fields, cond):
         """
