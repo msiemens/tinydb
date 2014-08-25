@@ -90,7 +90,7 @@ The documentation for TinyDB is hosted at ``Read the Docs``: https://tinydb.read
 Supported Python Versions
 -------------------------
 
-TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3 and pypy.
+TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3, 3.4 and pypy.
 
 
 Limitations
