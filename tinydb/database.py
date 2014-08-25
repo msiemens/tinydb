@@ -289,7 +289,8 @@ class Table(object):
         """
         data = self._read()
 
-        for eid, value in data.items():
+        for eid in data:
+            value = data[eid]
             if cond(value):
                 value.update(fields)
 
@@ -416,7 +417,8 @@ class SmartCacheTable(Table):
 
         super(SmartCacheTable, self).insert(element)
 
-        for query, cache in self._queries_cache.items():
+        for query in self._queries_cache:
+            cache = self._queries_cache[query]
             if query(element):
                 cache.append(element)
 
@@ -427,7 +429,8 @@ class SmartCacheTable(Table):
         data = self._read()
         query_cache = tuple(self._queries_cache.items())
 
-        for eid, value in data.items():
+        for eid in data:
+            value = data[eid]
             if cond(value):
 
                 old_value = value.copy()
@@ -451,7 +454,8 @@ class SmartCacheTable(Table):
         data = self._read()
         query_cache = tuple(self._queries_cache.items())
 
-        for eid, value in data.copy().items():
+        for eid in list(data):
+            value = data[eid]
             if cond(value):
 
                 for query, results in query_cache:
