@@ -425,6 +425,7 @@ class SmartCacheTable(Table):
         See :meth:`Table.update`
         """
         data = self._read()
+        query_cache = tuple(self._queries_cache.items())
 
         for eid, value in data.items():
             if cond(value):
@@ -432,7 +433,7 @@ class SmartCacheTable(Table):
                 old_value = value.copy()
                 value.update(fields)
 
-                for query, results in self._queries_cache.items():
+                for query, results in query_cache:
                     try:
                         results.remove(old_value)
                     except ValueError:
@@ -448,11 +449,12 @@ class SmartCacheTable(Table):
         See :meth:`Table.remove`
         """
         data = self._read()
+        query_cache = tuple(self._queries_cache.items())
 
         for eid, value in data.copy().items():
             if cond(value):
 
-                for query, results in self._queries_cache.items():
+                for query, results in query_cache:
                     try:
                         results.remove(value)
                     except ValueError:
