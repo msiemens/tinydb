@@ -1,7 +1,7 @@
 from threading import Thread
 
 from tinydb import TinyDB
-from tinydb.middlewares import CachingMiddleware, ConcurrencyMiddleware
+from tinydb.middlewares import CachingMiddleware
 from tinydb.storages import MemoryStorage
 
 if not 'xrange' in dir(__builtins__):
@@ -64,33 +64,8 @@ def test_caching_write(storage):
     assert storage.storage.memory
 
 
-def test_concurrency():
-    storage = ConcurrencyMiddleware(MemoryStorage)
-    storage()  # Initialization
-
-    run_count = 5
-
-    class WriteThread(Thread):
-        def run(self):
-            try:
-                current_contents = storage.read()
-            except ValueError:
-                current_contents = []
-
-            storage.write(current_contents + [element])
-
-    # Start threads
-    threads = [WriteThread() for i in xrange(run_count)]
-
-    [thread.start() for thread in threads]
-    [thread.join() for thread in threads]
-
-    # Verify contents: Storage shouldn't be empty
-    assert len(storage.memory) == run_count
-
-
 def test_nested():
-    storage = ConcurrencyMiddleware(CachingMiddleware(MemoryStorage))
+    storage = CachingMiddleware(MemoryStorage)
     storage()  # Initialization
 
     # Write contents

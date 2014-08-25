@@ -271,7 +271,7 @@ class Table(object):
         """
         data = self._read()
 
-        for eid in data.copy():
+        for eid in list(data):
             if cond(data[eid]):
                 data.pop(eid)
 
@@ -289,9 +289,9 @@ class Table(object):
         """
         data = self._read()
 
-        for eid in data:
-            if cond(data[eid]):
-                data[eid].update(fields)
+        for eid, value in data.items():
+            if cond(value):
+                value.update(fields)
 
         self._write(data)
 
@@ -414,17 +414,12 @@ class SmartCacheTable(Table):
         See :meth:`Table.insert`
         """
 
-        current_id = self._last_id + 1
-        self._last_id = current_id
+        super(SmartCacheTable, self).insert(element)
 
-        data = self._read()
-        data[current_id] = element
-
-        for query, results in self._queries_cache.items():
+        for query, cache in self._queries_cache.items():
             if query(element):
-                results.append(element)
+                cache.append(element)
 
-        self._write(data)
 
     def update(self, fields, cond):
         """
@@ -432,20 +427,20 @@ class SmartCacheTable(Table):
         """
         data = self._read()
 
-        for eid in data:
-            if cond(data[eid]):
+        for eid, value in data.items():
+            if cond(value):
 
-                old_value = data[eid].copy()
-                data[eid].update(fields)
-                new_value = data[eid]
+                old_value = value.copy()
+                value.update(fields)
 
                 for query, results in self._queries_cache.items():
-
-                    if query(old_value):
+                    try:
                         results.remove(old_value)
+                    except ValueError:
+                        pass
 
-                    elif query(new_value):
-                        results.append(new_value)
+                    if query(value):
+                        results.append(value)
 
         self._write(data)
 
@@ -455,12 +450,14 @@ class SmartCacheTable(Table):
         """
         data = self._read()
 
-        for eid in data.copy():
-            if cond(data[eid]):
+        for eid, value in data.copy().items():
+            if cond(value):
 
                 for query, results in self._queries_cache.items():
-                    if query(data[eid]):
-                        results.remove(data[eid])
+                    try:
+                        results.remove(value)
+                    except ValueError:
+                        pass
 
                 data.pop(eid)
 
