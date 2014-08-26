@@ -93,44 +93,6 @@ Supported Python Versions
 TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3, 3.4 and pypy.
 
 
-Limitations
------------
-
-JSON Serialization
-^^^^^^^^^^^^^^^^^^
-
-TinyDB serializes all data using the
-`Python JSON <http://docs.python.org/2/library/json.html>`_ module by default.
-It serializes most basic Python data types very well, but fails serializing
-classes. If you need a better serializer, you can write your own storage,
-that e.g. uses the more powerfull (but also slower)
-`pickle  <http://docs.python.org/library/pickle.html>`_
-or `PyYAML  <http://pyyaml.org/>`_.
-
-Performance
-^^^^^^^^^^^
-
-TinyDB is NOT designed to be used in environments, where performance might be
-an issue. Altough you can improve the TinyDB performance as described below,
-you should consider using a DB that is optimized for speed like Buzhug_ or
-CodernityDB_.
-
-How to Improve TinyDB Performance
-`````````````````````````````````
-
-The default storage serializes the data using JSON. To improve performance,
-you can install `ujson <http://pypi.python.org/pypi/ujson>`_ , an extremely
-fast JSON implementation. TinyDB will auto-detect and use it if possible.
-
-In addition, you can wrap the storage with the ``CachingMiddleware`` which
-reduces disk I/O (see `Using Middlewares`_)
-
-
-.. image:: http://i.imgur.com/if4JI70.png
-   :width: 800 px
-   :align: center
-
-
 Version Numbering
 -----------------
 
