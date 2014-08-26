@@ -243,6 +243,33 @@ class Query(AndOrMixin):
         """
         return QueryNot(self)
 
+    def __and__(self, other):
+        """
+        Combines this query and another with logical and.
+
+        Example:
+
+        >>> (where('f1') == 5) & (where('f2') != 2)
+        ('f1' == 5) and ('f2' != 2)
+
+        :rtype: QueryAnd
+        """
+        return super(Query, self).__and__(other)
+
+    def __or__(self, other):
+        """
+        Combines this query and another with logical or.
+
+        Example:
+
+        >>> (where('f1') == 5) | (where('f2') != 2)
+        ('f1' == 5) or ('f2' != 2)
+
+        :rtype: QueryOr
+        """
+
+        return super(Query, self).__or__(other)
+
     def __call__(self, element):
         """
         Run the test on the element.

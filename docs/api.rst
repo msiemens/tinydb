@@ -4,7 +4,35 @@ API Documentation
 ``tinydb.database``
 -------------------
 
-.. automodule:: tinydb.database
+.. autoclass:: tinydb.database.Element
+    :members:
+    :special-members:
+    :exclude-members: __dict__, __weakref__
+    :member-order: bysource
+
+    .. py:attribute:: eid
+
+        The element's id
+
+.. autoclass:: tinydb.database.TinyDB
+    :members:
+    :special-members:
+    :exclude-members: __dict__, __weakref__
+    :member-order: bysource
+
+.. autoclass:: tinydb.database.Table
+    :members:
+    :special-members:
+    :exclude-members: __dict__, __weakref__
+    :member-order: bysource
+
+.. autoclass:: tinydb.database.SmartCacheTable
+    :members:
+    :special-members:
+    :exclude-members: __dict__, __weakref__
+    :member-order: bysource
+
+.. autoclass:: tinydb.database.Element
     :members:
     :special-members:
     :exclude-members: __dict__, __weakref__
@@ -13,8 +41,8 @@ API Documentation
 ``tinydb.queries``
 ------------------
 
-.. automodule:: tinydb.queries
-    :members: Query, AndOrMixin
+.. autoclass:: tinydb.queries.Query
+    :members:
     :special-members:
     :exclude-members: __weakref__
     :member-order: bysource
@@ -30,5 +58,5 @@ API Documentation
 ----------------------
 
 .. automodule:: tinydb.middlewares
-    :members: CachingMiddleware, ConcurrencyMiddleware
+    :members: CachingMiddleware
     :special-members:

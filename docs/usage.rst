@@ -1,218 +1,294 @@
 :tocdepth: 3
 
-How to Use TinyDB
-=================
+.. toctree::
+   :maxdepth: 2
 
+Advanced Usage
+==============
 
-Basic Usage
------------
+Remarks on Serialization
+------------------------
 
+Before we dive deeper into the usage of TinyDB, we should stop for a moment
+and discuss the topic of serializtion.
 
-Initializing
-::::::::::::
+TinyDB serializes all data using the
+`Python JSON <http://docs.python.org/2/library/json.html>`_ module by default.
+It's great for serializing simple data types but cannot handle more complex
+data types like custom classes. If you need a better serializer, you can write
+:doc:`your own storage <extend>`, that uses a more powerful (but also slower)
+library like `pickle  <http://docs.python.org/library/pickle.html>`_ or
+`PyYAML  <http://pyyaml.org/>`_.
 
-By default, TinyDB stores data as JSON files, so you have to specify the file
-path:
+Alternative JSON libary
+.......................
 
->>> from tinydb import TinyDB, where
->>> db = TinyDB('/path/to/db.json')
+As already mentioned, the default default storage serializes the data using
+JSON. To improve performance, you can install
+`ujson <http://pypi.python.org/pypi/ujson>`_ , an extremely fast JSON
+implementation. TinyDB will auto-detect and use it if possible.
 
-You also can use in-memory JSON to store data:
+Handling Data
+-------------
 
->>> from tinydb.storages import MemoryStorage
->>> db = TinyDB(storage=MemoryStorage)
-
+So let's start with inserting and retrieving data from your database.
 
 Inserting
-:::::::::
+.........
 
-As a document-oriented database, TinyDB uses ``dict``\ s to store data:
-
->>> db.insert({'int': 1, 'char': 'a'})
->>> db.insert({'int': 1, 'char': 'b'})
->>> db.insert({'int': 1, 'value': 0})
->>> db.insert({'int': 1, 'value': 1})
-
-You can also insert multiple elements at once:
+As already described you can insert an element using ``db.insert(...)``.
+In case you want to insert multiple elements, you can use ``db.insert_multiple(...)``:
 
 >>> db.insert_multiple([{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}])
 >>> db.insert_multiple({'int': 1, 'value': i} for i in range(2))
 
+Retrieving
+..........
 
-Getting Data
-::::::::::::
-
-.. hint::
-
-    Throughout this section, the return values are stripped of the ``_id``
-    key for clarity reasons. So::
-
-        [{'int': 1, 'value': 0}]
-
-    would actually be some something like::
-
-        [{'int': 1, 'value': 0, '_id': 3}]
-
-
-Getting all data stored:
-
->>> db.all()
-[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}, {'int': 1, 'value': 0}, {'int': 1, 'value': 1}]
-
-
-Getting the database size (number of elements stored):
+There are several ways to retrieve data from your database. For instance you
+can get the number of stored elements:
 
 >>> len(db)
-4
+3
+
+Then of course you can use ``db.search(...)`` as described in the :doc:`getting-started`
+section. But sometimes you want to get only one matching element. Instead of using
+
+>>> try:
+...     result = db.search(where('value') == 1)[0]
+... except IndexError:
+...     pass
 
 
-Search for all elements that have the ``value`` key defined:
+you can use ``db.get(...)``:
 
->>> db.search(where('value'))
-[{'int': 1, 'value': 0}, {'int': 1, 'value': 1}]
+>>> db.get(where('value') == 1)
+{'int': 1, 'value': 1}
+>>> db.get(where('value') == 100)
+None
 
+.. caution::
 
-Search for a specific value:
+    If multiple elements match the query, propably a random one of them will
+    be returned!
 
->>> db.search(where('value') == 1)
-[{'int': 1, 'value': 1}]
+Often you don't want to search for elements but only know whether they are
+stored in the database. In this case ``db.contains(...)`` is your friend:
 
-Count the number of elements matching a query:
+>>> db.contains(where('char') == 'a')
+
+In a similar manner you can look up the number of elements matching a query:
 
 >>> db.count(where('int') == 1)
-4
+3
 
-Check whether a specific element is in the database:
+Element IDs
+^^^^^^^^^^^
 
->>> db.contains(where('int') == 1)
-True
->>> db.contains(where('int') == 0)
-False
+Internally TinyDB associates an ID with every element you insert. You can
+access it via ``element.eid``.
 
+>>> el = db.get(where('value') == 1)
+>>> el.eid
+7
 
+You also can access elements by ID using ``db.get_by_id(...)``:
 
-Alternative syntax for ``db.contains``:
-
->>> if where('value') == 0.5 in db: print 'Found!'
-Found!
-
-.. warning::
-    .. deprecated:: 1.3.0
-       This syntax will propably be removed soon. Please use
-       the ``db.contains(...)`` syntax instead.
+>>> db.get_by_id(1)
+{'int': 1, 'value': 1}
 
 
-Other comparison operators you can use:
+Recap
+^^^^^
 
-- ``where('int') != 1``
-- ``where('int') < 2`` and ``<=``
-- ``where('int') > 0`` and ``>=``
+Let's summarize the ways to handle data:
 
++-------------------------------+---------------------------------------------------------------+
+| **Inserting**                                                                                 |
++-------------------------------+---------------------------------------------------------------+
+| ``db.insert_multiple(...)``   | Insert multiple elements                                      |
++-------------------------------+---------------------------------------------------------------+
+| **Getting data**                                                                              |
++-------------------------------+---------------------------------------------------------------+
+| ``len(db)``                   | Get the number of elements in the database                    |
++-------------------------------+---------------------------------------------------------------+
+| ``db.get(query)``             | Get one element matching the query                            |
++-------------------------------+---------------------------------------------------------------+
+| ``db.contains(query)``        | Check if the database contains a matching element             |
++-------------------------------+---------------------------------------------------------------+
+| ``db.count(query)``           | Get the number of matching elements                           |
++-------------------------------+---------------------------------------------------------------+
+| ``db.get_by_id(eid)``         | Get an element by it's ID                                     |
++-------------------------------+---------------------------------------------------------------+
 
-Combine two queries with logical and:
+Queries
+-------
 
+TinyDB lets you use a rich set of queries. In the :doc:`getting-started` you've
+learned about the basic comparisons (``==``, ``<``, ``>``, ...). In addition
+to that TinyDB enables you run logical operations on queries.
+
+>>> # Negate a query:
+>>> db.search(~ where('int') == 1)
+
+>>> # Logical AND:
 >>> db.search((where('int') == 1) & (where('char') == 'b'))
 [{'int': 1, 'char': 'b'}]
 
-
-Combine two queries with logical or:
-
+>>> # Logical OR:
 >>> db.search((where('char') == 'a') | (where('char') == 'b'))
 [{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
 
-When using ``&`` or ``|``, make sure you wrap the conditions on both sides
-with parentheses or Python will mess up the comparison.
+.. note::
 
-More advanced queries
-.....................
+    When using ``&`` or ``|``, make sure you wrap the conditions on both sides
+    with parentheses or Python will mess up the comparison.
 
-Check against a regex:
+You also can search for elements where a specific key exists:
 
+>>> db.search(where('char'))
+[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
+
+Advanced queries
+................
+
+In addition to these checks TinyDB supports checking against
+a regex or a custom test function:
+
+>>> # Regex:
 >>> db.search(where('char').matches('[aZ]*'))
 [{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
 
-
-Use a custom test function:
-
+>>> # Custom test:
 >>> test_func = lambda c: c == 'a'
 >>> db.search(where('char').test(test_func))
 [{'char': 'a', 'int': 1}]
 
+Nested Queries
+..............
 
-Also, if you want to get only one element, you can use:
+You can insert nested elements into your database:
 
->>> db.get(where('value'))
-{'int': 1, 'value': 0}
+>>> db.insert({'field': {'name': {'first_name': 'John', 'last_name': 'Doe'}}})
 
-.. caution::
+To search for a nested field, use ``where('field').has(...)``. You can apply
+any queries you already know to this selector:
 
-    If multiple elements match the query, only one of them will
-    be returned!
+>>> db.search(where('field').has('name'))
+[{'field': ...}]
+>>> db.search(where('field').has('name').has('last_name') == 'Doe')
+[{'field': ...}]
 
+You also can use lists inside of elements:
 
-Removing
-::::::::
+>>> db.insert({'field': [{'val': 1}, {'val': 2}, {'val': 3}])
 
-You can remove all elements matching a query:
+Using ``where('field').any(...)`` and ``where('field').all(...)`` you can
+specify checks for the list's items. They behave similarly to Python's `any` and
+`all`:
 
->>> db.remove(where('int') == 1)
->>> len(db)
-0
-
-You also can purge all entries:
-
->>> db.purge()
->>> len(db)
-0
-
-
-Updating
-::::::::
-
-You can update elements matching a query. Assuming you have these elements in the
-database:
-
->>> db.insert({'int': 1, 'char': 'a'})
->>> db.insert({'int': 1, 'char': 'b'})
->>> db.insert({'int': 1, 'value': 5.0})
-
-Then you can update selected elements like this:
-
->>> db.update({'int': 2}, where('char') == 'a')
->>> db.all()
-[{'int': 2, 'char': 'a'}, {'int': 1, 'char': 'b'}, {'int': 1, 'value': 5.0}]
+>>> db.search(where('field').any(where('val') == 1))
+True
+>>> db.search(where('field').all(where('val') > 0))
+True
 
 
-Advanced Usage
---------------
+Recap
+.....
+
+Again, let's recapitulate the query operations:
+
++-----------------------------------+-----------------------------------------------------------+
+| **Queries**                                                                                   |
++-----------------------------------+-----------------------------------------------------------+
+| ``where('field').matches(regex)`` | Match any element matching the regular expression         |
++-----------------------------------+-----------------------------------------------------------+
+| ``where('field').test(func)``     | Matches any element for which the function returns        |
+|                                   | ``True``                                                  |
++-----------------------------------+-----------------------------------------------------------+
+| **Combining Queries**                                                                         |
++-----------------------------------+-----------------------------------------------------------+
+| ``~ query``                       | Match elements that don't match the query                 |
++-----------------------------------+-----------------------------------------------------------+
+| ``(query1) & (query2)``           | Match elements that match both queries                    |
++-----------------------------------+-----------------------------------------------------------+
+| ``(query1) | (query2)``           | Match elements that match one of the queries              |
++-----------------------------------+-----------------------------------------------------------+
+| **Nested Queries**                |                                                           |
++-----------------------------------+-----------------------------------------------------------+
+| ``where('field').has('field')``   | Match any element that has the specified item. Perform    |
+|                                   | more queries on this selector as needed                   |
++-----------------------------------+-----------------------------------------------------------+
+| ``where('field').any(query)``     | Match any element where 'field' is a list where one of    |
+|                                   | the items matches the subquery                            |
++-----------------------------------+-----------------------------------------------------------+
+| ``where('field').all(query)``     | Match any element where 'field' is a list where all items |
+|                                   | match the subquery                                        |
++-----------------------------------+-----------------------------------------------------------+
 
 
 Tables
-::::::
+------
 
-You can use TinyDB with multiple tables. They behave exactly as described
-above:
+TinyDB supports working with multiple tables. They behave just the same as
+the ``TinyDB`` class. To create and use a table, use ``db.table(name)``.
 
->>> table = db.table('name')
+>>> table = db.table('table_name')
 >>> table.insert({'value': True})
 >>> table.all()
 [{'value': True}]
 
-
-In addition, you can remove all tables by using:
+To remove all tables from a database, use:
 
 >>> db.purge_tables()
 
-.. hint::
+.. note::
 
-    When using the operations described above using ``db``,
-    TinyDB actually uses a table named ``_default``.
+    TinyDB uses a table named ``_default`` as default table. All operations
+    on the database object like ``db.insert(..)`` operate on this table.
 
+Query Caching
+.............
 
-.. _middlewares:
+TinyDB caches query result for performance. You can optimize the query cache
+size by passing the ``cache_size`` to the ``table(...)`` function:
+
+>>> table = db.table('table_name', cache_size=30)
+
+.. hint:: You can set ``cache_size`` to ``None`` to make the cache unlimited in
+   size.
+
+.. _smart_cache:
+
+Smart Query Cache
+^^^^^^^^^^^^^^^^^
+
+If you perform lots of queries while the data changes only little, you may
+enable a smarter query cache. It updates the query cache when
+inserting/removing/updating elements so the cache doesn't get invalidated.
+
+>>> table = db.table('table_name', smart_cache=True)
+
+Storages & Middlewares
+----------------------
+
+Storage Types
+.............
+
+TinyDB comes with two storage types: JSON and in-memory. By
+default TinyDB stores its data in JSON files so you have to specify the path
+where to store it:
+
+>>> from tinydb import TinyDB, where
+>>> db = TinyDB('path/to/db.json')
+
+To use the in-memory storage, use:
+
+>>> from tinydb.storages import MemoryStorage
+>>> db = TinyDB(storage=MemoryStorage)
 
 Middlewares
-:::::::::::
+...........
 
 Middlewares wrap around existing storages allowing you to customize their
 behaviour.
@@ -221,18 +297,29 @@ behaviour.
 >>> from tinydb.middlewares import CachingMiddleware
 >>> db = TinyDB('/path/to/db.json', storage=CachingMiddleware(JSONStorage))
 
-TinyDB ships with these middlewares:
-
-- **CachingMiddleware**: Improves speed by reducing disk I/O. It caches all
-  read operations and writes data to disk every
-  ``CachingMiddleware.WRITE_CACHE_SIZE`` write operations.
-- **ConcurrencyMiddleware**: Allows you to use TinyDB in multithreaded
-  environments by using a lock on read and write operations, making
-  them virtually atomic.
-
 .. hint::
 
     You can nest middlewares:
 
-    >>> from tinydb.middlewares import CachingMiddleware, ConcurrencyMiddleware
-    >>> db = TinyDB('/path/to/db.json', storage=ConcurrencyMiddleware(CachingMiddleware(JSONStorage)))
+    >>> db = TinyDB('/path/to/db.json', storage=FirstMiddleware(SecondMiddleware(JSONStorage)))
+
+CachingMiddleware
+^^^^^^^^^^^^^^^^^
+
+The ``CachingMiddleware`` improves speed by reducing disk I/O. It caches all
+read operations and writes data to disk after a configured number of
+write operations.
+
+To make sure that all data is safely written when closing the table, use one
+of these ways:
+
+.. code-block:: python
+
+    # Using a context manager:
+    with database as db:
+        # Your operations
+
+.. code-block:: python
+
+    # Using the close function
+    db.close()

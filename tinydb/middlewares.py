@@ -5,10 +5,8 @@ middlewares and two implementations.
 
 from threading import RLock
 
-from tinydb.storages import Storage
 
-
-class Middleware(Storage):
+class Middleware(object):
     """
     The base class for all Middlewares.
 
@@ -20,6 +18,9 @@ class Middleware(Storage):
     ``_storage_cls`` (see :class:`~tinydb.middlewares.CachingMiddleware` for an
     example).
     """
+
+    def __init__(self, storage_cls):
+        self._storage_cls = storage_cls
 
     def __call__(self, *args, **kwargs):
         """
@@ -42,8 +43,8 @@ class Middleware(Storage):
                                        The 'real' storage class
                                        v
             TinyDB(storage=Middleware(StorageClass))
-                           ^
-                           Already an instance!
+                       ^
+                       Already an instance!
 
         So, when running ``self._storage = storage(*args, **kwargs)`` Python
         now will call ``__call__`` and TinyDB will expect the return value to
@@ -82,9 +83,10 @@ class CachingMiddleware(Middleware):
     WRITE_CACHE_SIZE = 1000
 
     def __init__(self, storage_cls):
+        super(CachingMiddleware, self).__init__(storage_cls)
+
         self.cache = None
         self._cache_modified_count = 0
-        self._storage_cls = storage_cls
 
     def __del__(self):
         self.flush()  # Flush potentially unwritten data

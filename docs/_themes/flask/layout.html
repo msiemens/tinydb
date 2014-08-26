@@ -1,4 +1,5 @@
 {%- extends "basic/layout.html" %}
+
 {%- block extrahead %}
   {{ super() }}
   {% if theme_touch_icon %}
@@ -7,14 +8,17 @@
   <link media="only screen and (max-width: 920px)" href="{{
     pathto('_static/small_flask.css', 1) }}" type= "text/css" rel="stylesheet" />
 {% endblock %}
+
 {%- block relbar2 %}{% endblock %}
+
 {% block header %}
   {{ super() }}
   {% if pagename == 'index' %}
   <div class=indexwrapper>
   {% endif %}
 {% endblock %}
-{%- block footer %}
+
+      {%- block footer %}
   <div class="footer">
     &copy; Copyright {{ copyright }}.
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.

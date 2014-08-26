@@ -7,21 +7,20 @@ Welcome to TinyDB!
 ==================
 
 >>> from tinydb import TinyDB, where
->>> db = TinyDB('/path/to/db.json')
+>>> db = TinyDB('path/to/db.json')
 >>> db.insert({'int': 1, 'char': 'a'})
 >>> db.search(where('int') == 1)
 [{'int': 1, 'char': 'a'}]
 
 Welcome to TinyDB, your tiny, document oriented database optimized for your
-happiness :) If you're new here, consider reading the :doc:`introduction
-<intro>`, otherwise feel free to choose one of:
+happiness :)
 
 .. toctree::
    :maxdepth: 1
 
    Introduction <intro>
-   Usage <usage>
-   Extend TinyDB <extend>
-   Limitations <limitations>
+   Getting Started <getting-started>
+   Advanced Usage <usage>
+   Extending TinyDB <extend>
    api
    changelog

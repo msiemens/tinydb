@@ -11,6 +11,9 @@ from tinydb import JSONStorage, where
 class Element(dict):
     """
     Represents an element stored in the database.
+
+    This is a transparent proxy for database elements. It exists
+    to provide a way to access an element's id via ``el.eid``.
     """
     def __init__(self, value=None, eid=None, **kwargs):
         super(Element, self).__init__(**kwargs)
@@ -18,12 +21,6 @@ class Element(dict):
         if value:
             self.update(value)
             self.eid = eid
-
-    def __repr__(self):
-        return 'Element(eid={}, value={})'.format(self.eid, dict(self))
-
-    def __str__(self):
-        return str(dict(self))
 
 
 class TinyDB(object):
@@ -40,6 +37,9 @@ class TinyDB(object):
 
         All arguments and keyword arguments will be passed to the underlying
         storage class (default: :class:`~tinydb.storages.JSONStorage`).
+
+        :param storage: The class of the storage to use. Will be initialized
+                        with ``args`` and ``kwargs``.
         """
         storage = kwargs.pop('storage', JSONStorage)
         #: :type: Storage
@@ -72,7 +72,7 @@ class TinyDB(object):
 
     def purge_tables(self):
         """
-        Purge all tables from the database. **CANT BE REVERSED!**
+        Purge all tables from the database. **CANNOT BE REVERSED!**
         """
         self._write({})
         self._table_cache.clear()
@@ -396,6 +396,8 @@ class Table(object):
             self._db._storage.close()
         except AttributeError:
             pass
+
+    close = __exit__
 
 
 class SmartCacheTable(Table):

@@ -7,6 +7,17 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v2.0.0** (2014-XX-XX)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- `search`, `get` and friends now returns an `Element` object that contain the value
+  and the element's id.
+- Added ``get_by_id``.
+- Added optional smart query caching (see :ref:`Usage <smart_cache>`).
+- Added support for nested comparisons.
+- Added `all` and `any` comparisons on lists.
+- Query cache is now a fixed size lru cache.
+
 **v1.4.0** (2014-07-22)
 ^^^^^^^^^^^^^^^^^^^^^^^
 

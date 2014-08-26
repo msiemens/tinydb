@@ -105,7 +105,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+#html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -134,7 +134,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -146,8 +146,8 @@ html_static_path = ['_static']
 
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
-    'index': ['sidebarintro.html', 'searchbox.html'],
-    '**': ['sidebarintro.html', 'localtoc.html', 'relations.html',
+    'index': ['sidebarintro.html', 'links.html', 'searchbox.html'],
+    '**': ['sidebarintro.html', 'localtoc.html', 'links.html',
            'searchbox.html']
 }
 

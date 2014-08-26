@@ -49,6 +49,12 @@ class Storage(object):
         """
         raise NotImplementedError('To be overriden!')
 
+    def close(self):
+        """
+        Optional: Close open file handles, etc.
+        """
+        pass
+
 
 class JSONStorage(Storage):
     """

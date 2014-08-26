@@ -90,7 +90,7 @@ The documentation for TinyDB is hosted at ``Read the Docs``: https://tinydb.read
 Supported Python Versions
 -------------------------
 
-TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3 and pypy.
+TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3, 3.4 and pypy.
 
 
 Limitations
@@ -140,6 +140,17 @@ see `semver.org <http://semver.org/>`_
 
 Changelog
 ---------
+
+**v2.0.0** (2014-XX-XX)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- `search`/`get` etc. now returns an `Element` object that contain the value
+  and the element's id.
+- Added ``get_by_id``.
+- Added optional smart query caching.
+- Added support for nested comparisons.
+- Added `all` and `any` comparisons on lists.
+- Query cache is now a fixed size lru cache.
 
 **v1.4.0** (2014-07-22)
 ^^^^^^^^^^^^^^^^^^^^^^^
