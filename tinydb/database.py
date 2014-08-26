@@ -15,7 +15,7 @@ class Element(dict):
     def __init__(self, value=None, eid=None, **kwargs):
         super(Element, self).__init__(**kwargs)
 
-        if value:
+        if value is not None:
             self.update(value)
             self.eid = eid
 
@@ -197,7 +197,7 @@ class Table(object):
 
         data = self._db._read(self.name)
 
-        for eid in data.copy():
+        for eid in list(data):
             data[eid] = Element(data[eid], eid)
 
         return data
