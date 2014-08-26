@@ -157,11 +157,11 @@ Changelog
 
 
 
-.. |Build Status| image:: http://img.shields.io/travis/msiemens/tinydb.svg?style=flat
+.. |Build Status| image:: http://img.shields.io/travis/msiemens/tinydb.svg?style=flat-square
    :target: https://travis-ci.org/msiemens/TinyDB
-.. |Coverage| image:: http://img.shields.io/coveralls/msiemens/tinydb.svg?style=flat
+.. |Coverage| image:: http://img.shields.io/coveralls/msiemens/tinydb.svg?style=flat-square
    :target: https://coveralls.io/r/msiemens/tinydb
-.. |Version| image:: http://img.shields.io/pypi/v/tinydb.svg?style=flat
+.. |Version| image:: http://img.shields.io/pypi/v/tinydb.svg?style=flat-square
    :target: https://crate.io/packages/tinydb
 .. _Buzhug: http://buzhug.sourceforge.net/
 .. _CodernityDB: http://labs.codernity.com/codernitydb/
