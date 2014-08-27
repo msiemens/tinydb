@@ -56,6 +56,11 @@ def test_in_memory():
     # Verify contents
     assert element == storage.read()
 
+    # Test case for #21
+    other = MemoryStorage()
+    other.write({})
+    assert other.read() != storage.read()
+
 
 def test_in_memory_close():
     with TinyDB(storage=MemoryStorage) as db:

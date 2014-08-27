@@ -322,6 +322,8 @@ class Table(object):
         self._queries_cache[cond] = elems
         self._lru.append(cond)
 
+        # since x > float('nan') is always false,
+        # no need to check for any special cases
         if len(self._queries_cache) > self._cache_size:
             self._queries_cache.pop(self._lru.pop(0))
 
