@@ -245,13 +245,7 @@ class Table(object):
         Insert a new element into the table.
         """
 
-        current_id = self._last_id + 1
-        self._last_id = current_id
-
-        data = self._read()
-        data[current_id] = element
-
-        self._write(data)
+        self.insert_multiple((element,))
 
     def insert_multiple(self, elements):
         """
@@ -259,8 +253,15 @@ class Table(object):
 
         :param elements: a list of elements to insert
         """
+        data = self._read()
+        current_id = self._last_id
+
         for element in elements:
-            self.insert(element)
+            current_id += 1
+            data[current_id] = element
+
+        self._write(data)
+        self._last_id = current_id
 
     def remove(self, cond):
         """
