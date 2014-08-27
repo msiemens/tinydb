@@ -129,7 +129,9 @@ def test_all():
 
 def test_has():
     query = where('key1').has('key2')
+    str(query)  # This used to cause a bug...
 
+    assert query({'key1': {'key2': {'key3': 1}}})
     assert query({'key1': {'key2': 1}})
     assert not query({'key1': 3})
     assert not query({'key1': {'key1': 1}})

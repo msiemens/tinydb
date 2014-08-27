@@ -444,7 +444,7 @@ class QueryHas(Query):
             return super(QueryHas, self).__call__(element)
 
     def __repr__(self):
-        path = self._path
+        path = self._path[:]
 
         if not self._special and not self._cmp:
             path += [self._key]
