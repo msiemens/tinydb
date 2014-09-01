@@ -127,21 +127,6 @@ class TinyDB(object):
         """
         return len(self._table)
 
-    def __contains__(self, condition):  # pragma: no cover
-        """
-        A shorthand for ``query(...) == ... in db.table()``. Intendet to be
-        used in if-clauses (avoiding ``if len(db.serach(...)):``)
-
-        >>> if where('field') == 'value' in db:
-        ...     print True
-        """
-        warnings.warn('The `where(...) in db` syntax will '
-                      'propably be deprecated soon. Please use '
-                      '`db.contains(where(...))` instead.',
-                      DeprecationWarning)
-
-        return self.contains(condition)
-
     def __enter__(self):
         """
         See :meth:`Table.__enter__`
@@ -244,17 +229,6 @@ class Table(object):
         Get the total number of elements in the table.
         """
         return len(self.all())
-
-    def __contains__(self, condition):  # pragma: no cover
-        """
-        Equals to ``bool(table.search(condition)))``.
-        """
-        warnings.warn('The `where(...) in db` syntax will '
-                      'propably be deprecated soon. Please use '
-                      '`db.contains(where(...))` instead.',
-                      DeprecationWarning)
-
-        return self.contains(condition)
 
     def all(self):
         """
