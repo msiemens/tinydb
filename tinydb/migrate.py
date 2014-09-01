@@ -11,9 +11,7 @@ def migrate(*args, **kwargs):
     storage_cls = kwargs.pop('storage', JSONStorage)
     storage = storage_cls(*args)
 
-    new_data = {
-        '_version': (2, 0)
-    }
+    new_data = {}
     data = storage.read()
 
     if isinstance(data['_default'], dict):
