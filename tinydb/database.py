@@ -187,6 +187,32 @@ class Table(object):
         except IndexError:
             self._last_id = 0
 
+    def _process_data(self, func, cond=None, eids=None):
+        """
+        Process all elements specified by condition or ids using a given
+        function.
+
+        :param func: the function to execute on every included element.
+                     first argument: all data
+                     second argument: the current eid
+        :param cond: elements to use
+        :param eids: elements to use
+        """
+        data = self._read()
+
+        if eids is not None:
+            # Included element specified by id
+            for eid in eids:
+                func(data, eid)
+
+        else:
+            # Included elements specified by condition
+            for eid in list(data):
+                if cond(data[eid]):
+                    func(data, eid)
+
+        self._write(data)
+
     def _read(self):
         """
         Reading access to the DB.
@@ -253,31 +279,26 @@ class Table(object):
 
         self._write(data)
 
+        return current_id
+
     def insert_multiple(self, elements):
         """
         Insert multiple elements into the table.
 
         :param elements: a list of elements to insert
         """
-        for element in elements:
-            self.insert(element)
+        return [self.insert(element) for element in elements]
 
-    def remove(self, cond):
+    def remove(self, cond=None, eids=None):
         """
         Remove the element matching the condition.
 
         :param cond: the condition to check against
         :type cond: query, int, list
         """
-        data = self._read()
+        self._process_data(lambda data, eid: data.pop(eid), cond, eids)
 
-        for eid in list(data):
-            if cond(data[eid]):
-                data.pop(eid)
-
-        self._write(data)
-
-    def update(self, fields, cond):
+    def update(self, fields, cond=None, eids=None):
         """
         Update all elements matching the condition to have a given set of
         fields.
@@ -287,20 +308,15 @@ class Table(object):
         :param cond: which elements to update
         :type cond: query
         """
-        data = self._read()
-
-        for eid in data:
-            value = data[eid]
-            if cond(value):
-                value.update(fields)
-
-        self._write(data)
+        self._process_data(lambda data, eid: data[eid].update(fields),
+                           cond, eids)
 
     def purge(self):
         """
         Purge the table by removing all elements.
         """
         self._write({})
+        self._last_id = 0
 
     def search(self, cond):
         """
@@ -329,7 +345,7 @@ class Table(object):
 
         return elems
 
-    def get(self, cond):
+    def get(self, cond=None, eid=None):
         """
         Search for exactly one element matching a condition.
 
@@ -340,21 +356,13 @@ class Table(object):
         :rtype: dict or None
         """
 
-        for el in self.all():
-            if cond(el):
-                return el
+        if eid is not None:
+            return self._read().get(eid, None)
 
-    def get_by_id(self, eid):
-        """
-        Get an element by specifying its id.
-
-        :return: the element or None
-        :rtype: dict or None
-        """
-        try:
-            return self._read()[eid]
-        except KeyError:
-            return None
+        else:
+            elements = self.search(cond)
+            if elements:
+                return elements.pop(0)
 
     def count(self, cond):
         """
@@ -365,14 +373,17 @@ class Table(object):
         """
         return len(self.search(cond))
 
-    def contains(self, cond):
+    def contains(self, cond=None, eids=None):
         """
         Check wether the database contains an element matching a condition.
 
         :param cond: the condition use
         :type cond: Query
         """
-        return self.count(cond) > 0
+        if eids is not None:
+            return any(self.get(eid=eid) for eid in eids)
+        else:
+            return self.count(cond) > 0
 
     def _clear_query_cache(self):
         """
@@ -419,48 +430,50 @@ class SmartCacheTable(Table):
         See :meth:`Table.insert`
         """
 
-        super(SmartCacheTable, self).insert(element)
+        eid = super(SmartCacheTable, self).insert(element)
 
         for query in self._queries_cache:
             cache = self._queries_cache[query]
             if query(element):
                 cache.append(element)
 
-    def update(self, fields, cond):
+        return eid
+
+    def update(self, fields, cond=None, eids=None):
         """
         See :meth:`Table.update`
         """
         data = self._read()
         query_cache = tuple(self._queries_cache.items())
 
-        for eid in data:
-            value = data[eid]
-            if cond(value):
+        for eid in (eids if eids else data.copy()):
+            if eids or cond(data[eid]):
 
-                old_value = value.copy()
-                value.update(fields)
+                # Update the value
+                old_value = data[eid].copy()
+                data[eid].update(fields)
+                new_value = data[eid]
 
-                for query, results in query_cache:
-                    try:
+                # Update query cache
+                for query, results in self._queries_cache.items():
+                    if query(old_value):
                         results.remove(old_value)
-                    except ValueError:
-                        pass
 
-                    if query(value):
-                        results.append(value)
+                    elif query(new_value):
+                        results.append(new_value)
 
         self._write(data)
 
-    def remove(self, cond):
+    def remove(self,  cond=None, eids=None):
         """
         See :meth:`Table.remove`
         """
         data = self._read()
         query_cache = tuple(self._queries_cache.items())
 
-        for eid in list(data):
+        for eid in (eids if eids else data.copy()):
             value = data[eid]
-            if cond(value):
+            if eids or cond(data[eid]):
 
                 for query, results in query_cache:
                     try:
@@ -471,3 +484,10 @@ class SmartCacheTable(Table):
                 data.pop(eid)
 
         self._write(data)
+
+    def purge(self):
+        """
+        See :meth:`Table.purge`
+        """
+        super(SmartCacheTable, self).purge()
+        self._clear_query_cache()  # Query cache got invalid

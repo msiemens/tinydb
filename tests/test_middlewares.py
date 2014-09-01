@@ -1,10 +1,8 @@
-from threading import Thread
-
 from tinydb import TinyDB
 from tinydb.middlewares import CachingMiddleware
 from tinydb.storages import MemoryStorage
 
-if not 'xrange' in dir(__builtins__):
+if 'xrange' not in dir(__builtins__):
     xrange = range  # Python 3 support
 
 

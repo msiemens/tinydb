@@ -1,7 +1,14 @@
+import pytest
+
+from conftest import get_db
+
 from tinydb import TinyDB, where
 from tinydb.storages import MemoryStorage
 
+dbs = lambda: [get_db(), get_db(smart_cache=True)]
 
+
+@pytest.mark.parametrize('db', dbs())
 def test_purge(db):
     db.purge()
 
@@ -11,6 +18,7 @@ def test_purge(db):
     assert len(db) == 0
 
 
+@pytest.mark.parametrize('db', dbs())
 def test_all(db):
     db.purge()
 
@@ -20,6 +28,7 @@ def test_all(db):
     assert len(db.all()) == 10
 
 
+@pytest.mark.parametrize('db', dbs())
 def test_insert(db):
     db.purge()
     db.insert({'int': 1, 'char': 'a'})
@@ -36,11 +45,19 @@ def test_insert(db):
     assert db.count(where('char') == 'a') == 1
 
 
+@pytest.mark.parametrize('db', dbs())
+def test_insert_ids(db):
+    db.purge()
+    assert db.insert({'int': 1, 'char': 'a'}) == 1
+    assert db.insert({'int': 1, 'char': 'a'}) == 2
+
+
+@pytest.mark.parametrize('db', dbs())
 def test_insert_multiple(db):
     db.purge()
     assert not db.contains(where('int') == 1)
 
-    # Insert multiple from lis
+    # Insert multiple from list
     db.insert_multiple([{'int': 1, 'char': 'a'},
                         {'int': 1, 'char': 'b'},
                         {'int': 1, 'char': 'c'}])
@@ -70,6 +87,17 @@ def test_insert_multiple(db):
         assert db.count(where('int') == i) == 1
 
 
+@pytest.mark.parametrize('db', dbs())
+def test_insert_multiple_with_ids(db):
+    db.purge()
+
+    # Insert multiple from list
+    assert db.insert_multiple([{'int': 1, 'char': 'a'},
+                               {'int': 1, 'char': 'b'},
+                               {'int': 1, 'char': 'c'}]) == [1, 2, 3]
+
+
+@pytest.mark.parametrize('db', dbs())
 def test_remove(db):
     db.remove(where('char') == 'b')
 
@@ -77,12 +105,21 @@ def test_remove(db):
     assert db.count(where('int') == 1) == 2
 
 
+@pytest.mark.parametrize('db', dbs())
 def test_remove_multiple(db):
     db.remove(where('int') == 1)
 
     assert len(db) == 0
 
 
+@pytest.mark.parametrize('db', dbs())
+def test_remove_ids(db):
+    db.remove(eids=[1, 2])
+
+    assert len(db) == 1
+
+
+@pytest.mark.parametrize('db', dbs())
 def test_update(db):
     assert db.count(where('int') == 1) == 3
 
@@ -92,6 +129,14 @@ def test_update(db):
     assert db.count(where('int') == 1) == 2
 
 
+@pytest.mark.parametrize('db', dbs())
+def test_update_ids(db):
+    db.update({'int': 2}, eids=[1, 2])
+
+    assert db.count(where('int') == 2) == 2
+
+
+@pytest.mark.parametrize('db', dbs())
 def test_search(db):
     assert not db._queries_cache
     assert len(db.search(where('int') == 1)) == 3
@@ -100,30 +145,46 @@ def test_search(db):
     assert len(db.search(where('int') == 1)) == 3  # Query result from cache
 
 
+@pytest.mark.parametrize('db', dbs())
 def test_contians(db):
     assert db.contains(where('int') == 1)
     assert not db.contains(where('int') == 0)
 
 
+@pytest.mark.parametrize('db', dbs())
+def test_contains_ids(db):
+    assert db.contains(eids=[1, 2])
+    assert not db.contains(eids=[88])
+
+
+@pytest.mark.parametrize('db', dbs())
 def test_get(db):
     item = db.get(where('char') == 'b')
     assert item['char'] == 'b'
 
 
-def test_get_by_id(db):
+@pytest.mark.parametrize('db', dbs())
+def test_get_ids(db):
     el = db.all()[0]
-    assert db.get_by_id(el.eid) == el
-    assert db.get_by_id(float('NaN')) is None
+    assert db.get(eid=el.eid) == el
+    assert db.get(eid=float('NaN')) is None
 
 
+@pytest.mark.parametrize('db', dbs())
 def test_count(db):
     assert db.count(where('int') == 1) == 3
     assert db.count(where('char') == 'd') == 0
 
 
+@pytest.mark.parametrize('db', dbs())
 def test_contains(db):
     assert db.contains(where('int') == 1)
     assert not db.contains(where('int') == 0)
+
+
+@pytest.mark.parametrize('db', dbs())
+def test_contains_ids(db):
+    assert db.contains(eids=[1, 2])
 
 
 def test_multiple_dbs():
@@ -162,8 +223,15 @@ def test_unique_ids(tmpdir):
     with TinyDB(path) as _db:
         _db.purge()
 
+        print 'Inserting...'
         _db.insert_multiple({'x': i} for i in range(5))
+
+        print _db.all()
+
+        print 'Removing...'
         _db.remove(where('x') == 2)
+
+        print _db.all()
 
         assert len(_db) == 4
 
