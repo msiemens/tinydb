@@ -3,9 +3,7 @@ Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
 
-import warnings
-
-from tinydb import JSONStorage, where
+from tinydb import JSONStorage
 
 
 class Element(dict):
@@ -235,7 +233,7 @@ class Table(object):
         Get all elements stored in the table.
 
         :returns: a list with all elements.
-        :rtype: list[dict]
+        :rtype: list[Element]
         """
 
         return list(self._read().values())
