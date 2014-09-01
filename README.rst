@@ -158,7 +158,7 @@ Changelog
 
 
 .. |Build Status| image:: http://img.shields.io/travis/msiemens/tinydb.svg?style=flat-square
-   :target: https://travis-ci.org/msiemens/TinyDB
+   :target: https://travis-ci.org/msiemens/tinydb
 .. |Coverage| image:: http://img.shields.io/coveralls/msiemens/tinydb.svg?style=flat-square
    :target: https://coveralls.io/r/msiemens/tinydb
 .. |Version| image:: http://img.shields.io/pypi/v/tinydb.svg?style=flat-square
