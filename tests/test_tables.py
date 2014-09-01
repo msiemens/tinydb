@@ -52,18 +52,21 @@ def test_query_cache_size(db):
 def test_smart_query_cache(db):
     table = db.table('table3', smart_cache=True)
     query = where('int') == 1
+    dummy = where('int') == 2
 
     assert not table.search(query)
+    assert not table.search(dummy)
 
     # Test insert
     table.insert({'int': 1})
 
-    assert len(table._queries_cache) == 1
+    assert len(table._queries_cache) == 2
     assert len(table._queries_cache[query]) == 1
 
     # Test update
     table.update({'int': 2}, where('int') == 1)
 
+    assert len(table._queries_cache[dummy]) == 1
     assert table.count(query) == 0
 
     # Test remove

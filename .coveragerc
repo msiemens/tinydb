@@ -4,3 +4,4 @@ exclude_lines =
     raise NotImplementedError.*
     warnings\.warn.*
     def __repr__
+    def __str__
