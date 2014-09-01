@@ -1,6 +1,6 @@
 import pytest
 
-from conftest import get_db
+from . conftest import get_db
 
 from tinydb import TinyDB, where
 from tinydb.storages import MemoryStorage
