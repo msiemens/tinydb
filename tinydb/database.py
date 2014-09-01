@@ -405,11 +405,7 @@ class Table(object):
         Try to close the storage after being used as a context manager.
         """
         _ = args
-
-        try:
-            self._db._storage.close()
-        except AttributeError:
-            pass
+        self._db._storage.close()
 
     close = __exit__
 
