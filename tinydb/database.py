@@ -252,6 +252,7 @@ class Table(object):
         data[current_id] = element
 
         self._write(data)
+        return element
 
     def insert_multiple(self, elements):
         """
@@ -261,6 +262,7 @@ class Table(object):
         """
         for element in elements:
             self.insert(element)
+        return elements
 
     def remove(self, cond):
         """
