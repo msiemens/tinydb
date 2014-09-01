@@ -222,16 +222,8 @@ def test_unique_ids(tmpdir):
     # Verify ids stay unique when inserting/removing
     with TinyDB(path) as _db:
         _db.purge()
-
-        print 'Inserting...'
         _db.insert_multiple({'x': i} for i in range(5))
-
-        print _db.all()
-
-        print 'Removing...'
         _db.remove(where('x') == 2)
-
-        print _db.all()
 
         assert len(_db) == 4
 
