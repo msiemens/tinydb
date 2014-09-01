@@ -18,7 +18,7 @@ class Element(dict):
     def __init__(self, value=None, eid=None, **kwargs):
         super(Element, self).__init__(**kwargs)
 
-        if value:
+        if value is not None:
             self.update(value)
             self.eid = eid
 
@@ -179,7 +179,7 @@ class Table(object):
         self.name = name
         self._db = db
         self._queries_cache = {}
-        self._cache_size = cache_size
+        self._cache_size = cache_size or float('nan')
         self._lru = []
 
         try:
@@ -197,7 +197,7 @@ class Table(object):
 
         data = self._db._read(self.name)
 
-        for eid in data.copy():
+        for eid in list(data):
             data[eid] = Element(data[eid], eid)
 
         return data
@@ -271,7 +271,7 @@ class Table(object):
         """
         data = self._read()
 
-        for eid in data.copy():
+        for eid in list(data):
             if cond(data[eid]):
                 data.pop(eid)
 
@@ -290,8 +290,9 @@ class Table(object):
         data = self._read()
 
         for eid in data:
-            if cond(data[eid]):
-                data[eid].update(fields)
+            value = data[eid]
+            if cond(value):
+                value.update(fields)
 
         self._write(data)
 
@@ -321,7 +322,9 @@ class Table(object):
         self._queries_cache[cond] = elems
         self._lru.append(cond)
 
-        if self._cache_size and len(self._queries_cache) > self._cache_size:
+        # since x > float('nan') is always false,
+        # no need to check for any special cases
+        if len(self._queries_cache) > self._cache_size:
             self._queries_cache.pop(self._lru.pop(0))
 
         return elems
@@ -416,38 +419,35 @@ class SmartCacheTable(Table):
         See :meth:`Table.insert`
         """
 
-        current_id = self._last_id + 1
-        self._last_id = current_id
+        super(SmartCacheTable, self).insert(element)
 
-        data = self._read()
-        data[current_id] = element
-
-        for query, results in self._queries_cache.items():
+        for query in self._queries_cache:
+            cache = self._queries_cache[query]
             if query(element):
-                results.append(element)
-
-        self._write(data)
+                cache.append(element)
 
     def update(self, fields, cond):
         """
         See :meth:`Table.update`
         """
         data = self._read()
+        query_cache = tuple(self._queries_cache.items())
 
         for eid in data:
-            if cond(data[eid]):
+            value = data[eid]
+            if cond(value):
 
-                old_value = data[eid].copy()
-                data[eid].update(fields)
-                new_value = data[eid]
+                old_value = value.copy()
+                value.update(fields)
 
-                for query, results in self._queries_cache.items():
-
-                    if query(old_value):
+                for query, results in query_cache:
+                    try:
                         results.remove(old_value)
+                    except ValueError:
+                        pass
 
-                    elif query(new_value):
-                        results.append(new_value)
+                    if query(value):
+                        results.append(value)
 
         self._write(data)
 
@@ -456,13 +456,17 @@ class SmartCacheTable(Table):
         See :meth:`Table.remove`
         """
         data = self._read()
+        query_cache = tuple(self._queries_cache.items())
 
-        for eid in data.copy():
-            if cond(data[eid]):
+        for eid in list(data):
+            value = data[eid]
+            if cond(value):
 
-                for query, results in self._queries_cache.items():
-                    if query(data[eid]):
-                        results.remove(data[eid])
+                for query, results in query_cache:
+                    try:
+                        results.remove(value)
+                    except ValueError:
+                        pass
 
                 data.pop(eid)
 

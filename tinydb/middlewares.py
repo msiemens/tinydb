@@ -3,8 +3,6 @@ Contains the :class:`base class <tinydb.middlewares.Middleware>` for
 middlewares and two implementations.
 """
 
-from threading import RLock
-
 
 class Middleware(object):
     """
@@ -109,23 +107,3 @@ class CachingMiddleware(Middleware):
         """
         self.storage.write(self.cache)
         self._cache_modified_count = 0
-
-
-class ConcurrencyMiddleware(Middleware):
-    """
-    Makes TinyDB working with multithreading.
-
-    Uses a lock so write/read operations are virtually atomic.
-    """
-
-    def __init__(self, storage_cls):
-        self.lock = RLock()
-        self._storage_cls = storage_cls
-
-    def write(self, data):
-        with self.lock:
-            self.storage.write(data)
-
-    def read(self):
-        with self.lock:
-            return self.storage.read()
