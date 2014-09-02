@@ -12,27 +12,27 @@ TinyDB.
 Why using TinyDB?
 -----------------
 
-- **tiny**: The current source code has 1200 lines of code (+ 600 lines tests).
+- **tiny:** The current source code has 1200 lines of code (+ 600 lines tests).
   For comparison: Buzhug_ has about 2000 lines of
   code (w/o tests), CodernityDB_ has about 8000 lines of code (w/o tests).
 
-- **document oriented**: Like MongoDB_, you can store any document
+- **document oriented:** Like MongoDB_, you can store any document
   (represented as ``dict``) in TinyDB.
 
-- **optimized for your happiness**: TinyDB is designed to be simple and
+- **optimized for your happiness:** TinyDB is designed to be simple and
   fun to use by providing a simple and clean API.
 
-- **written in pure Python**: TinyDB neither needs an external server (as
+- **written in pure Python:** TinyDB neither needs an external server (as
   e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any dependencies
   from PyPI.
 
-- **works on Python 2.6 – 3.4 and PyPy**: TinyDB works on all
+- **works on Python 2.6 – 3.4 and PyPy:** TinyDB works on all
   modern versions of Python and PyPy.
 
-- **easily extensible**: You can easily extend TinyDB by writing new
+- **easily extensible:** You can easily extend TinyDB by writing new
   storages or modify the behaviour of storages with Middlewares.
 
-- **nearly 100% test coverage**: If you don't count that ``__repr__``
+- **nearly 100% test coverage:** If you don't count that ``__repr__``
   methods and some abstract methods are not tested, TinyDB has a test
   coverage of 100%.
 

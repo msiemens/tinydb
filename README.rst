@@ -96,10 +96,10 @@ TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3, 3.4 and pypy.
 Extensions
 **********
 
-| **Name**:        ``tinyrecord``
-| **Repo**:        https://github.com/eugene-eeo/tinyrecord
-| **Status**:      *experimental*
-| **Description**: Tinyrecord is a library which implements experimental atomic
+| **Name:**        ``tinyrecord``
+| **Repo:**        https://github.com/eugene-eeo/tinyrecord
+| **Status:**      *experimental*
+| **Description:** Tinyrecord is a library which implements experimental atomic
                    transaction support for the TinyDB NoSQL database. It uses a
                    record-first then execute architecture which allows us to
                    minimize the time that we are within a thread lock.
@@ -113,7 +113,7 @@ Changelog
 
 `Upgrade Nodes <tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
 
-**Warning**: TinyDB changed the way data is stored. You may need to migrate
+**Warning:** TinyDB changed the way data is stored. You may need to migrate
 your databases to the new scheme. Check out the `Upgrade Nodes <tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
 for details.
 
