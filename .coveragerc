@@ -5,3 +5,5 @@ exclude_lines =
     warnings\.warn.*
     def __repr__
     def __str__
+    def main()
+    if __name__ == .__main__.:
