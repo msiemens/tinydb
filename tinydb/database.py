@@ -3,9 +3,7 @@ Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
 
-import warnings
-
-from tinydb import JSONStorage, where
+from tinydb import JSONStorage
 
 
 class Element(dict):

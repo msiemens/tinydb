@@ -6,14 +6,14 @@ from tinydb import TinyDB
 
 
 def get_db(smart_cache=False):
-    db = TinyDB(storage=MemoryStorage)
-    db.purge_tables()
+    db_ = TinyDB(storage=MemoryStorage)
+    db_.purge_tables()
 
     if smart_cache:
-        db = db.table('_default', smart_cache=True)
+        db_ = db_.table('_default', smart_cache=True)
 
-    db.insert_multiple({'int': 1, 'char': c} for c in 'abc')
-    return db
+    db_.insert_multiple({'int': 1, 'char': c} for c in 'abc')
+    return db_
 
 
 @pytest.fixture

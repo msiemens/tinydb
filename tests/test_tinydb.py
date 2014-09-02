@@ -67,8 +67,8 @@ def test_insert_multiple(db):
 
     # Insert multiple from generator function
     def generator():
-        for i in range(10):
-            yield {'int': i}
+        for j in range(10):
+            yield {'int': j}
 
     db.purge()
 
