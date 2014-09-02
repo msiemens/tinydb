@@ -236,7 +236,11 @@ class Table(object):
         """
 
         data = self._db._read(self.name)
-        return {eid: Element(data[eid], eid) for eid in data}
+
+        for eid in list(data):
+            data[eid] = Element(data[eid], eid)
+
+        return data
 
     def _write(self, values):
         """
