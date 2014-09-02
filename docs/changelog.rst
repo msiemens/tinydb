@@ -10,11 +10,11 @@ see `semver.org <http://semver.org/>`_
 **v2.0.0** (2014-XX-XX)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-:ref:`Upgrade Nodes <upgrade_v2_0>`
+:ref:`Upgrade Notes <upgrade_v2_0>`
 
 .. warning:: TinyDB changed the way data is stored. You may need to migrate
              your databases to the new scheme. Check out the
-             :ref:`Upgrade Nodes <upgrade_v2_0>` for details.
+             :ref:`Upgrade Notes <upgrade_v2_0>` for details.
 
 - The syntax ``query in db`` has been removed, use ``db.contains`` instead.
 - The ``ConcurrencyMiddleware`` has been removed due to a insecure implementation
