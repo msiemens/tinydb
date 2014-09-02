@@ -22,6 +22,17 @@ def test_lru_cache_set_multiple():
     assert cache.lru == ["a"]
 
 
+def test_lru_cache_get():
+    cache = LRUCache(capacity=3)
+    cache["a"] = 1
+    cache["b"] = 1
+    cache["c"] = 1
+    cache.get("a")
+    cache["d"] = 4
+
+    assert cache.lru == ["c", "a", "d"]
+
+
 def test_lru_cache_delete():
     cache = LRUCache(capacity=3)
     cache["a"] = 1
@@ -38,3 +49,11 @@ def test_lru_cache_clear():
     cache.clear()
 
     assert cache.lru == []
+
+
+def test_lru_cache_unlimited():
+    cache = LRUCache()
+    for i in xrange(100):
+        cache[i] = i
+
+    assert len(cache.lru) == 100
