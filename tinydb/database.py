@@ -2,8 +2,8 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
-
 from tinydb import JSONStorage
+from tinydb.utils import LRUCache
 
 
 class Element(dict):
@@ -65,7 +65,9 @@ class TinyDB(object):
 
         table_class = SmartCacheTable if smart_cache else Table
         table = table_class(name, self, **options)
+
         self._table_cache[name] = table
+
         return table
 
     def purge_tables(self):
@@ -86,16 +88,18 @@ class TinyDB(object):
         :rtype: dict
         """
 
-        if not table:
+        if table is not None:
+            # Read specific table
+            try:
+                return self._read()[table]
+            except (KeyError, TypeError):
+                return {}
+        else:
+            # Read all tables
             try:
                 return self._storage.read()
             except ValueError:
                 return {}
-
-        try:
-            return self._read()[table]
-        except (KeyError, TypeError):
-            return {}
 
     def _write(self, values, table=None):
         """
@@ -105,16 +109,23 @@ class TinyDB(object):
         tables' dict.
         :type table: str or None
         :param values: the new values to write
-        :type values: list, dict
+        :type values: list | dict
         """
 
-        if not table:
-            self._storage.write(values)
-        else:
-            current_data = self._read()
-            current_data[table] = values
+        if table is not None:
+            # Write specific table
+            data = self._read()
+            data[table] = values
 
-            self._write(current_data)
+            self._write(data)
+
+        else:
+            # Write all tables
+            self._storage.write(values)
+
+    # Methods that are executed on the default table
+    # Because magic methods are not handlet by __getattr__ we need to forward
+    # them manually here
 
     def __len__(self):
         """
@@ -159,14 +170,14 @@ class Table(object):
         :type db: tinydb.database.TinyDB
         :param cache_size: Maximum size of query cache.
         """
+
         self.name = name
         self._db = db
-        self._queries_cache = {}
-        self._cache_size = cache_size or float('nan')
-        self._lru = []
+        self._query_cache = LRUCache(capacity=cache_size)
 
         try:
-            self._last_id = int(sorted(self._read().keys())[-1])
+            all_ids = sorted(self._read().keys())
+            self._last_id = int(all_ids.pop())
         except IndexError:
             self._last_id = 0
 
@@ -190,20 +201,31 @@ class Table(object):
         :param cond: elements to use
         :param eids: elements to use
         """
+
         data = self._read()
 
         if eids is not None:
-            # Included element specified by id
+            # Processed element specified by id
             for eid in eids:
                 func(data, eid)
 
         else:
-            # Included elements specified by condition
+            # Processed elements specified by condition
             for eid in list(data):
                 if cond(data[eid]):
                     func(data, eid)
 
         self._write(data)
+
+    def _get_next_id(self):
+        """
+        Increment the ID used the last time and return it
+        """
+
+        current_id = self._last_id + 1
+        self._last_id = current_id
+
+        return current_id
 
     def _read(self):
         """
@@ -214,11 +236,7 @@ class Table(object):
         """
 
         data = self._db._read(self.name)
-
-        for eid in list(data):
-            data[eid] = Element(data[eid], eid)
-
-        return data
+        return {eid: Element(data[eid], eid) for eid in data}
 
     def _write(self, values):
         """
@@ -228,21 +246,21 @@ class Table(object):
         :type values: dict
         """
 
-        self._clear_query_cache()
+        self._query_cache.clear()
         self._db._write(values, self.name)
 
     def __len__(self):
         """
         Get the total number of elements in the table.
         """
-        return len(self.all())
+        return len(self._read())
 
     def all(self):
         """
         Get all elements stored in the table.
 
         :returns: a list with all elements.
-        :rtype: list[dict]
+        :rtype: list[Element]
         """
 
         return list(self._read().values())
@@ -250,45 +268,53 @@ class Table(object):
     def insert(self, element):
         """
         Insert a new element into the table.
+
+        :param element: the element to insert
+        :returns: the inserted element's ID
         """
 
-        current_id = self._last_id + 1
-        self._last_id = current_id
+        eid = self._get_next_id()
 
         data = self._read()
-        data[current_id] = element
-
+        data[eid] = element
         self._write(data)
 
-        return current_id
+        return eid
 
     def insert_multiple(self, elements):
         """
         Insert multiple elements into the table.
 
         :param elements: a list of elements to insert
+        :returns: a list containing the inserted elements' IDs
         """
+
         return [self.insert(element) for element in elements]
 
     def remove(self, cond=None, eids=None):
         """
-        Remove the element matching the condition.
+        Remove all matching elements.
 
         :param cond: the condition to check against
-        :type cond: query, int, list
+        :type cond: query
+        :param eids: a list of element IDs
+        :type eids: list
         """
+
         self.process_elements(lambda data, eid: data.pop(eid), cond, eids)
 
     def update(self, fields, cond=None, eids=None):
         """
-        Update all elements matching the condition to have a given set of
-        fields.
+        Update all matching elements to have a given set of fields.
 
         :param fields: the fields that the matching elements will have
         :type fields: dict
         :param cond: which elements to update
         :type cond: query
+        :param eids: a list of element IDs
+        :type eids: list
         """
+
         self.process_elements(lambda data, eid: data[eid].update(fields),
                               cond, eids)
 
@@ -296,6 +322,7 @@ class Table(object):
         """
         Purge the table by removing all elements.
         """
+
         self._write({})
         self._last_id = 0
 
@@ -307,40 +334,41 @@ class Table(object):
         :type cond: Query
 
         :returns: list of matching elements
-        :rtype: list
+        :rtype: list[Element]
         """
 
-        if cond in self._queries_cache:
-            self._lru.remove(cond)
-            self._lru.append(cond)
-            return self._queries_cache[cond]
+        if cond in self._query_cache:
+            return self._query_cache[cond]
 
-        elems = [e for e in self.all() if cond(e)]
-        self._queries_cache[cond] = elems
-        self._lru.append(cond)
+        elements = [e for e in self.all() if cond(e)]
+        self._query_cache[cond] = elements
 
-        # since x > float('nan') is always false,
-        # no need to check for any special cases
-        if len(self._queries_cache) > self._cache_size:
-            self._queries_cache.pop(self._lru.pop(0))
-
-        return elems
+        return elements
 
     def get(self, cond=None, eid=None):
         """
-        Search for exactly one element matching a condition.
+        Get exactly one element specified by a query or and ID.
+
+        Returns ``None`` if the element doesn't exist
 
         :param cond: the condition to check against
         :type cond: Query
 
+        :param eid: the element's ID
+
         :returns: the element or None
-        :rtype: dict or None
+        :rtype: Element | None
         """
 
+        # Cannot use process_elements here because we want to return a
+        # specific element
+
         if eid is not None:
+            # Element specified by ID
             return self._read().get(eid, None)
 
         else:
+            # Element specified by condition
             elements = self.search(cond)
             if elements:
                 return elements.pop(0)
@@ -352,26 +380,29 @@ class Table(object):
         :param cond: the condition use
         :type cond: Query
         """
+
         return len(self.search(cond))
 
     def contains(self, cond=None, eids=None):
         """
-        Check wether the database contains an element matching a condition.
+        Check wether the database contains an element matching a condition or
+        an ID.
+
+        If ``eids`` is set, it checks if the db contains an element with one
+        of the specified.
 
         :param cond: the condition use
         :type cond: Query
+        :param eids: the element IDs to look for
         """
-        if eids is not None:
-            return any(self.get(eid=eid) for eid in eids)
-        else:
-            return self.count(cond) > 0
 
-    def _clear_query_cache(self):
-        """
-        Clear query cache.
-        """
-        self._queries_cache = {}
-        self._lru = []
+        if eids is not None:
+            # Elements specified by ID
+            return any(self.get(eid=eid) for eid in eids)
+
+        else:
+            # Element specified by condition
+            return self.count(cond) > 0
 
     def __enter__(self):
         """
@@ -379,12 +410,14 @@ class Table(object):
 
         :return: the table instance
         """
+
         return self
 
     def __exit__(self, *args):
         """
         Try to close the storage after being used as a context manager.
         """
+
         _ = args
         self._db._storage.close()
 
@@ -395,6 +428,8 @@ class SmartCacheTable(Table):
     """
     A Table with a smarter query cache.
 
+    Provides the same methods as :class:`~tinydb.database.Table`.
+
     The query cache gets updated on insert/update/remove. Useful when in cases
     where many searches are done but data isn't changed often.
     """
@@ -403,25 +438,22 @@ class SmartCacheTable(Table):
         self._db._write(values, self.name)
 
     def insert(self, element):
-        """
-        See :meth:`.Table.insert`
-        """
+        # See Table.insert
 
         eid = super(SmartCacheTable, self).insert(element)
 
-        for query in self._queries_cache:
-            cache = self._queries_cache[query]
+        for query in self._query_cache:
+            cache = self._query_cache[query]
             if query(element):
                 cache.append(element)
 
         return eid
 
     def update(self, fields, cond=None, eids=None):
-        """
-        See :meth:`.Table.update`
-        """
+        # See Table.update
+
         data = self._read()
-        query_cache = tuple(self._queries_cache.items())
+        query_cache = self._query_cache.items()
 
         for eid in (eids if eids else data.copy()):
             if eids or cond(data[eid]):
@@ -432,7 +464,7 @@ class SmartCacheTable(Table):
                 new_value = data[eid]
 
                 # Update query cache
-                for query, results in self._queries_cache.items():
+                for query, results in query_cache:
                     if query(old_value):
                         results.remove(old_value)
 
@@ -442,11 +474,10 @@ class SmartCacheTable(Table):
         self._write(data)
 
     def remove(self,  cond=None, eids=None):
-        """
-        See :meth:`.Table.remove`
-        """
+        # See Table.remove
+
         data = self._read()
-        query_cache = tuple(self._queries_cache.items())
+        query_cache = tuple(self._query_cache.items())
 
         for eid in (eids if eids else data.copy()):
             value = data[eid]
@@ -463,8 +494,7 @@ class SmartCacheTable(Table):
         self._write(data)
 
     def purge(self):
-        """
-        See :meth:`.Table.purge`
-        """
+        # See Table.purge
+
         super(SmartCacheTable, self).purge()
-        self._clear_query_cache()  # Query cache got invalid
+        self._query_cache.clear()  # Query cache got invalid

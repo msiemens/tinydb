@@ -4,16 +4,6 @@ API Documentation
 ``tinydb.database``
 -------------------
 
-.. autoclass:: tinydb.database.Element
-    :members:
-    :special-members:
-    :exclude-members: __dict__, __weakref__
-    :member-order: bysource
-
-    .. py:attribute:: eid
-
-        The element's id
-
 .. autoclass:: tinydb.database.TinyDB
     :members:
     :special-members:
@@ -37,6 +27,10 @@ API Documentation
     :special-members:
     :exclude-members: __dict__, __weakref__
     :member-order: bysource
+
+    .. py:attribute:: eid
+
+        The element's id
 
 ``tinydb.queries``
 ------------------

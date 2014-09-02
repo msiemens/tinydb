@@ -2,6 +2,7 @@
 Contains the :class:`base class <tinydb.middlewares.Middleware>` for
 middlewares and two implementations.
 """
+from abc import ABCMeta, abstractmethod
 
 
 class Middleware(object):
@@ -16,6 +17,8 @@ class Middleware(object):
     ``_storage_cls`` (see :class:`~tinydb.middlewares.CachingMiddleware` for an
     example).
     """
+
+    __metaclass__ = ABCMeta
 
     def __init__(self, storage_cls):
         self._storage_cls = storage_cls
@@ -57,6 +60,7 @@ class Middleware(object):
         nested Middleware that itself will initialize the next Middleware and
         so on.
         """
+
         self.storage = self._storage_cls(*args, **kwargs)
 
         return self
@@ -66,6 +70,7 @@ class Middleware(object):
         Forward all unknown attribute calls to the underlying storage so we
         remain as transparent as possible.
         """
+
         return getattr(self.__dict__['storage'], name)
 
 
@@ -90,6 +95,11 @@ class CachingMiddleware(Middleware):
     def __del__(self):
         self.flush()  # Flush potentially unwritten data
 
+    def read(self):
+        if self.cache is None:
+            raise ValueError
+        return self.cache
+
     def write(self, data):
         self.cache = data
         self._cache_modified_count += 1
@@ -97,14 +107,10 @@ class CachingMiddleware(Middleware):
         if self._cache_modified_count >= self.WRITE_CACHE_SIZE:
             self.flush()
 
-    def read(self):
-        if self.cache is None:
-            raise ValueError
-        return self.cache
-
     def flush(self):
         """
         Flush all unwritten data to disk.
         """
+
         self.storage.write(self.cache)
         self._cache_modified_count = 0

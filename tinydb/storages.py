@@ -24,7 +24,21 @@ class Storage(object):
     A Storage (de)serializes the current state of the database and stores it in
     some place (memory, file on disk, ...).
     """
+
+    # Allow instantiating only storages that have implemented read and write
     __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def read(self):
+        """
+        Read the last stored state.
+
+        Any kind of deserialization should go here.
+
+        :rtype: dict
+        """
+
+        raise NotImplementedError('To be overriden!')
 
     @abstractmethod
     def write(self, data):
@@ -36,23 +50,14 @@ class Storage(object):
         :param data: The current state of the database.
         :type data: dict
         """
-        raise NotImplementedError('To be overriden!')
 
-    @abstractmethod
-    def read(self):
-        """
-        Read the last stored state.
-
-        Any kind of deserialization should go here.
-
-        :rtype: dict
-        """
         raise NotImplementedError('To be overriden!')
 
     def close(self):
         """
         Optional: Close open file handles, etc.
         """
+
         pass
 
 
@@ -70,6 +75,7 @@ class JSONStorage(Storage):
         :param path: Where to store the JSON data.
         :type path: str
         """
+
         super(JSONStorage, self).__init__()
         touch(path)  # Create file if not exists
         self.path = path
@@ -81,33 +87,35 @@ class JSONStorage(Storage):
     def __del__(self):
         self.close()
 
+    def read(self):
+        self._handle.seek(0)
+        return json.load(self._handle)
+
     def write(self, data):
         self._handle.seek(0)
         json.dump(data, self._handle)
         self._handle.flush()
         self._handle.truncate()
 
-    def read(self):
-        self._handle.seek(0)
-        return json.load(self._handle)
-
 
 class MemoryStorage(Storage):
     """
     Store the data as JSON in memory.
     """
+
     memory = None
 
     def __init__(self):
         """
         Create a new instance.
         """
-        super(MemoryStorage, self).__init__()
 
-    def write(self, data):
-        self.memory = data
+        super(MemoryStorage, self).__init__()
 
     def read(self):
         if self.memory is None:
             raise ValueError
         return self.memory
+
+    def write(self, data):
+        self.memory = data

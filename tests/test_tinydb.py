@@ -138,10 +138,10 @@ def test_update_ids(db):
 
 @pytest.mark.parametrize('db', dbs())
 def test_search(db):
-    assert not db._queries_cache
+    assert not db._query_cache
     assert len(db.search(where('int') == 1)) == 3
 
-    assert len(db._queries_cache) == 1
+    assert len(db._query_cache) == 1
     assert len(db.search(where('int') == 1)) == 3  # Query result from cache
 
 

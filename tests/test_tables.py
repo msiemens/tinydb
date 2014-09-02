@@ -46,7 +46,7 @@ def test_query_cache_size(db):
 
     assert table.count(query) == 2
     assert table.count(where('int') == 2) == 0
-    assert len(table._queries_cache) == 1
+    assert len(table._query_cache) == 1
 
 
 def test_smart_query_cache(db):
@@ -60,13 +60,13 @@ def test_smart_query_cache(db):
     # Test insert
     table.insert({'int': 1})
 
-    assert len(table._queries_cache) == 2
-    assert len(table._queries_cache[query]) == 1
+    assert len(table._query_cache) == 2
+    assert len(table._query_cache[query]) == 1
 
     # Test update
     table.update({'int': 2}, where('int') == 1)
 
-    assert len(table._queries_cache[dummy]) == 1
+    assert len(table._query_cache[dummy]) == 1
     assert table.count(query) == 0
 
     # Test remove
@@ -77,13 +77,14 @@ def test_smart_query_cache(db):
 
 
 def test_lru_cache(db):
+    # Test integration into TinyDB
     table = db.table('table3', cache_size=2)
     query = where('int') == 1
 
     table.search(query)
     table.search(where('int') == 2)
     table.search(where('int') == 3)
-    assert query not in table._queries_cache
+    assert query not in table._query_cache
 
     table.remove(where('int') == 1)
-    assert not table._lru
+    assert not table._query_cache.lru

@@ -32,6 +32,7 @@ class AndOrMixin(object):
     All queries can be combined with ``&`` and ``|``. Thus, we provide a mixin
     here to prevent repeating this code all the time.
     """
+
     def __or__(self, other):
         """
         Combines this query and another with logical or.
@@ -43,6 +44,7 @@ class AndOrMixin(object):
 
         :rtype: QueryOr
         """
+
         return QueryOr(self, other)
 
     def __and__(self, other):
@@ -56,6 +58,7 @@ class AndOrMixin(object):
 
         :rtype: QueryAnd
         """
+
         return QueryAnd(self, other)
 
 
@@ -85,6 +88,7 @@ class Query(AndOrMixin):
         :param regex: The regular expression to pass to ``re.match``
         :rtype: QueryRegex
         """
+
         return QueryRegex(self._key, regex)
 
     def test(self, func):
@@ -95,12 +99,13 @@ class Query(AndOrMixin):
         ...     return val == 42
         ...
         >>> where('f1').test(test_func)
-        'f1'.test(<function test_func at 0x029950F0>)
+        'f1'.test(<function test_func at 0xXXXXXXXX>)
 
         :param func: The function to run. Has to accept one parameter and
             return a boolean.
         :rtype: QueryCustom
         """
+
         return QueryCustom(self._key, func)
 
     def has(self, key):
@@ -117,6 +122,7 @@ class Query(AndOrMixin):
         :param key: the key to search for in the nested dict
         :rtype: QueryHas
         """
+
         return QueryHas(self._key, key)
 
     def any(self, cond):
@@ -170,6 +176,7 @@ class Query(AndOrMixin):
         >>> where('f1') == 42
         'f1' == 42
         """
+
         if isinstance(other, Query):
             return self._repr == other._repr
         else:
@@ -184,6 +191,7 @@ class Query(AndOrMixin):
         >>> where('f1') != 42
         'f1' != 42
         """
+
         self._cmp = lambda value: value != other
         self._update_repr('!=', other)
         return self
@@ -195,6 +203,7 @@ class Query(AndOrMixin):
         >>> where('f1') < 42
         'f1' < 42
         """
+
         self._cmp = lambda value: value < other
         self._update_repr('<', other)
         return self
@@ -206,6 +215,7 @@ class Query(AndOrMixin):
         >>> where('f1') <= 42
         'f1' <= 42
         """
+
         self._cmp = lambda value: value <= other
         self._update_repr('<=', other)
         return self
@@ -217,6 +227,7 @@ class Query(AndOrMixin):
         >>> where('f1') > 42
         'f1' > 42
         """
+
         self._cmp = lambda value: value > other
         self._update_repr('>', other)
         return self
@@ -228,6 +239,7 @@ class Query(AndOrMixin):
         >>> where('f1') >= 42
         'f1' >= 42
         """
+
         self._cmp = lambda value: value >= other
         self._update_repr('>=', other)
         return self
@@ -241,6 +253,7 @@ class Query(AndOrMixin):
 
         :rtype: tinydb.queries.QueryNot
         """
+
         return QueryNot(self)
 
     def __and__(self, other):
@@ -254,6 +267,7 @@ class Query(AndOrMixin):
 
         :rtype: QueryAnd
         """
+
         return super(Query, self).__and__(other)
 
     def __or__(self, other):
@@ -277,16 +291,22 @@ class Query(AndOrMixin):
         :param element: The dict that we will run our tests against.
         :type element: dict
         """
+
+        # Check for key existence
         if self._key not in element:
             return False
 
+        # Check, if a comparator has been set
         if self._cmp:
             return self._cmp(element[self._key])
-
-        return True  # Key exists
+        else:
+            return True  # Key exists
 
     def _update_repr(self, operator, value):
-        """ Update the current test's ``repr``. """
+        """
+        Update the current test's ``repr``.
+        """
+
         self._repr = '\'{0}\' {1} {2}'.format(self._key, operator, value)
 
     def __repr__(self):
@@ -305,6 +325,7 @@ class QueryNot(AndOrMixin):
     >>> ~(where('f1') >= 42)
     not ('f1' >= 42)
     """
+
     def __init__(self, cond):
         self._cond = cond
 
@@ -315,6 +336,7 @@ class QueryNot(AndOrMixin):
         :param element: The dict that we will run our tests against.
         :type element: dict
         """
+
         return not self._cond(element)
 
     def __repr__(self):
@@ -327,6 +349,7 @@ class QueryOr(AndOrMixin):
 
     See :meth:`.AndOrMixin.__or__`.
     """
+
     def __init__(self, where1, where2):
         self._cond_1 = where1
         self._cond_2 = where2
@@ -335,6 +358,7 @@ class QueryOr(AndOrMixin):
         """
         See :meth:`.Query.__call__`.
         """
+
         return self._cond_1(element) or self._cond_2(element)
 
     def __repr__(self):
@@ -347,6 +371,7 @@ class QueryAnd(AndOrMixin):
 
     See :meth:`.AndOrMixin.__and__`.
     """
+
     def __init__(self, where1, where2):
         self._cond_1 = where1
         self._cond_2 = where2
@@ -355,6 +380,7 @@ class QueryAnd(AndOrMixin):
         """
         See :meth:`.Query.__call__`.
         """
+
         return self._cond_1(element) and self._cond_2(element)
 
     def __repr__(self):
@@ -367,6 +393,7 @@ class QueryRegex(AndOrMixin):
 
     See :meth:`.Query.matches`.
     """
+
     def __init__(self, key, regex):
         self.regex = regex
         self._key = key
@@ -375,8 +402,11 @@ class QueryRegex(AndOrMixin):
         """
         See :meth:`.Query.__call__`.
         """
-        return (self._key in element
-                and re.match(self.regex, element[self._key]))
+
+        if self._key not in element:
+            return False
+
+        return re.match(self.regex, element[self._key])
 
     def __repr__(self):
         return '\'{0}\' ~= {1} '.format(self._key, self.regex)
@@ -397,7 +427,11 @@ class QueryCustom(AndOrMixin):
         """
         See :meth:`.Query.__call__`.
         """
-        return self._key in element and self.test(element[self._key])
+
+        if self._key not in element:
+            return False
+
+        return self.test(element[self._key])
 
     def __repr__(self):
         return '\'{0}\'.test({1})'.format(self._key, self.test)
@@ -419,6 +453,7 @@ class QueryHas(Query):
         """
         See :meth:`.Query.matches`.
         """
+
         self._special = QueryRegex(self._key, regex)
         return self
 
@@ -426,6 +461,7 @@ class QueryHas(Query):
         """
         See :meth:`.Query.test`.
         """
+
         self._special = QueryCustom(self._key, func)
         return self
 
@@ -433,6 +469,7 @@ class QueryHas(Query):
         """
         See :meth:`.Query.has`.
         """
+
         # Nested has: Append old key to path and use given key from now on
         self._path.append(self._key)
         self._key = key
@@ -442,6 +479,7 @@ class QueryHas(Query):
         """
         See :meth:`.Query.__call__`.
         """
+
         # Retrieve value from given path
         for key in self._path:
             try:
@@ -466,6 +504,7 @@ class QueryHas(Query):
         if self._special:
             # Process special test
             return self._special(element)
+
         else:
             # Process like a normal query
             return super(QueryHas, self).__call__(element)
@@ -482,6 +521,7 @@ class QueryHas(Query):
 
         if self._special:
             repr_str += ' => ({})'.format(self._special)
+
         elif self._cmp:
             repr_str += ' => ({})'.format(super(QueryHas, self).__repr__())
 
