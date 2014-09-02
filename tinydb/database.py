@@ -170,10 +170,19 @@ class Table(object):
         except IndexError:
             self._last_id = 0
 
-    def _process_data(self, func, cond=None, eids=None):
+    def process_elements(self, func, cond=None, eids=None):
         """
-        Process all elements specified by condition or ids using a given
-        function.
+        Helper function for processing all elements specified by condition
+        or IDs.
+
+        A repeating pattern in TinyDB is to run some code on all elements
+        that match a condition or are specified by their ID. This is
+        implemented in this function.
+        The function passed as ``func`` has to be a callable. It's first
+        argument will be the data currently in the database. It's second
+        argument is the element ID of the currently processed element.
+
+        See: :meth:`~.update`, :meth:`.remove`
 
         :param func: the function to execute on every included element.
                      first argument: all data
@@ -268,7 +277,7 @@ class Table(object):
         :param cond: the condition to check against
         :type cond: query, int, list
         """
-        self._process_data(lambda data, eid: data.pop(eid), cond, eids)
+        self.process_elements(lambda data, eid: data.pop(eid), cond, eids)
 
     def update(self, fields, cond=None, eids=None):
         """
@@ -280,8 +289,8 @@ class Table(object):
         :param cond: which elements to update
         :type cond: query
         """
-        self._process_data(lambda data, eid: data[eid].update(fields),
-                           cond, eids)
+        self.process_elements(lambda data, eid: data[eid].update(fields),
+                              cond, eids)
 
     def purge(self):
         """
