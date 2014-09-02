@@ -10,13 +10,22 @@ see `semver.org <http://semver.org/>`_
 **v2.0.0** (2014-XX-XX)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- `search`, `get` and friends now returns an `Element` object that contain the value
-  and the element's id.
-- Added ``get_by_id``.
-- Added optional smart query caching (see :ref:`Usage <smart_cache>`).
-- Added support for nested comparisons.
-- Added `all` and `any` comparisons on lists.
-- Query cache is now a fixed size lru cache.
+:ref:`Upgrade Nodes <upgrade_v2_0>`
+
+.. warning:: TinyDB changed the way data is stored. You may need to migrate
+             your databases to the new scheme. Check out the
+             :ref:`Upgrade Nodes <upgrade_v2_0>` for details.
+
+- The syntax ``query in db`` has been removed, use ``db.contains`` instead.
+- The ``ConcurrencyMiddleware`` has been removed due to a insecure implementation
+  (see `Issue #18 <https://github.com/msiemens/tinydb/issues/18>`_).  Consider
+  :ref:`tinyrecord` instead.
+
+- Better support for working with :ref:`Element IDs <element_ids>`.
+- Added support for :ref:`nested comparisons <nested_queries>`.
+- Added ``all`` and ``any`` :ref:`comparisons on lists <nested_queries>`.
+- Added optional :ref:`smart query caching <smart_cache>`.
+- The query cache is now a :ref:`fixed size lru cache <query_caching>`.
 
 **v1.4.0** (2014-07-22)
 ^^^^^^^^^^^^^^^^^^^^^^^

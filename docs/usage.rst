@@ -82,22 +82,6 @@ In a similar manner you can look up the number of elements matching a query:
 >>> db.count(where('int') == 1)
 3
 
-Element IDs
-^^^^^^^^^^^
-
-Internally TinyDB associates an ID with every element you insert. You can
-access it via ``element.eid``.
-
->>> el = db.get(where('value') == 1)
->>> el.eid
-7
-
-You also can access elements by ID using ``db.get_by_id(...)``:
-
->>> db.get_by_id(1)
-{'int': 1, 'value': 1}
-
-
 Recap
 ^^^^^
 
@@ -118,8 +102,63 @@ Let's summarize the ways to handle data:
 +-------------------------------+---------------------------------------------------------------+
 | ``db.count(query)``           | Get the number of matching elements                           |
 +-------------------------------+---------------------------------------------------------------+
-| ``db.get_by_id(eid)``         | Get an element by it's ID                                     |
-+-------------------------------+---------------------------------------------------------------+
+
+
+.. _element_ids:
+
+Using Element IDs
+-----------------
+
+Internally TinyDB associates an ID with every element you insert. It's returned
+after inserting an element:
+
+>>> db.insert({'value': 1})
+3
+>>> db.insert_multiple([{...}, {...}, {...}])
+[4, 5, 6]
+
+In addition you can get the ID of already inserted elements using
+``element.eid``:
+
+>>> el = db.get(where('value') == 1)
+>>> el.eid
+3
+
+Different TinyDB methods also work with IDs, namely: ``update``, ``remove``,
+``contains`` and ``get``.
+
+>>> db.update({'value': 2}, eids=[1, 2])
+>>> db.contains(eids=[1])
+True
+>>> db.remove(eids=[1, 2])
+>>> db.get(eid=3)
+{...}
+
+Recap
+.....
+
+Let's sum up the way TinyDB supports working with IDs:
+
++----------------------------------+---------------------------------------------------------------+
+| **Getting an element's ID**                                                                      |
++----------------------------------+---------------------------------------------------------------+
+| ``db.insert(...)``               | Returns the inserted element's ID                             |
++----------------------------------+---------------------------------------------------------------+
+| ``db.insert_multiple(...)``      | Returns the inserted elements' ID                             |
++----------------------------------+---------------------------------------------------------------+
+| ``element.eid``                  | Get the ID of an element fetched from the db                  |
++----------------------------------+---------------------------------------------------------------+
+| **Working with IDs**                                                                             |
++----------------------------------+---------------------------------------------------------------+
+| ``db.get(eid=...)``              | Get the elemtent with the given ID                            |
++----------------------------------+---------------------------------------------------------------+
+| ``db.contains(eids=[...])``      | Check if the db contains elements with one of the given IDs   |
++----------------------------------+---------------------------------------------------------------+
+| ``db.update({...}, eids=[...])`` | Update all elements with the given IDs                        |
++----------------------------------+---------------------------------------------------------------+
+| ``db.remove(eids=[...])``        | Remove all elements with the given IDs                        |
++----------------------------------+---------------------------------------------------------------+
+
 
 Queries
 -------
@@ -164,6 +203,8 @@ a regex or a custom test function:
 >>> db.search(where('char').test(test_func))
 [{'char': 'a', 'int': 1}]
 
+.. _nested_queries:
+
 Nested Queries
 ..............
 
@@ -191,7 +232,6 @@ specify checks for the list's items. They behave similarly to Python's `any` and
 True
 >>> db.search(where('field').all(where('val') > 0))
 True
-
 
 Recap
 .....
@@ -245,7 +285,9 @@ To remove all tables from a database, use:
 .. note::
 
     TinyDB uses a table named ``_default`` as default table. All operations
-    on the database object like ``db.insert(..)`` operate on this table.
+    on the database object like ``db.insert(...)`` operate on this table.
+
+.. _query_caching:
 
 Query Caching
 .............

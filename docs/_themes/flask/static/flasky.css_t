@@ -404,3 +404,9 @@ a.footnote-reference:hover {
 a:hover tt {
     background: #EEE;
 }
+
+
+.admonition.warning {
+    background-color: #F5CDCD;
+    border-color: #7B1B1B;
+}

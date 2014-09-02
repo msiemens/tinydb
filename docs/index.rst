@@ -15,12 +15,38 @@ Welcome to TinyDB!
 Welcome to TinyDB, your tiny, document oriented database optimized for your
 happiness :)
 
+User's Guide
+------------
+
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    Introduction <intro>
    Getting Started <getting-started>
    Advanced Usage <usage>
+
+Extending TinyDB
+----------------
+
+.. toctree::
+   :maxdepth: 2
+
    Extending TinyDB <extend>
+   TinyDB Extensions <extensions>
+
+API Reference
+-------------
+
+.. toctree::
+   :maxdepth: 2
+
    api
+
+Additional Notes
+----------------
+
+.. toctree::
+   :maxdepth: 2
+
    changelog
+   Upgrade Notes <upgrade>
