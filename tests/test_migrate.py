@@ -26,7 +26,15 @@ def test_upgrade(tmpdir):
     db_file.write(v1_0)
 
     # Run upgrade
-    migrate(str(db_file))
+    assert migrate(str(db_file)) is True
     db = TinyDB(str(db_file))
 
     assert db.count(where('key') == 'value') == 1
+
+
+def test_no_upgrade_needed(tmpdir):
+    db_file = tmpdir.join('db.json')
+    with TinyDB(str(db_file)) as db:
+        db.insert({'val': 1})
+
+    assert migrate(str(db_file)) is False
