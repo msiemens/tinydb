@@ -5,6 +5,7 @@ two implementations.
 
 from abc import ABCMeta, abstractmethod
 import os
+from tinydb.utils import with_metaclass
 
 try:
     import ujson as json
@@ -17,7 +18,7 @@ def touch(fname, times=None):
         os.utime(fname, times)
 
 
-class Storage(object):
+class Storage(with_metaclass(ABCMeta, object)):
     """
     The abstract base class for all Storages.
 
@@ -25,8 +26,8 @@ class Storage(object):
     some place (memory, file on disk, ...).
     """
 
-    # Allow instantiating only storages that have implemented read and write
-    __metaclass__ = ABCMeta
+    # Using ABCMeta as metaclass allows instantiating only storages that have
+    # implemented read and write
 
     @abstractmethod
     def read(self):

@@ -1,12 +1,13 @@
 import os
 import tempfile
 import random
+import pytest
 from tinydb.database import TinyDB
 
 random.seed()
 
 from tinydb import TinyDB, where
-from tinydb.storages import JSONStorage, MemoryStorage
+from tinydb.storages import JSONStorage, MemoryStorage, Storage
 
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
            'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
@@ -65,3 +66,11 @@ def test_in_memory():
 def test_in_memory_close():
     with TinyDB(storage=MemoryStorage) as db:
         db.insert({})
+
+
+def test_custom():
+    class MyStorage(Storage):
+        pass
+
+    with pytest.raises(TypeError):
+        MyStorage()
