@@ -325,7 +325,7 @@ class QueryOr(AndOrMixin):
     """
     Combines this query and another with logical or.
 
-    See :meth:`AndOrMixin.__or__`.
+    See :meth:`.AndOrMixin.__or__`.
     """
     def __init__(self, where1, where2):
         self._cond_1 = where1
@@ -333,7 +333,7 @@ class QueryOr(AndOrMixin):
 
     def __call__(self, element):
         """
-        See :meth:`Query.__call__`.
+        See :meth:`.Query.__call__`.
         """
         return self._cond_1(element) or self._cond_2(element)
 
@@ -345,7 +345,7 @@ class QueryAnd(AndOrMixin):
     """
     Combines this query and another with logical and.
 
-    See :meth:`AndOrMixin.__and__`.
+    See :meth:`.AndOrMixin.__and__`.
     """
     def __init__(self, where1, where2):
         self._cond_1 = where1
@@ -353,7 +353,7 @@ class QueryAnd(AndOrMixin):
 
     def __call__(self, element):
         """
-        See :meth:`Query.__call__`.
+        See :meth:`.Query.__call__`.
         """
         return self._cond_1(element) and self._cond_2(element)
 
@@ -365,7 +365,7 @@ class QueryRegex(AndOrMixin):
     """
     Run a regex test against a dict value.
 
-    See :meth:`Query.matches`.
+    See :meth:`.Query.matches`.
     """
     def __init__(self, key, regex):
         self.regex = regex
@@ -373,7 +373,7 @@ class QueryRegex(AndOrMixin):
 
     def __call__(self, element):
         """
-        See :meth:`Query.__call__`.
+        See :meth:`.Query.__call__`.
         """
         return (self._key in element
                 and re.match(self.regex, element[self._key]))
@@ -386,7 +386,7 @@ class QueryCustom(AndOrMixin):
     """
     Run a user-defined test function against a dict value.
 
-    See :meth:`Query.test`.
+    See :meth:`.Query.test`.
     """
 
     def __init__(self, key, test):
@@ -395,7 +395,7 @@ class QueryCustom(AndOrMixin):
 
     def __call__(self, element):
         """
-        See :meth:`Query.__call__`.
+        See :meth:`.Query.__call__`.
         """
         return self._key in element and self.test(element[self._key])
 
@@ -407,7 +407,7 @@ class QueryHas(Query):
     """
     Run a query on a nested dict.
 
-    See :meth:`Query.has`
+    See :meth:`.Query.has`
     """
 
     def __init__(self, root, key):
@@ -417,21 +417,21 @@ class QueryHas(Query):
 
     def matches(self, regex):
         """
-        See :meth:`Query.matches`.
+        See :meth:`.Query.matches`.
         """
         self._special = QueryRegex(self._key, regex)
         return self
 
     def test(self, func):
         """
-        See :meth:`Query.test`.
+        See :meth:`.Query.test`.
         """
         self._special = QueryCustom(self._key, func)
         return self
 
     def has(self, key):
         """
-        See :meth:`Query.has`.
+        See :meth:`.Query.has`.
         """
         # Nested has: Append old key to path and use given key from now on
         self._path.append(self._key)
@@ -440,7 +440,7 @@ class QueryHas(Query):
 
     def __call__(self, element):
         """
-        See :meth:`Query.__call__`.
+        See :meth:`.Query.__call__`.
         """
         # Retrieve value from given path
         for key in self._path:

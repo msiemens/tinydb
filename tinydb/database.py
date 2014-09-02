@@ -127,13 +127,13 @@ class TinyDB(object):
 
     def __enter__(self):
         """
-        See :meth:`Table.__enter__`
+        See :meth:`.Table.__enter__`
         """
         return self._table.__enter__()
 
     def __exit__(self, *args):
         """
-        See :meth:`Table.__exit__`
+        See :meth:`.Table.__exit__`
         """
         return self._table.__exit__(*args)
 
@@ -404,7 +404,7 @@ class SmartCacheTable(Table):
 
     def insert(self, element):
         """
-        See :meth:`Table.insert`
+        See :meth:`.Table.insert`
         """
 
         eid = super(SmartCacheTable, self).insert(element)
@@ -418,7 +418,7 @@ class SmartCacheTable(Table):
 
     def update(self, fields, cond=None, eids=None):
         """
-        See :meth:`Table.update`
+        See :meth:`.Table.update`
         """
         data = self._read()
         query_cache = tuple(self._queries_cache.items())
@@ -443,7 +443,7 @@ class SmartCacheTable(Table):
 
     def remove(self,  cond=None, eids=None):
         """
-        See :meth:`Table.remove`
+        See :meth:`.Table.remove`
         """
         data = self._read()
         query_cache = tuple(self._queries_cache.items())
@@ -464,7 +464,7 @@ class SmartCacheTable(Table):
 
     def purge(self):
         """
-        See :meth:`Table.purge`
+        See :meth:`.Table.purge`
         """
         super(SmartCacheTable, self).purge()
         self._clear_query_cache()  # Query cache got invalid
