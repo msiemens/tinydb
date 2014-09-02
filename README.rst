@@ -84,7 +84,7 @@ Using Middlewares
 Documentation
 -------------
 
-The documentation for TinyDB is hosted at ``Read the Docs``: https://tinydb.readthedocs.org/en/latest/
+The documentation for TinyDB is hosted at ``Read the Docs``: https://tinydb.readthedocs.org/
 
 
 Supported Python Versions
@@ -93,11 +93,18 @@ Supported Python Versions
 TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3, 3.4 and pypy.
 
 
-Version Numbering
------------------
+Extensions
+----------
 
-TinyDB follows the SemVer versioning guidelines. For more information,
-see `semver.org <http://semver.org/>`_
+``tinyrecord``
+^^^^^^^^^^^^^^
+
+| **Repo**:        https://github.com/eugene-eeo/tinyrecord
+| **Status**:      *experimental*
+| **Description**: Tinyrecord is a library which implements experimental atomic
+                   transaction support for the TinyDB NoSQL database. It uses a
+                   record-first then execute architecture which allows us to
+                   minimize the time that we are within a thread lock.
 
 
 Changelog
@@ -106,13 +113,23 @@ Changelog
 **v2.0.0** (2014-XX-XX)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- `search`/`get` etc. now returns an `Element` object that contain the value
-  and the element's id.
-- Added ``get_by_id``.
-- Added optional smart query caching.
-- Added support for nested comparisons.
-- Added `all` and `any` comparisons on lists.
-- Query cache is now a fixed size lru cache.
+`Upgrade Nodes <tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
+
+.. warning:: TinyDB changed the way data is stored. You may need to migrate
+             your databases to the new scheme. Check out the
+             `Upgrade Nodes <tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
+             for details.
+
+- The syntax ``query in db`` has been removed, use ``db.contains`` instead.
+- The ``ConcurrencyMiddleware`` has been removed due to a insecure implementation
+  (see `Issue #18 <https://github.com/msiemens/tinydb/issues/18>`_).  Consider
+  `tinyrecord <http://tinydb.readthedocs.org/en/latest/extensions.html#tinyrecord>`_ instead.
+
+- Better support for working with `Element IDs <tinydb.readthedocs.org/en/v2.0/usage.html#using-element-ids>`_.
+- Added support for `nested comparisons <http://tinydb.readthedocs.org/en/v2.0/usage.html#nested-queries>`_.
+- Added ``all`` and ``any`` `comparisons on lists <http://tinydb.readthedocs.org/en/v2.0/usage.html#nested-queries>`_.
+- Added optional `smart query caching <http://tinydb.readthedocs.org/en/v2.0/usage.html#smart-query-cache>`_.
+- The query cache is now a `fixed size lru cache <http://tinydb.readthedocs.org/en/v2.0/usage.html#query-caching>`_.
 
 **v1.4.0** (2014-07-22)
 ^^^^^^^^^^^^^^^^^^^^^^^
