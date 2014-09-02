@@ -9,7 +9,7 @@ small apps that would be blown away by a SQL-DB or an external database server.
 
 TinyDB is:
 
-- **tiny**: The current source code has 800 lines of code (+ 500 lines tests)
+- **tiny:** The current source code has 1200 lines of code (+ 600 lines tests).
   what makes about 100 KB. For comparison: Buzhug_ has about 2000 lines of code
   (w/o tests), CodernityDB_ has about 8000 lines of code (w/o tests).
 
