@@ -71,7 +71,7 @@ And of course you can throw away all data to start with an empty database:
 
 
 Recap
------
+*****
 
 Before we dive deeper, let's recapitulate the basics:
 
