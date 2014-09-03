@@ -14,9 +14,7 @@ class LRUCache(dict):
                          or ``None`` for an unlimited cache size
         """
 
-        self.capacity = kwargs.pop('capacity', None)
-        if self.capacity is None:
-            self.capacity = float('nan')
+        self.capacity = kwargs.pop('capacity', None) or float('nan')
         self.lru = []
 
         super(LRUCache, self).__init__(*args, **kwargs)

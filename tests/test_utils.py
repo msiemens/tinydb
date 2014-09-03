@@ -53,7 +53,15 @@ def test_lru_cache_clear():
 
 def test_lru_cache_unlimited():
     cache = LRUCache()
-    for i in xrange(100):
+    for i in range(100):
+        cache[i] = i
+
+    assert len(cache.lru) == 100
+
+
+def test_lru_cache_unlimited_explicit():
+    cache = LRUCache(capacity=None)
+    for i in range(100):
         cache[i] = i
 
     assert len(cache.lru) == 100
