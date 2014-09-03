@@ -68,7 +68,19 @@ class TinyDB(object):
 
         self._table_cache[name] = table
 
+        if name not in self._read():
+            self._write({}, name)
+
         return table
+
+    def tables(self):
+        """
+        Get the names of all tables in the database.
+
+        :returns: a set of table names
+        :rtype: set[str]
+        """
+        return set(self._read().keys())
 
     def purge_tables(self):
         """

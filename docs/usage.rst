@@ -285,9 +285,14 @@ To remove all tables from a database, use:
 .. note::
 
     TinyDB uses a table named ``_default`` as default table. All operations
-    on the database object like ``db.insert(...)`` operate on this table.
+    on the database object (like ``db.insert(...)``) operate on this table.
 
 .. _query_caching:
+
+You can get a list with the names of all tables in your database:
+
+>>> db.tables()
+{'_default', 'table_name'}
 
 Query Caching
 .............

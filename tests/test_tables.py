@@ -1,6 +1,13 @@
 from tinydb import where
 
 
+def test_tables_list(db):
+    db.table('table1')
+    db.table('table2')
+
+    assert db.tables() == set(['_default', 'table1', 'table2'])
+
+
 def test_one_table(db):
     table1 = db.table('table1')
 
