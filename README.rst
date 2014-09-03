@@ -10,25 +10,28 @@ small apps that would be blown away by a SQL-DB or an external database server.
 TinyDB is:
 
 - **tiny:** The current source code has 1200 lines of code (+ 600 lines tests).
-  what makes about 100 KB. For comparison: Buzhug_ has about 2000 lines of code
-  (w/o tests), CodernityDB_ has about 8000 lines of code (w/o tests).
+  For comparison: Buzhug_ has about 2000 lines of
+  code (w/o tests), CodernityDB_ has about 8000 lines of code (w/o tests).
 
-- **document oriented**: Like `MongoDB <http://mongodb.org/>`_, you can store
-  any document (represented as ``dict``) in TinyDB.
+- **document oriented:** Like MongoDB_, you can store any document
+  (represented as ``dict``) in TinyDB.
 
-- **optimized for your happiness**: TinyDB is designed to be simple and fun to
-  use. It's not bloated and has a simple and clean API.
+- **optimized for your happiness:** TinyDB is designed to be simple and
+  fun to use by providing a simple and clean API.
 
-- **written in pure Python**: TinyDB neither needs an external server (as e.g.
-  `PyMongo <http://api.mongodb.org/python/current/>`_) nor any packages from
-  PyPI. Just install TinyDB and you're ready to go.
+- **written in pure Python:** TinyDB neither needs an external server (as
+  e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any dependencies
+  from PyPI.
 
-- **easily extensible**: You can easily extend TinyDB by writing new storages
-  or modify the behaviour of storages with Middlewares. TinyDB provides
-  Middlewares for caching and concurrency handling.
+- **works on Python 2.6 – 3.4 and PyPy:** TinyDB works on all
+  modern versions of Python and PyPy.
 
-- **nearly 100% code coverage**: If you don't count that ``__repr__`` methods
-  and some abstract methods are not tested, TinyDB has a code coverage of 100%.
+- **easily extensible:** You can easily extend TinyDB by writing new
+  storages or modify the behaviour of storages with Middlewares.
+
+- **nearly 100% test coverage:** If you don't count that ``__repr__``
+  methods and some abstract methods are not tested, TinyDB has a test
+  coverage of 100%.
 
 
 Example Code
@@ -179,3 +182,4 @@ for details.
    :target: https://crate.io/packages/tinydb
 .. _Buzhug: http://buzhug.sourceforge.net/
 .. _CodernityDB: http://labs.codernity.com/codernitydb/
+.. _MongoDB: http://mongodb.org/
