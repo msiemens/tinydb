@@ -439,6 +439,7 @@ class SmartCacheTable(Table):
     """
 
     def _write(self, values):
+        # Just write data, don't clear the query cache
         self._db._write(values, self.name)
 
     def insert(self, element):
@@ -455,47 +456,38 @@ class SmartCacheTable(Table):
 
     def update(self, fields, cond=None, eids=None):
         # See Table.update
+        query_cache = tuple(self._query_cache.items())
 
-        data = self._read()
-        query_cache = self._query_cache.items()
+        def process(data, eid):
+            # Update the value
+            old_value = data[eid].copy()
+            data[eid].update(fields)
+            new_value = data[eid]
 
-        for eid in (eids if eids else data.copy()):
-            if eids or cond(data[eid]):
+            # Update query cache
+            for query, results in query_cache:
+                if query(old_value):
+                    results.remove(old_value)
 
-                # Update the value
-                old_value = data[eid].copy()
-                data[eid].update(fields)
-                new_value = data[eid]
+                elif query(new_value):
+                    results.append(new_value)
 
-                # Update query cache
-                for query, results in query_cache:
-                    if query(old_value):
-                        results.remove(old_value)
-
-                    elif query(new_value):
-                        results.append(new_value)
-
-        self._write(data)
+        self.process_elements(process, cond, eids)
 
     def remove(self,  cond=None, eids=None):
         # See Table.remove
-
-        data = self._read()
         query_cache = tuple(self._query_cache.items())
 
-        for eid in (eids if eids else data.copy()):
-            value = data[eid]
-            if eids or cond(data[eid]):
+        def process(data, eid):
+            for query, results in query_cache:
+                try:
+                    results.remove(data[eid])
+                except ValueError:
+                    pass
 
-                for query, results in query_cache:
-                    try:
-                        results.remove(value)
-                    except ValueError:
-                        pass
+            data.pop(eid)
 
-                data.pop(eid)
-
-        self._write(data)
+        self.process_elements(process, cond, eids)
 
     def purge(self):
         # See Table.purge
