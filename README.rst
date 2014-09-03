@@ -131,10 +131,10 @@ Changelog
 **v2.0.0** (2014-XX-XX)
 =======================
 
-`Upgrade Notes <tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
+`Upgrade Notes <http://tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
 
 **Warning:** TinyDB changed the way data is stored. You may need to migrate
-your databases to the new scheme. Check out the `Upgrade Notes <tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
+your databases to the new scheme. Check out the `Upgrade Notes <http://tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
 for details.
 
 - The syntax ``query in db`` has been removed, use ``db.contains`` instead.
