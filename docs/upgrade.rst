@@ -48,11 +48,13 @@ provides a migration script for the default JSON storage:
     Processing db1.json ... Done
     Processing db2.json ... Done
 
-If you've written your own stroage you can write your own migration script
-that calls ``tinydb.migrate.migrate``:
+Migration with a custom storage
+...............................
 
-.. automethod:: tinydb.migrate.migrate
+If you have database files that have been written using a custom storage class,
+you can write your own migration script that calls ``tinydb.migrate.migrate``:
 
-.. todo:: migrate API docs when #24 is merged
+.. automodule:: tinydb.migrate
+    :members: migrate
 
 .. _Issue #13: https://github.com/msiemens/tinydb/issues/13
