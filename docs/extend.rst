@@ -21,8 +21,12 @@ You can write a custom storage by subclassing :class:`~tinydb.storages.Storage`:
         def close(self):
             # optional: close open file handles, etc.
 
-TinyDB will pass any args and keyword args (except ``storage``) to the
-storage class on initialization:
+To indicate that your storage is empty, raise an ``ValueError`` in
+``read(self)``. TinyDB will create the data for a new database and ask your
+storage to write it.
+
+When creating a new instance of :class:`.TinyDB`, the instance will pass
+all arguments and keyword arguments (except ``storage``) to your storage class:
 
 .. code-block:: python
 

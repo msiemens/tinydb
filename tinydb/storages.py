@@ -1,6 +1,6 @@
 """
 Contains the :class:`base class <tinydb.storages.Storage>` for storages and
-two implementations.
+implementations.
 """
 
 from abc import ABCMeta, abstractmethod
@@ -35,6 +35,7 @@ class Storage(with_metaclass(ABCMeta, object)):
         Read the last stored state.
 
         Any kind of deserialization should go here.
+        Raise ``ValueError`` here to indicate that the storage is empty.
 
         :rtype: dict
         """

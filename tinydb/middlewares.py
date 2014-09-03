@@ -1,8 +1,7 @@
 """
 Contains the :class:`base class <tinydb.middlewares.Middleware>` for
-middlewares and two implementations.
+middlewares and implementations.
 """
-from abc import ABCMeta, abstractmethod
 
 
 class Middleware(object):
@@ -17,8 +16,6 @@ class Middleware(object):
     ``_storage_cls`` (see :class:`~tinydb.middlewares.CachingMiddleware` for an
     example).
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, storage_cls):
         self._storage_cls = storage_cls
