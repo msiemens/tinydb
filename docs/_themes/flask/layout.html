@@ -4,6 +4,7 @@
   {{ super() }}
   {% if theme_touch_icon %}
   <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" />
+  <link rel="icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" type="image/png" />
   {% endif %}
   <link media="only screen and (max-width: 920px)" href="{{
     pathto('_static/small_flask.css', 1) }}" type= "text/css" rel="stylesheet" />

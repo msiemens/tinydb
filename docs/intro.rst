@@ -1,7 +1,3 @@
-.. |br| raw:: html
-
-   <br />
-
 Welcome to TinyDB!
 ==================
 

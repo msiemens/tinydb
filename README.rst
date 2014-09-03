@@ -1,5 +1,6 @@
-TinyDB
-######
+.. image:: artwork/logo.png
+    :scale: 100%
+    :height: 150px
 
 |Build Status| |Coverage| |Version|
 
