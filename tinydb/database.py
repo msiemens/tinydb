@@ -445,46 +445,54 @@ class SmartCacheTable(Table):
     def insert(self, element):
         # See Table.insert
 
+        # Insert element
         eid = super(SmartCacheTable, self).insert(element)
 
+        # Update query cache
         for query in self._query_cache:
-            cache = self._query_cache[query]
+            results = self._query_cache[query]
             if query(element):
-                cache.append(element)
+                results.append(element)
 
         return eid
 
     def update(self, fields, cond=None, eids=None):
         # See Table.update
-        query_cache = tuple(self._query_cache.items())
 
         def process(data, eid):
-            # Update the value
             old_value = data[eid].copy()
+
+            # Update element
             data[eid].update(fields)
             new_value = data[eid]
 
             # Update query cache
-            for query, results in query_cache:
+            for query in self._query_cache:
+                results = self._query_cache[query]
+
                 if query(old_value):
+                    # Remove old value from cache
                     results.remove(old_value)
 
                 elif query(new_value):
+                    # Add new value to cache
                     results.append(new_value)
 
         self.process_elements(process, cond, eids)
 
     def remove(self,  cond=None, eids=None):
         # See Table.remove
-        query_cache = tuple(self._query_cache.items())
 
         def process(data, eid):
-            for query, results in query_cache:
+            # Update query cache
+            for query in self._query_cache:
+                results = self._query_cache[query]
                 try:
                     results.remove(data[eid])
                 except ValueError:
                     pass
 
+            # Remove element
             data.pop(eid)
 
         self.process_elements(process, cond, eids)
