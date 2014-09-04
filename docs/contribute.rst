@@ -12,7 +12,7 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 3. Write a test which shows that the bug was fixed or that the feature works
    as expected
 4. Send a pull request and bug the maintainer until it gets merged and
-   published ☺
+   published :)
 
 Philosophy of TinyDB
 ********************
