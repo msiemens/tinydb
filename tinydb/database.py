@@ -106,12 +106,12 @@ class TinyDB(object):
                 return self._read()[table]
             except (KeyError, TypeError):
                 return {}
-        else:
-            # Read all tables
-            try:
-                return self._storage.read()
-            except ValueError:
-                return {}
+
+        # Read all tables
+        try:
+            return self._storage.read()
+        except ValueError:
+            return {}
 
     def _write(self, values, table=None):
         """
@@ -130,10 +130,10 @@ class TinyDB(object):
             data[table] = values
 
             self._write(data)
+            return
 
-        else:
-            # Write all tables
-            self._storage.write(values)
+        # Write all tables
+        self._storage.write(values)
 
     # Methods that are executed on the default table
     # Because magic methods are not handlet by __getattr__ we need to forward
@@ -383,11 +383,10 @@ class Table(object):
             # Element specified by ID
             return self._read().get(eid, None)
 
-        else:
-            # Element specified by condition
-            elements = self.search(cond)
-            if elements:
-                return elements[0]
+        # Element specified by condition
+        elements = self.search(cond)
+        if elements:
+            return elements[0]
 
     def count(self, cond):
         """
@@ -416,9 +415,8 @@ class Table(object):
             # Elements specified by ID
             return any(self.get(eid=eid) for eid in eids)
 
-        else:
-            # Element specified by condition
-            return self.count(cond) > 0
+        # Element specified by condition
+        return self.count(cond) > 0
 
     def __enter__(self):
         """
