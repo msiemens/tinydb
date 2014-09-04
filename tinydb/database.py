@@ -471,6 +471,8 @@ class SmartCacheTable(Table):
     def update(self, fields, cond=None, eids=None):
         # See Table.update
 
+        query_cache = tuple(self._query_cache.items())
+
         def process(data, eid):
             old_value = data[eid].copy()
 
@@ -479,8 +481,7 @@ class SmartCacheTable(Table):
             new_value = data[eid]
 
             # Update query cache
-            for query in self._query_cache:
-                results = self._query_cache[query]
+            for query, results in query_cache:
 
                 if query(old_value):
                     # Remove old value from cache
@@ -495,10 +496,11 @@ class SmartCacheTable(Table):
     def remove(self,  cond=None, eids=None):
         # See Table.remove
 
+        query_cache = tuple(self._query_cache.items())
+
         def process(data, eid):
             # Update query cache
-            for query in self._query_cache:
-                results = self._query_cache[query]
+            for query, results in query_cache:
                 try:
                     results.remove(data[eid])
                 except ValueError:
