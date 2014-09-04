@@ -387,7 +387,7 @@ class Table(object):
             # Element specified by condition
             elements = self.search(cond)
             if elements:
-                return elements.pop(0)
+                return elements[0]
 
     def count(self, cond):
         """
