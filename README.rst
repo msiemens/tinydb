@@ -143,11 +143,11 @@ for details.
   (see `Issue #18 <https://github.com/msiemens/tinydb/issues/18>`_).  Consider
   `tinyrecord <http://tinydb.readthedocs.org/en/v2.0/extensions.html#tinyrecord>`_ instead.
 
-- Better support for working with `Element IDs <http://tinydb.readthedocs.org/en/v2.0/usage.html#using-element-ids>`_.
-- Added support for `nested comparisons <http://tinydb.readthedocs.org/en/v2.0/usage.html#nested-queries>`_.
-- Added ``all`` and ``any`` `comparisons on lists <http://tinydb.readthedocs.org/en/v2.0/usage.html#nested-queries>`_.
-- Added optional `smart query caching <http://tinydb.readthedocs.org/en/v2.0/usage.html#smart-query-cache>`_.
-- The query cache is now a `fixed size lru cache <http://tinydb.readthedocs.org/en/v2.0/usage.html#query-caching>`_.
+- Better support for working with `Element IDs <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#using-element-ids>`_.
+- Added support for `nested comparisons <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#nested-queries>`_.
+- Added ``all`` and ``any`` `comparisons on lists <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#nested-queries>`_.
+- Added optional `smart query caching <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#smart-query-cache>`_.
+- The query cache is now a `fixed size lru cache <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#query-caching>`_.
 
 **v1.4.0** (2014-07-22)
 =======================
