@@ -16,10 +16,10 @@ User's Guide
 .. toctree::
    :maxdepth: 2
 
-   Introduction <intro>
-   Getting Started <getting-started>
-   Advanced Usage <usage>
-   Contribution Guidelines <contribute>
+   intro
+   getting-started
+   usage
+   contribute
 
 Extending TinyDB
 ----------------

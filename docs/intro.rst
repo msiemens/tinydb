@@ -1,5 +1,5 @@
-Welcome to TinyDB!
-==================
+Introduction
+============
 
 Great that you've taken time to check out the TinyDB docs! Before we begin
 looking at TinyDB itself, let's take some time to see whether you should use
