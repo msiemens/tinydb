@@ -187,6 +187,13 @@ def test_contains_ids(db):
     assert db.contains(eids=[1, 2])
 
 
+@pytest.mark.parametrize('db', dbs())
+def test_get_idempotent(db):
+    u = db.get(where('int') == 1)
+    z = db.get(where('int') == 1)
+    assert u == z
+
+
 def test_multiple_dbs():
     db1 = TinyDB(storage=MemoryStorage)
     db2 = TinyDB(storage=MemoryStorage)
