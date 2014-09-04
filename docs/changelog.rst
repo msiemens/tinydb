@@ -7,7 +7,7 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
-**v2.0.0** (2014-XX-XX)
+**v2.0.0** (2014-09-05)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 :ref:`Upgrade Notes <upgrade_v2_0>`

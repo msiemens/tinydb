@@ -129,7 +129,7 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
-**v2.0.0** (2014-XX-XX)
+**v2.0.0** (2014-09-05)
 =======================
 
 `Upgrade Notes <http://tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
