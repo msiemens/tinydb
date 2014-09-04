@@ -1,1 +1,1 @@
-docs/contributing.rst
+docs/contribute.rst

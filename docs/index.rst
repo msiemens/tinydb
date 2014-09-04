@@ -19,7 +19,7 @@ User's Guide
    Introduction <intro>
    Getting Started <getting-started>
    Advanced Usage <usage>
-   Contribution Guidelines <contributing>
+   Contribution Guidelines <contribute>
 
 Extending TinyDB
 ----------------
