@@ -27,11 +27,8 @@ if sys.version_info[0] == 3:
     stringify = str
     unicodize = str
 else:
-    def stringify(string):
-        return string.encode('utf-8')
-
-    def unicodize(string):
-        return unicode(string)
+    stringify = lambda x: x.encode('utf-8')
+    unicodize = lambda x: unicode(x)
 
 
 def is_sequence(obj):
@@ -535,7 +532,7 @@ class QueryHas(Query):
 
         repr_str = u'has '
         # 'key1' => 'key2' => ...
-        repr_str += u'\'' + u'\' => \''.join(path) + u'\''
+        repr_str += u'\'' + u'\' => \''.join(str(x) for x in path) + u'\''
 
         if self._special:
             repr_str += u' => ({})'.format(self._special)
