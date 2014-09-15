@@ -23,16 +23,15 @@ import sys
 __all__ = ('Query',)
 
 
-def stringify(string):
-    if sys.version_info[0] == 3:
-        return string
-    return string.encode('utf-8')
+if sys.version_info[0] == 3:
+    stringify = str
+    unicodize = str
+else:
+    def stringify(string):
+        return string.encode('utf-8')
 
-
-def unicodize(string):
-    if sys.version_info[0] == 3:
-        return string
-    return unicode(string)
+    def unicodize(string):
+        return unicode(string)
 
 
 def is_sequence(obj):
