@@ -24,13 +24,13 @@ __all__ = ('Query',)
 
 
 def stringify(string):
-    if sys.version[0] == 3:
+    if sys.version_info[0] == 3:
         return string
     return string.encode('utf-8')
 
 
 def unicodize(string):
-    if sys.version[0] == 3:
+    if sys.version_info[0] == 3:
         return string
     return unicode(string)
 
