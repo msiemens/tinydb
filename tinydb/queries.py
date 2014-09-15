@@ -532,7 +532,7 @@ class QueryHas(Query):
 
         repr_str = u'has '
         # 'key1' => 'key2' => ...
-        repr_str += u'\'' + u'\' => \''.join(str(x) for x in path) + u'\''
+        repr_str += u'\'' + u'\' => \''.join(unicodize(x) for x in path) + u'\''
 
         if self._special:
             repr_str += u' => ({})'.format(self._special)
