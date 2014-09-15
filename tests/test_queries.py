@@ -1,3 +1,4 @@
+# encoding: utf-8
 from tinydb.queries import where
 
 
@@ -172,3 +173,11 @@ def test_has():
     # Test special methods: custom test
     query = where('key1').has('int').test(lambda x: x == 3)
     assert query({'key1': {'int': 3}})
+
+
+def test_unicode():
+    query = where('key1') == u'å'
+    assert query({'key1': u'å'})
+    assert repr(query)
+    assert repr(where('key1').has(u'Å'))
+    assert repr(where('key1') | where(u'ß') & ~where(u'Ω'))

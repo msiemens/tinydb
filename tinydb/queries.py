@@ -17,8 +17,18 @@ False
 """
 
 import re
+import sys
+
 
 __all__ = ('Query',)
+
+
+if sys.version_info[0] == 3:
+    stringify = str
+    unicodize = str
+else:
+    stringify = lambda x: x.encode('utf-8')
+    unicodize = lambda x: unicode(x)
 
 
 def is_sequence(obj):
@@ -76,7 +86,7 @@ class Query(AndOrMixin):
     def __init__(self, key):
         self._key = key
         self._cmp = None
-        self._repr = 'has \'{0}\''.format(key)
+        self._repr = u'has \'{0}\''.format(key)
 
     def matches(self, regex):
         """
@@ -144,7 +154,7 @@ class Query(AndOrMixin):
             return is_sequence(value) and any(cond(e) for e in value)
 
         self._cmp = _cmp
-        self._repr = '\'{0}\' has any {1}'.format(self._key, cond)
+        self._repr = u'\'{0}\' has any {1}'.format(self._key, cond)
         return self
 
     def all(self, cond):
@@ -166,7 +176,7 @@ class Query(AndOrMixin):
             return is_sequence(value) and all(cond(e) for e in value)
 
         self._cmp = _cmp
-        self._repr = '\'{0}\' all have {1}'.format(self._key, cond)
+        self._repr = u'\'{0}\' all have {1}'.format(self._key, cond)
         return self
 
     def __eq__(self, other):
@@ -307,10 +317,10 @@ class Query(AndOrMixin):
         Update the current test's ``repr``.
         """
 
-        self._repr = '\'{0}\' {1} {2}'.format(self._key, operator, value)
+        self._repr = u'\'{0}\' {1} {2}'.format(self._key, operator, value)
 
     def __repr__(self):
-        return self._repr
+        return stringify(self._repr)
 
     def __hash__(self):
         return hash(repr(self))
@@ -339,8 +349,9 @@ class QueryNot(AndOrMixin):
 
         return not self._cond(element)
 
-    def __repr__(self):
-        return 'not ({0})'.format(self._cond)
+    @property
+    def _repr(self):
+        return u'not ({0})'.format(self._cond)
 
 
 class QueryOr(AndOrMixin):
@@ -361,8 +372,9 @@ class QueryOr(AndOrMixin):
 
         return self._cond_1(element) or self._cond_2(element)
 
-    def __repr__(self):
-        return '({0}) or ({1})'.format(self._cond_1, self._cond_2)
+    @property
+    def _repr(self):
+        return u'({0}) or ({1})'.format(self._cond_1, self._cond_2)
 
 
 class QueryAnd(AndOrMixin):
@@ -383,8 +395,9 @@ class QueryAnd(AndOrMixin):
 
         return self._cond_1(element) and self._cond_2(element)
 
-    def __repr__(self):
-        return '({0}) and ({1})'.format(self._cond_1, self._cond_2)
+    @property
+    def _repr(self):
+        return u'({0}) and ({1})'.format(self._cond_1, self._cond_2)
 
 
 class QueryRegex(AndOrMixin):
@@ -408,8 +421,9 @@ class QueryRegex(AndOrMixin):
 
         return re.match(self.regex, element[self._key])
 
-    def __repr__(self):
-        return '\'{0}\' ~= {1} '.format(self._key, self.regex)
+    @property
+    def _repr(self):
+        return u'\'{0}\' ~= {1} '.format(self._key, self.regex)
 
 
 class QueryCustom(AndOrMixin):
@@ -433,8 +447,9 @@ class QueryCustom(AndOrMixin):
 
         return self.test(element[self._key])
 
-    def __repr__(self):
-        return '\'{0}\'.test({1})'.format(self._key, self.test)
+    @property
+    def _repr(self):
+        return u'\'{0}\'.test({1})'.format(self._key, self.test)
 
 
 class QueryHas(Query):
@@ -510,19 +525,19 @@ class QueryHas(Query):
             return super(QueryHas, self).__call__(element)
 
     def __repr__(self):
-        path = self._path[:]
+        path = [unicodize(x) for x in self._path]
 
         if not self._special and not self._cmp:
             path += [self._key]
 
-        repr_str = 'has '
+        repr_str = u'has '
         # 'key1' => 'key2' => ...
-        repr_str += '\'' + '\' => \''.join(path) + '\''
+        repr_str += u'\'' + u'\' => \''.join(unicodize(x) for x in path) + u'\''
 
         if self._special:
-            repr_str += ' => ({})'.format(self._special)
+            repr_str += u' => ({})'.format(self._special)
 
         elif self._cmp:
-            repr_str += ' => ({})'.format(super(QueryHas, self).__repr__())
+            repr_str += u' => ({})'.format(super(QueryHas, self).__repr__())
 
-        return repr_str
+        return stringify(repr_str)
