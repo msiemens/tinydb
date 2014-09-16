@@ -17,6 +17,10 @@ False
 """
 
 import re
+import warnings
+import sys
+
+from tinydb.utils import catch_warning
 
 __all__ = ('Query',)
 
@@ -179,8 +183,24 @@ class Query(AndOrMixin):
 
         if isinstance(other, Query):
             return self._repr == other._repr
+
         else:
-            self._cmp = lambda value: value == other
+            if sys.version_info <= (3, 0):
+                # Special UTF-8 handling on Python 2
+                def _cmp(value):
+                    with catch_warning(UnicodeWarning):
+                        try:
+                            return value == other
+                        except UnicodeWarning:
+                            # Dealing with a case, where 'value' is unicode,
+                            # but  'other' is not. Handle accordingly.
+                            return value == other.decode('utf-8')
+
+                self._cmp = _cmp
+
+            else:
+                self._cmp = lambda value: value == other
+
             self._update_repr('==', other)
             return self
 
@@ -307,12 +327,15 @@ class Query(AndOrMixin):
         Update the current test's ``repr``.
         """
 
-        self._repr = '\'{0}\' {1} {2}'.format(self._key, operator, value)
+        self._repr = '{0!r} {1} {2!r}'.format(self._key, operator, value)
 
     def __repr__(self):
         return self._repr
 
     def __hash__(self):
+        # Queries have to be hashable because the query cache is implemented
+        # as an dict where the keys are Query objects. The hash should be
+        # the same for objects with the same, so we can use the repr for this.
         return hash(repr(self))
 
 where = Query

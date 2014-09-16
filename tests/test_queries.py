@@ -172,3 +172,13 @@ def test_has():
     # Test special methods: custom test
     query = where('key1').has('int').test(lambda x: x == 3)
     assert query({'key1': {'int': 3}})
+
+
+def test_hash():
+    d = {
+        where('key1') == 2: True,
+        where('key1').has('key2').has('key3'): True
+    }
+
+    assert (where('key1') == 2) in d
+    assert (where('key1').has('key2').has('key3')) in d

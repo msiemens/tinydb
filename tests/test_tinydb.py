@@ -1,4 +1,6 @@
+# coding=utf-8
 import pytest
+import sys
 
 from . conftest import get_db
 
@@ -236,3 +238,35 @@ def test_unique_ids(tmpdir):
 
         ids = [e.eid for e in _db.all()]
         assert len(ids) == len(set(ids))
+
+
+@pytest.mark.skipif(sys.version_info >= (3, 0),
+                    reason="requires python2")
+def test_unicode_memory(db):
+    db.insert({'value': u'ß'})
+    assert db.contains(where('value') == 'ß')
+    assert db.contains(where('value') == u'ß')
+
+
+@pytest.mark.skipif(sys.version_info >= (3, 0),
+                    reason="requires python2")
+def test_unicode_json(tmpdir):
+    path = str(tmpdir.join('db.json'))
+
+    with TinyDB(path) as _db:
+        _db.purge()
+        _db.insert({'value': 'a'})
+        _db.insert({'value': 'ß'})
+        assert _db.contains(where('value') == 'a')
+        assert _db.contains(where('value') == u'a')
+        assert _db.contains(where('value') == 'ß')
+        assert _db.contains(where('value') == u'ß')
+
+    with TinyDB(path) as _db:
+        _db.purge()
+        _db.insert({'value': u'a'})
+        _db.insert({'value': u'ß'})
+        assert _db.contains(where('value') == 'a')
+        assert _db.contains(where('value') == u'a')
+        assert _db.contains(where('value') == 'ß')
+        assert _db.contains(where('value') == u'ß')
