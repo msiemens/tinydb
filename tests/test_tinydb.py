@@ -247,6 +247,11 @@ def test_unicode_memory(db):
     assert db.contains(where('value') == 'ß')
     assert db.contains(where('value') == u'ß')
 
+    db.purge()
+    db.insert({'value': 'ß'})
+    assert db.contains(where('value') == 'ß')
+    assert db.contains(where('value') == u'ß')
+
 
 @pytest.mark.skipif(sys.version_info >= (3, 0),
                     reason="requires python2")

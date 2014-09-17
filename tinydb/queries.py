@@ -184,25 +184,27 @@ class Query(AndOrMixin):
         if isinstance(other, Query):
             return self._repr == other._repr
 
-        else:
-            if sys.version_info <= (3, 0):
-                # Special UTF-8 handling on Python 2
-                def _cmp(value):
-                    with catch_warning(UnicodeWarning):
-                        try:
-                            return value == other
-                        except UnicodeWarning:
-                            # Dealing with a case, where 'value' is unicode,
-                            # but  'other' is not. Handle accordingly.
+        if sys.version_info <= (3, 0):
+            # Special UTF-8 handling on Python 2
+            def _cmp(value):
+                with catch_warning(UnicodeWarning):
+                    try:
+                        return value == other
+                    except UnicodeWarning:
+                        # Dealing with a case, where 'value' or 'other'
+                        # is unicode and the other is a byte string.
+                        if isinstance(value, str):
+                            return value.decode('utf-8') == other
+                        elif isinstance(other, str):
                             return value == other.decode('utf-8')
 
-                self._cmp = _cmp
+            self._cmp = _cmp
 
-            else:
-                self._cmp = lambda value: value == other
+        else:
+            self._cmp = lambda value: value == other
 
-            self._update_repr('==', other)
-            return self
+        self._update_repr('==', other)
+        return self
 
     def __ne__(self, other):
         """
