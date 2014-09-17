@@ -243,35 +243,44 @@ def test_unique_ids(tmpdir):
 @pytest.mark.skipif(sys.version_info >= (3, 0),
                     reason="requires python2")
 def test_unicode_memory(db):
-    db.insert({'value': u'ß'})
-    assert db.contains(where('value') == 'ß')
-    assert db.contains(where('value') == u'ß')
+    unic_str = 'ß'.decode('utf-8')
+    byte_str = 'ß'
+
+    db.insert({'value': unic_str})
+    assert db.contains(where('value') == byte_str)
+    assert db.contains(where('value') == unic_str)
 
     db.purge()
-    db.insert({'value': 'ß'})
-    assert db.contains(where('value') == 'ß')
-    assert db.contains(where('value') == u'ß')
+    db.insert({'value': byte_str})
+    assert db.contains(where('value') == byte_str)
+    assert db.contains(where('value') == unic_str)
 
 
 @pytest.mark.skipif(sys.version_info >= (3, 0),
                     reason="requires python2")
 def test_unicode_json(tmpdir):
+    unic_str1 = 'a'.decode('utf-8')
+    byte_str1 = 'a'
+
+    unic_str2 = 'ß'.decode('utf-8')
+    byte_str2 = 'ß'
+
     path = str(tmpdir.join('db.json'))
 
     with TinyDB(path) as _db:
         _db.purge()
-        _db.insert({'value': 'a'})
-        _db.insert({'value': 'ß'})
-        assert _db.contains(where('value') == 'a')
-        assert _db.contains(where('value') == u'a')
-        assert _db.contains(where('value') == 'ß')
-        assert _db.contains(where('value') == u'ß')
+        _db.insert({'value': byte_str1})
+        _db.insert({'value': byte_str2})
+        assert _db.contains(where('value') == byte_str1)
+        assert _db.contains(where('value') == unic_str1)
+        assert _db.contains(where('value') == byte_str2)
+        assert _db.contains(where('value') == unic_str2)
 
     with TinyDB(path) as _db:
         _db.purge()
-        _db.insert({'value': u'a'})
-        _db.insert({'value': u'ß'})
-        assert _db.contains(where('value') == 'a')
-        assert _db.contains(where('value') == u'a')
-        assert _db.contains(where('value') == 'ß')
-        assert _db.contains(where('value') == u'ß')
+        _db.insert({'value': unic_str1})
+        _db.insert({'value': unic_str2})
+        assert _db.contains(where('value') == byte_str1)
+        assert _db.contains(where('value') == unic_str1)
+        assert _db.contains(where('value') == byte_str2)
+        assert _db.contains(where('value') == unic_str2)
