@@ -184,7 +184,7 @@ class Query(AndOrMixin):
         if isinstance(other, Query):
             return self._repr == other._repr
 
-        if sys.version_info <= (3, 0):
+        if sys.version_info <= (3, 0):  # pragma: no cover
             # Special UTF-8 handling on Python 2
             def _cmp(value):
                 with catch_warning(UnicodeWarning):
@@ -200,7 +200,7 @@ class Query(AndOrMixin):
 
             self._cmp = _cmp
 
-        else:
+        else:  # pragma: no cover
             self._cmp = lambda value: value == other
 
         self._update_repr('==', other)

@@ -102,9 +102,11 @@ def catch_warning(warning_cls):
     warning_filter = [f for f in warnings.filters if f[2] == warning_cls]
     warnings.filterwarnings(action="error", category=warning_cls)
 
-    yield  # Run user code
+    try:
+        yield  # Run user code
 
-    if warning_filter:
-        # Reset original filter
-        warnings.filterwarnings(action=warning_filter[0][0],
-                                category=warning_cls)
+    finally:
+        if warning_filter:
+            # Reset original filter
+            warnings.filterwarnings(action=warning_filter[0][0],
+                                    category=warning_cls)

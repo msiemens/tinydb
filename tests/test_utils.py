@@ -1,4 +1,7 @@
-from tinydb.utils import LRUCache
+import warnings
+import pytest
+
+from tinydb.utils import LRUCache, catch_warning
 
 
 def test_lru_cache():
@@ -65,3 +68,27 @@ def test_lru_cache_unlimited_explicit():
         cache[i] = i
 
     assert len(cache.lru) == 100
+
+
+def test_catch_warning():
+    class MyWarning(Warning):
+        pass
+
+    with pytest.raises(MyWarning):
+        with catch_warning(MyWarning):
+            warnings.warn("message", MyWarning)
+
+
+def test_catch_warning_reset_filter():
+    class MyWarning(Warning):
+        pass
+
+    warnings.filterwarnings(action='once', category=MyWarning)
+
+    with pytest.raises(MyWarning):
+        with catch_warning(MyWarning):
+            warnings.warn("message", MyWarning)
+
+    filter = [f for f in warnings.filters if f[2] == MyWarning]
+    assert filter
+    assert filter[0][0] == 'once'
