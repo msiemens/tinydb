@@ -129,6 +129,11 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v2.0.1** (2014-09-22)
+=======================
+
+- Fixed handling of unicode data in Python 2 (see `issue #28 <https://github.com/msiemens/tinydb/issues/28>`_).
+
 **v2.0.0** (2014-09-05)
 =======================
 
