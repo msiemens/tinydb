@@ -15,7 +15,11 @@ and discuss the topic of serializtion.
 TinyDB serializes all data using the
 `Python JSON <http://docs.python.org/2/library/json.html>`_ module by default.
 It's great for serializing simple data types but cannot handle more complex
-data types like custom classes. If you need a better serializer, you can write
+data types like custom classes. On Python 2 it also converts strings to
+unicode strings upon reading
+(described `here <http://stackoverflow.com/q/956867/997063>`_).
+
+If you need a better serializer, you can write
 :doc:`your own storage <extend>`, that uses a more powerful (but also slower)
 library like `pickle  <http://docs.python.org/library/pickle.html>`_ or
 `PyYAML  <http://pyyaml.org/>`_.
