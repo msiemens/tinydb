@@ -17,10 +17,10 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Philosophy of TinyDB
 ********************
 
-TinyDB aims to be simple and fun to use. Therefore two key values in
-development are simplicity and elegance. Sometimes these values
-contradict each other. In this case, try using as little magic as possible.
-In any case don't forget commenting code that isn't clear at first glance.
+TinyDB aims to be simple and fun to use. Therefore two key values are simplicity
+and elegance of interfaces and code. These values will contradict each other
+from time to time. In these cases , try using as little magic as possible.
+In any case don't forget documenting code that isn't clear at first glance.
 
 Code Conventions
 ****************

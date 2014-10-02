@@ -374,3 +374,15 @@ of these ways:
 
     # Using the close function
     db.close()
+
+What's next
+-----------
+
+Congratulations, you've made through the user guide! Now go and build something
+awesome or dive deeper into TinyDB with these ressources:
+
+- Want to learn how to customize TinyDB and what extensions exist?
+  Check out :doc:`extend`.
+- Want to study the API in detail? Read :doc:`api`.
+- Interested in contributing to the TinyDB development guide? Go on to the
+  :doc:`contribute`.

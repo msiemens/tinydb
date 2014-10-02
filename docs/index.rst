@@ -19,7 +19,6 @@ User's Guide
    intro
    getting-started
    usage
-   contribute
 
 Extending TinyDB
 ----------------
@@ -44,5 +43,6 @@ Additional Notes
 .. toctree::
    :maxdepth: 2
 
+   contribute
    changelog
    Upgrade Notes <upgrade>
