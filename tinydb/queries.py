@@ -4,7 +4,7 @@ Contains the querying interface.
 Starting with :class:`~tinydb.queries.Query` you can construct complex
 queries:
 
->>> ((where('f1') == 5) & (where('f2') != 2)) | where('s').matches('^\w+$')
+>>> ((where('f1') == 5) & (where('f2') != 2)) | where('s').matches(r'^\w+$')
 (('f1' == 5) and ('f2' != 2)) or ('s' ~= ^\w+$ )
 
 Queries are executed by using the ``__call__``:
@@ -17,7 +17,6 @@ False
 """
 
 import re
-import warnings
 import sys
 
 from tinydb.utils import catch_warning
@@ -86,7 +85,7 @@ class Query(AndOrMixin):
         """
         Run a regex test against a dict value.
 
-        >>> where('f1').matches('^\w+$')
+        >>> where('f1').matches(r'^\w+$')
         'f1' ~= ^\w+$
 
         :param regex: The regular expression to pass to ``re.match``

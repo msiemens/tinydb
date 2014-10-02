@@ -69,6 +69,7 @@ def test_in_memory_close():
 
 
 def test_custom():
+    # noinspection PyAbstractClass
     class MyStorage(Storage):
         pass
 

@@ -489,7 +489,7 @@ class SmartCacheTable(Table):
 
         self.process_elements(process, cond, eids)
 
-    def remove(self,  cond=None, eids=None):
+    def remove(self, cond=None, eids=None):
         # See Table.remove
 
         def process(data, eid):

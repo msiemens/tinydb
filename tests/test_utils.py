@@ -89,6 +89,6 @@ def test_catch_warning_reset_filter():
         with catch_warning(MyWarning):
             warnings.warn("message", MyWarning)
 
-    filter = [f for f in warnings.filters if f[2] == MyWarning]
-    assert filter
-    assert filter[0][0] == 'once'
+    filters = [f for f in warnings.filters if f[2] == MyWarning]
+    assert filters
+    assert filters[0][0] == 'once'

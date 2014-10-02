@@ -19,6 +19,7 @@ class Middleware(object):
 
     def __init__(self, storage_cls):
         self._storage_cls = storage_cls
+        self.storage = None
 
     def __call__(self, *args, **kwargs):
         """
