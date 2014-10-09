@@ -95,3 +95,15 @@ def test_lru_cache(db):
 
     table.remove(where('int') == 1)
     assert not table._query_cache.lru
+
+
+def test_getitem(db):
+    table = db.table('table3')
+    table.insert({'int': 1})
+    table.insert({'int': 2})
+    table.insert({'int': 3})
+
+    assert table[0] == {'int': 1}
+    assert table[:2] == [{'int': 1}, {'int': 2}]
+    assert table[1:] == [{'int': 2}, {'int': 3}]
+    assert table[1:2:2] == [{'int': 2}]

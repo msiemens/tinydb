@@ -160,6 +160,9 @@ class TinyDB(object):
         """
         return self._table.__exit__(*args)
 
+    def __getitem__(self, sl):
+        return self._table[sl]
+
     def __getattr__(self, name):
         """
         Forward all unknown attribute calls to the underlying standard table.
@@ -436,6 +439,9 @@ class Table(object):
         self._db._storage.close()
 
     close = __exit__
+
+    def __getitem__(self, sl):
+        return self.all()[sl]
 
 
 class SmartCacheTable(Table):
