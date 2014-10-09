@@ -41,7 +41,7 @@ middleware. To do so, subclass :class:`~tinydb.middlewares.Middleware`:
 
 .. code-block:: python
 
-    class CustomMiddleware(CustomMiddleware):
+    class CustomMiddleware(Middleware):
         def __init__(self, storage_cls):
             # Any middleware *has* to call the super constructor
             # with storage_cls
@@ -53,7 +53,7 @@ middleware. To do so, subclass :class:`~tinydb.middlewares.Middleware`:
 
         def write(self, data):
             # your implementation
-            self.storage.write(data)  # access the storage's close function
+            self.storage.write(data)  # access the storage's write function
 
         def close(self):
             # optional: close open file handles, etc.
