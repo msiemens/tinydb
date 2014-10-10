@@ -107,6 +107,15 @@ Extensions
                    transaction support for the TinyDB NoSQL database. It uses a
                    record-first then execute architecture which allows us to
                    minimize the time that we are within a thread lock.
+|
+
+| **Name:**        ``tinyindex``
+| **Repo:**        https://github.com/eugene-eeo/tinyindex
+| **Status:**      *experimental*
+| **Description:** Document indexing for TinyDB. Basically ensures deterministic
+                   (as long as there aren't any changes to the table) yielding
+                   of documents.
+|
 
 
 Contributing
@@ -202,7 +211,7 @@ for details.
 .. |Coverage| image:: http://img.shields.io/coveralls/msiemens/tinydb.svg?style=flat-square
    :target: https://coveralls.io/r/msiemens/tinydb
 .. |Version| image:: http://img.shields.io/pypi/v/tinydb.svg?style=flat-square
-   :target: https://crate.io/packages/tinydb
+   :target: https://pypi.python.org/pypi/tinydb/
 .. _Buzhug: http://buzhug.sourceforge.net/
 .. _CodernityDB: http://labs.codernity.com/codernitydb/
 .. _MongoDB: http://mongodb.org/
