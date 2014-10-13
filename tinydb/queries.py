@@ -92,7 +92,20 @@ class Query(AndOrMixin):
         :rtype: QueryRegex
         """
 
-        return QueryRegex(self._key, regex)
+        return QueryRegex(self._key, regex, re_method='match')
+
+    def search(self, regex):
+        """
+        Run a regex test against a dict value.
+
+        >>> where('f1').search(r'\d+')
+        'f1' ~= \d+
+
+        :param regex: The regular expression to pass to ``re.search``
+        :rtype: QueryRegex
+        """
+
+        return QueryRegex(self._key, regex, re_method='search')
 
     def test(self, func):
         """
@@ -411,6 +424,7 @@ class QueryAnd(AndOrMixin):
         return '({0}) and ({1})'.format(self._cond_1, self._cond_2)
 
 
+
 class QueryRegex(AndOrMixin):
     """
     Run a regex test against a dict value.
@@ -418,9 +432,10 @@ class QueryRegex(AndOrMixin):
     See :meth:`.Query.matches`.
     """
 
-    def __init__(self, key, regex):
+    def __init__(self, key, regex, re_method):
         self.regex = regex
         self._key = key
+        self.re_method = re_method
 
     def __call__(self, element):
         """
@@ -429,8 +444,12 @@ class QueryRegex(AndOrMixin):
 
         if self._key not in element:
             return False
-
-        return re.match(self.regex, element[self._key])
+        
+        if self.re_method == 'match':
+            return re.match(self.regex, element[self._key])
+    
+        if self.re_method == 'search':
+            return re.search(self.regex, element[self._key])
 
     def __repr__(self):
         return '\'{0}\' ~= {1} '.format(self._key, self.regex)
@@ -478,7 +497,15 @@ class QueryHas(Query):
         See :meth:`.Query.matches`.
         """
 
-        self._special = QueryRegex(self._key, regex)
+        self._special = QueryRegex(self._key, regex, re_method='match')
+        return self
+
+    def search(self, regex):
+        """
+        See :meth:`.Query.search`.
+        """
+
+        self._special = QueryRegex(self._key, regex, re_method='search')
         return self
 
     def test(self, func):
