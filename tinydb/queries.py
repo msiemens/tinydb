@@ -424,7 +424,6 @@ class QueryAnd(AndOrMixin):
         return '({0}) and ({1})'.format(self._cond_1, self._cond_2)
 
 
-
 class QueryRegex(AndOrMixin):
     """
     Run a regex test against a dict value.
@@ -444,15 +443,19 @@ class QueryRegex(AndOrMixin):
 
         if self._key not in element:
             return False
-        
+
         if self.re_method == 'match':
             return re.match(self.regex, element[self._key])
-    
+
         if self.re_method == 'search':
             return re.search(self.regex, element[self._key])
 
     def __repr__(self):
-        return '\'{0}\' ~= {1} '.format(self._key, self.regex)
+        return '\'{0}\' {1} /{2}/'.format(self._key, self.re_method,
+                                          self.regex)
+
+    def __hash__(self):
+        return hash(repr(self))
 
 
 class QueryCustom(AndOrMixin):
