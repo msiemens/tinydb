@@ -6,20 +6,20 @@
 Advanced Usage
 ==============
 
-Remarks on Serialization
-------------------------
+Remarks on Storages
+-------------------
 
 Before we dive deeper into the usage of TinyDB, we should stop for a moment
-and discuss the topic of serializtion.
+and discuss how TinyDB stores data.
 
-TinyDB serializes all data using the
+To convert your data to a format that is writable to disk TinyDB uses the
 `Python JSON <http://docs.python.org/2/library/json.html>`_ module by default.
-It's great for serializing simple data types but cannot handle more complex
-data types like custom classes. On Python 2 it also converts strings to
+It's great when only simple data types are involved but it cannot handle more
+complex data types like custom classes. On Python 2 it also converts strings to
 unicode strings upon reading
 (described `here <http://stackoverflow.com/q/956867/997063>`_).
 
-If you need a better serializer, you can write
+If that causes problems, you can write
 :doc:`your own storage <extend>`, that uses a more powerful (but also slower)
 library like `pickle  <http://docs.python.org/library/pickle.html>`_ or
 `PyYAML  <http://pyyaml.org/>`_.
@@ -27,15 +27,16 @@ library like `pickle  <http://docs.python.org/library/pickle.html>`_ or
 Alternative JSON libary
 .......................
 
-As already mentioned, the default default storage serializes the data using
-JSON. To improve performance, you can install
+As already mentioned, the default storage relies upon Python's
+JSON module. To improve performance, you can install
 `ujson <http://pypi.python.org/pypi/ujson>`_ , an extremely fast JSON
 implementation. TinyDB will auto-detect and use it if possible.
 
 Handling Data
 -------------
 
-So let's start with inserting and retrieving data from your database.
+With that out of the way, let's start with inserting and retrieving data from
+your database.
 
 Inserting
 .........
