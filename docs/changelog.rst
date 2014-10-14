@@ -7,6 +7,12 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v2.1.0** (2014-10-14)
+=======================
+
+- Added ``where(...).contains(regex)`` (see `issue #32 <https://github.com/msiemens/tinydb/issues/32>`_)
+- Fixed a bug that corrupted data after reopening a database (see `issue #34 <https://github.com/msiemens/tinydb/issues/34>`_)
+
 **v2.0.1** (2014-09-22)
 =======================
 
