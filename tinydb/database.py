@@ -187,10 +187,10 @@ class Table(object):
         self._db = db
         self._query_cache = LRUCache(capacity=cache_size)
 
-        try:
-            all_ids = sorted(self._read().keys())
-            self._last_id = int(all_ids.pop())
-        except IndexError:
+        old_ids = self._read().keys()
+        if old_ids:
+            self._last_id = max(int(i, 10) for i in old_ids)
+        else:
             self._last_id = 0
 
     def process_elements(self, func, cond=None, eids=None):

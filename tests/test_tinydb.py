@@ -240,6 +240,23 @@ def test_unique_ids(tmpdir):
         assert len(ids) == len(set(ids))
 
 
+def test_lastid_after_open(tmpdir):
+    """
+    Regression test for issue #34
+
+    :type tmpdir: py._path.local.LocalPath
+    """
+
+    path = str(tmpdir.join('db.json'))
+    NUM = 100
+
+    with TinyDB(path) as _db:
+        _db.insert_multiple({'i': i} for i in range(NUM))
+
+    with TinyDB(path) as _db:
+        assert _db._last_id == NUM
+
+
 @pytest.mark.skipif(sys.version_info >= (3, 0),
                     reason="requires python2")
 def test_unicode_memory(db):
