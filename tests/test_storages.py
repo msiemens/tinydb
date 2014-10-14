@@ -26,6 +26,9 @@ def test_json(tmpdir):
 
 
 def test_json_readwrite(tmpdir):
+    """
+    Regression test for issue #1
+    """
     path = str(tmpdir.join('test.db'))
 
     # Create TinyDB instance
