@@ -83,7 +83,7 @@ class Query(AndOrMixin):
 
     def matches(self, regex):
         """
-        Run a regex test against a dict value.
+        Run a regex test against a dict value (whole string has to match).
 
         >>> where('f1').matches(r'^\w+$')
         'f1' ~= ^\w+$
@@ -94,11 +94,11 @@ class Query(AndOrMixin):
 
         return QueryRegex(self._key, regex, re_method='match')
 
-    def search(self, regex):
+    def contains(self, regex):
         """
-        Run a regex test against a dict value.
+        Run a regex test against a dict value (only substring has to match).
 
-        >>> where('f1').search(r'\d+')
+        >>> where('f1').contains(r'\d+')
         'f1' ~= \d+
 
         :param regex: The regular expression to pass to ``re.search``
@@ -503,7 +503,7 @@ class QueryHas(Query):
         self._special = QueryRegex(self._key, regex, re_method='match')
         return self
 
-    def search(self, regex):
+    def contains(self, regex):
         """
         See :meth:`.Query.search`.
         """

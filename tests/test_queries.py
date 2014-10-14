@@ -92,7 +92,7 @@ def test_regex():
     assert not query({'val': 'ab.'})
     assert not query({'': None})
 
-    query = where('val').search(r'\d+')
+    query = where('val').contains(r'\d+')
 
     assert query({'val': 'ab3'})
     assert not query({'val': 'abc'})
@@ -170,8 +170,8 @@ def test_has():
     assert not query({'key2': {'value': '123'}})
     assert not query({'key2': {'value': 'abc'}})
 
-    # Test special methods: regex search
-    query = where('key1').has('value').search(r'\d+')
+    # Test special methods: regex contains
+    query = where('key1').has('value').contains(r'\d+')
     assert query({'key1': {'value': 'a2c'}})
     assert not query({'key2': {'value': 'a2c'}})
     assert not query({'key2': {'value': 'abc'}})
@@ -181,11 +181,11 @@ def test_has():
     assert query({'key1': {'x': {'y': '123'}}})
     assert not query({'key1': {'x': {'y': 'abc'}}})
 
-    # Test special method: nested has and regex search
-    query = where('key1').has('x').has('y').search(r'\d+')
+    # Test special method: nested has and regex contains
+    query = where('key1').has('x').has('y').contains(r'\d+')
     assert query({'key1': {'x': {'y': 'a2c'}}})
     assert not query({'key1': {'x': {'y': 'abc'}}})
-    
+
     # Test special methods: custom test
     query = where('key1').has('int').test(lambda x: x == 3)
     assert query({'key1': {'int': 3}})

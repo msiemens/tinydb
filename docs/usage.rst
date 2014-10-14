@@ -202,7 +202,7 @@ a regex or a custom test function:
 >>> # Regex:
 >>> db.search(where('char').matches('[aZ]*'))
 [{'int': 1, 'char': 'abc'}, {'int': 1, 'char': 'def'}]
->>> db.search(where('char').search('b+'))
+>>> db.search(where('char').contains('b+'))
 [{'int': 1, 'char': 'abbc'}, {'int': 1, 'char': 'bb'}]
 
 >>> # Custom test:
@@ -250,7 +250,7 @@ Again, let's recapitulate the query operations:
 +-----------------------------------+-----------------------------------------------------------+
 | ``where('field').matches(regex)`` | Match any element matching the regular expression         |
 +-----------------------------------+-----------------------------------------------------------+
-| ``where('field').search(regex)``  | Match any element with a matching substring               |
+| ``where('field').contains(regex)``| Match any element with a matching substring               |
 +-----------------------------------+-----------------------------------------------------------+
 | ``where('field').test(func)``     | Matches any element for which the function returns        |
 |                                   | ``True``                                                  |
