@@ -122,6 +122,14 @@ def test_any():
     assert query({'followers': [{'num': '12'}, {'num': 'abc'}]})
     assert not query({'followers': [{'num': 'abc'}]})
 
+    query = where('followers').any(['don', 'jon'])
+    assert query({'followers': ['don', 'greg', 'bill']})
+    assert not query({'followers': ['greg', 'bill']})
+    assert not query({})
+
+    query = where('followers').any([{'name': 'don'}, {'name': 'john'}])
+    assert query({'followers': [{'name': 'don'}, {'name': 'greg'}]})
+    assert not query({'followers': [{'name': 'greg'}]})
 
 def test_all():
     query = where('followers').all(where('name') == 'don')
@@ -132,6 +140,14 @@ def test_all():
     assert query({'followers': [{'num': '123'}, {'num': '456'}]})
     assert not query({'followers': [{'num': '123'}, {'num': 'abc'}]})
 
+    query = where('followers').all(['don', 'john'])
+    assert query({'followers': ['don', 'john', 'greg']})
+    assert not query({'followers': ['don', 'greg']})
+    assert not query({})
+
+    query = where('followers').all([{'name': 'john'}, {'age': 17}])
+    assert query({'followers': [{'name': 'john'}, {'age': 17}]})
+    assert not query({'followers': [{'name': 'john'}, {'age': 18}]})
 
 def test_has():
     query = where('key1').has('key2')

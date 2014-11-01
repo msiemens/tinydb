@@ -155,9 +155,12 @@ class Query(AndOrMixin):
         :param cond: The condition to check
         :rtype: tinydb.queries.Query
         """
-
-        def _cmp(value):
-            return is_sequence(value) and any(cond(e) for e in value)
+        if isinstance(cond, list):
+            def _cmp(value):
+                return is_sequence(value) and any(e in cond for e in value)
+        else:
+            def _cmp(value):
+                return is_sequence(value) and any(cond(e) for e in value)
 
         self._cmp = _cmp
         self._repr = '\'{0}\' has any {1}'.format(self._key, cond)
@@ -177,9 +180,12 @@ class Query(AndOrMixin):
         :param cond: The condition to check
         :rtype: tinydb.queries.Query
         """
-
-        def _cmp(value):
-            return is_sequence(value) and all(cond(e) for e in value)
+        if isinstance(cond, list):
+            def _cmp(value):
+                return is_sequence(value) and all(e in value for e in cond)
+        else:
+            def _cmp(value):
+                return is_sequence(value) and all(cond(e) for e in value)
 
         self._cmp = _cmp
         self._repr = '\'{0}\' all have {1}'.format(self._key, cond)
