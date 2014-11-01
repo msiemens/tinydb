@@ -143,7 +143,8 @@ class Query(AndOrMixin):
 
     def any(self, cond):
         """
-        Checks if a condition is met by any element in a list.
+        Checks if a condition is met by any element in a list,
+        where a condition can also be a list.
 
         >>> where('f1').any(where('f2') == 1)
         'f1' has any 'f2' == 1
@@ -151,6 +152,14 @@ class Query(AndOrMixin):
         Matches::
 
             {'f1': [{'f2': 1}, {'f2': 0}]}
+
+        >>> where('f1').any([1, 2, 3])
+        'f1' has any [1, 2, 3]
+
+        Matches::
+            
+            {'f1': [1, 2]}
+            {'f1': [3, 4, 5]}
 
         :param cond: The condition to check
         :rtype: tinydb.queries.Query
@@ -168,7 +177,8 @@ class Query(AndOrMixin):
 
     def all(self, cond):
         """
-        Checks if a condition is met by any element in a list.
+        Checks if a condition is met by any element in a list,
+        where a condition can also be a list.
 
         >>> where('f1').all(where('f2') == 1)
         'f1' all have 'f2' == 1
@@ -176,6 +186,14 @@ class Query(AndOrMixin):
         Matches::
 
             {'f1': [{'f2': 1}, {'f2': 1}]}
+
+        >>> where('f1').all([{'f2': 1}, {'f3': 2}])
+        'f1' all have [{'f2': 1}, {'f3': 2}]
+
+        Matches::
+
+            {'f1': [{'f2': 1}, {'f3': 2}]}
+            {'f1': [{'f2': 1}, {'f3': 2}, {'f4': 3}]}
 
         :param cond: The condition to check
         :rtype: tinydb.queries.Query
