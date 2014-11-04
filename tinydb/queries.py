@@ -143,7 +143,8 @@ class Query(AndOrMixin):
 
     def any(self, cond):
         """
-        Checks if a condition is met by any element in a list.
+        Checks if a condition is met by any element in a list,
+        where a condition can also be a sequence (e.g. list).
 
         >>> where('f1').any(where('f2') == 1)
         'f1' has any 'f2' == 1
@@ -152,12 +153,24 @@ class Query(AndOrMixin):
 
             {'f1': [{'f2': 1}, {'f2': 0}]}
 
+        >>> where('f1').any([1, 2, 3])
+        'f1' has any [1, 2, 3]
+
+        Matches::
+            
+            {'f1': [1, 2]}
+            {'f1': [3, 4, 5]}
+
         :param cond: The condition to check
         :rtype: tinydb.queries.Query
         """
-
-        def _cmp(value):
-            return is_sequence(value) and any(cond(e) for e in value)
+        # Check for condition type
+        if callable(cond):
+            def _cmp(value):
+                return is_sequence(value) and any(cond(e) for e in value)
+        else:
+            def _cmp(value):
+                return is_sequence(value) and any(e in cond for e in value)
 
         self._cmp = _cmp
         self._repr = '\'{0}\' has any {1}'.format(self._key, cond)
@@ -165,7 +178,8 @@ class Query(AndOrMixin):
 
     def all(self, cond):
         """
-        Checks if a condition is met by any element in a list.
+        Checks if a condition is met by any element in a list,
+        where a condition can also be a sequence (e.g. list).
 
         >>> where('f1').all(where('f2') == 1)
         'f1' all have 'f2' == 1
@@ -174,13 +188,25 @@ class Query(AndOrMixin):
 
             {'f1': [{'f2': 1}, {'f2': 1}]}
 
+        >>> where('f1').all([{'f2': 1}, {'f3': 2}])
+        'f1' all have [{'f2': 1}, {'f3': 2}]
+
+        Matches::
+
+            {'f1': [{'f2': 1}, {'f3': 2}]}
+            {'f1': [{'f2': 1}, {'f3': 2}, {'f4': 3}]}
+
         :param cond: The condition to check
         :rtype: tinydb.queries.Query
         """
-
-        def _cmp(value):
-            return is_sequence(value) and all(cond(e) for e in value)
-
+        # Check for condition type
+        if callable(cond): 
+            def _cmp(value):
+                return is_sequence(value) and all(cond(e) for e in value)
+        else:
+            def _cmp(value):
+                return is_sequence(value) and all(e in value for e in cond)
+        
         self._cmp = _cmp
         self._repr = '\'{0}\' all have {1}'.format(self._key, cond)
         return self

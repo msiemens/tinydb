@@ -232,12 +232,21 @@ You also can use lists inside of elements:
 >>> db.insert({'field': [{'val': 1}, {'val': 2}, {'val': 3}])
 
 Using ``where('field').any(...)`` and ``where('field').all(...)`` you can
-specify checks for the list's items. They behave similarly to Python's `any` and
-`all`:
+specify checks for the list's items using either a nested query or a sequence
+such as a list. They behave similarly to Python's `any` and `all`:
 
+>>> # Nested Query:
 >>> db.search(where('field').any(where('val') == 1))
 True
 >>> db.search(where('field').all(where('val') > 0))
+True
+
+>>> # List:
+>>> db.search(where('field').any([{'val': 1}, {'val': 4}]))
+True
+>>> db.search(where('field').all([{'val': 1}, {'val': 4}]))
+False
+>>> db.search(where('field').all([{'val': 1}, {'val': 3}]))
 True
 
 Recap
