@@ -246,7 +246,7 @@ True
 True
 >>> db.search(where('field').all([{'val': 1}, {'val': 4}]))
 False
->>> db.search(where('field').all({{'val': 1}, {'val': 3}]))
+>>> db.search(where('field').all([{'val': 1}, {'val': 3}]))
 True
 
 Recap
