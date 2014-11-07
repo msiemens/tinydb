@@ -1,6 +1,8 @@
+import os
+
 from tinydb import TinyDB
 from tinydb.middlewares import CachingMiddleware
-from tinydb.storages import MemoryStorage
+from tinydb.storages import MemoryStorage, JSONStorage
 
 if 'xrange' not in dir(__builtins__):
     xrange = range  # Python 3 support
@@ -71,3 +73,17 @@ def test_nested():
 
     # Verify contents
     assert element == storage.read()
+
+
+def test_caching_json_write(tmpdir):
+    path = str(tmpdir.join('test.db'))
+
+    db = TinyDB(path, storage=CachingMiddleware(JSONStorage))
+
+    db.insert({'key':'value'})
+
+    db.close()
+
+    # Verify database filesize
+    statinfo = os.stat(path)
+    assert statinfo.st_size != 0
