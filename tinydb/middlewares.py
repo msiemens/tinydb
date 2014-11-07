@@ -112,3 +112,6 @@ class CachingMiddleware(Middleware):
 
         self.storage.write(self.cache)
         self._cache_modified_count = 0
+
+    def close(self):
+        self.flush()
