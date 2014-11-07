@@ -115,3 +115,4 @@ class CachingMiddleware(Middleware):
 
     def close(self):
         self.flush()
+        self.storage.close()

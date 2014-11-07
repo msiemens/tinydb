@@ -87,3 +87,6 @@ def test_caching_json_write(tmpdir):
     # Verify database filesize
     statinfo = os.stat(path)
     assert statinfo.st_size != 0
+
+    # Assert JSON file has been closed
+    assert db._storage._handle.closed
