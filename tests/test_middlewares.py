@@ -80,7 +80,7 @@ def test_caching_json_write(tmpdir):
 
     db = TinyDB(path, storage=CachingMiddleware(JSONStorage))
 
-    db.insert({'key':'value'})
+    db.insert({'key': 'value'})
 
     db.close()
 

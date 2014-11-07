@@ -99,6 +99,7 @@ def test_regex():
     assert not query({'val': ''})
     assert not query({'': None})
 
+
 def test_custom():
     def test(value):
         return value == 42
@@ -131,6 +132,7 @@ def test_any():
     assert query({'followers': [{'name': 'don'}, {'name': 'greg'}]})
     assert not query({'followers': [{'name': 'greg'}]})
 
+
 def test_all():
     query = where('followers').all(where('name') == 'don')
     assert query({'followers': [{'name': 'don'}]})
@@ -148,6 +150,7 @@ def test_all():
     query = where('followers').all([{'name': 'john'}, {'age': 17}])
     assert query({'followers': [{'name': 'john'}, {'age': 17}]})
     assert not query({'followers': [{'name': 'john'}, {'age': 18}]})
+
 
 def test_has():
     query = where('key1').has('key2')

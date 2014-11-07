@@ -157,7 +157,7 @@ class Query(AndOrMixin):
         'f1' has any [1, 2, 3]
 
         Matches::
-            
+
             {'f1': [1, 2]}
             {'f1': [3, 4, 5]}
 
@@ -200,13 +200,13 @@ class Query(AndOrMixin):
         :rtype: tinydb.queries.Query
         """
         # Check for condition type
-        if callable(cond): 
+        if callable(cond):
             def _cmp(value):
                 return is_sequence(value) and all(cond(e) for e in value)
         else:
             def _cmp(value):
                 return is_sequence(value) and all(e in value for e in cond)
-        
+
         self._cmp = _cmp
         self._repr = '\'{0}\' all have {1}'.format(self._key, cond)
         return self
