@@ -138,16 +138,29 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v2.2.0** (2014-11-10)
+=======================
+
+- Extended ``any`` and ``all`` queries to take lists as conditions
+  (see `pull request #38 <https://github.com/msiemens/tinydb/pull/38>`_)
+- Fixed an ``decode error`` when installing TinyDB in a non-UTF-8 environment
+  (see `pull request #37 <https://github.com/msiemens/tinydb/pull/37>`_)
+- Fixed some issues with ``CachingMiddleware`` in combination with
+  ``JSONStorage`` (see `pull request #39 <https://github.com/msiemens/tinydb/pull/39>`_)
+
 **v2.1.0** (2014-10-14)
 =======================
 
-- Added ``where(...).contains(regex)`` (see `issue #32 <https://github.com/msiemens/tinydb/issues/32>`_)
-- Fixed a bug that corrupted data after reopening a database (see `issue #34 <https://github.com/msiemens/tinydb/issues/34>`_)
+- Added ``where(...).contains(regex)``
+  (see `issue #32 <https://github.com/msiemens/tinydb/issues/32>`_)
+- Fixed a bug that corrupted data after reopening a database
+  (see `issue #34 <https://github.com/msiemens/tinydb/issues/34>`_)
 
 **v2.0.1** (2014-09-22)
 =======================
 
-- Fixed handling of unicode data in Python 2 (see `issue #28 <https://github.com/msiemens/tinydb/issues/28>`_).
+- Fixed handling of unicode data in Python 2
+  (see `issue #28 <https://github.com/msiemens/tinydb/issues/28>`_).
 
 **v2.0.0** (2014-09-05)
 =======================
@@ -172,20 +185,22 @@ for details.
 **v1.4.0** (2014-07-22)
 =======================
 
-- Added ``insert_multiple`` function (see `issue #8 <https://github.com/msiemens/tinydb/issues/8>`_).
+- Added ``insert_multiple`` function
+  (see `issue #8 <https://github.com/msiemens/tinydb/issues/8>`_).
 
 **v1.3.0** (2014-07-02)
 =======================
 
 - Fixed `bug #7 <https://github.com/msiemens/tinydb/issues/7>`_: IDs not unique.
-- Extended the API: ``db.count(where(...))`` and ``db.contains(where(...))``
+- Extended the API: ``db.count(where(...))`` and ``db.contains(where(...))``.
 - The syntax ``query in db`` is now **deprecated** and replaced
   by ``db.contains``.
 
 **v1.2.0** (2014-06-19)
 =======================
 
-- Added ``update`` method (see `Issue #6 <https://github.com/msiemens/tinydb/issues/6>`_).
+- Added ``update`` method
+  (see `issue #6 <https://github.com/msiemens/tinydb/issues/6>`_).
 
 **v1.1.1** (2014-06-14)
 =======================
@@ -198,7 +213,7 @@ for details.
 
 - Improved the docs and fixed some typos.
 - Refactored some internal code.
-- Fixed a bug with multiple ``TinyDB`` instances.
+- Fixed a bug with multiple ``TinyDB?`` instances.
 
 **v1.0.1** (2014-04-26)
 =======================

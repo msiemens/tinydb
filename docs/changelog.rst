@@ -7,16 +7,29 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
-**v2.1.0** (2014-10-14)
-=======================
+**v2.2.0** (2014-11-10)
+^^^^^^^^^^^^^^^^^^^^^^^
 
-- Added ``where(...).contains(regex)`` (see `issue #32 <https://github.com/msiemens/tinydb/issues/32>`_)
-- Fixed a bug that corrupted data after reopening a database (see `issue #34 <https://github.com/msiemens/tinydb/issues/34>`_)
+- Extended ``any`` and ``all`` queries to take lists as conditions
+  (see `pull request #38 <https://github.com/msiemens/tinydb/pull/38>`_)
+- Fixed an ``decode error`` when installing TinyDB in a non-UTF-8 environment
+  (see `pull request #37 <https://github.com/msiemens/tinydb/pull/37>`_)
+- Fixed some issues with ``CachingMiddleware`` in combination with
+  ``JSONStorage`` (see `pull request #39 <https://github.com/msiemens/tinydb/pull/39>`_)
+
+**v2.1.0** (2014-10-14)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Added ``where(...).contains(regex)``
+  (see `issue #32 <https://github.com/msiemens/tinydb/issues/32>`_)
+- Fixed a bug that corrupted data after reopening a database
+  (see `issue #34 <https://github.com/msiemens/tinydb/issues/34>`_)
 
 **v2.0.1** (2014-09-22)
-=======================
+^^^^^^^^^^^^^^^^^^^^^^^
 
-- Fixed handling of unicode data in Python 2 (see `issue #28 <https://github.com/msiemens/tinydb/issues/28>`_).
+- Fixed handling of unicode data in Python 2
+  (see `issue #28 <https://github.com/msiemens/tinydb/issues/28>`_).
 
 **v2.0.0** (2014-09-05)
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -29,7 +42,7 @@ see `semver.org <http://semver.org/>`_
 
 - The syntax ``query in db`` has been removed, use ``db.contains`` instead.
 - The ``ConcurrencyMiddleware`` has been removed due to a insecure implementation
-  (see `Issue #18 <https://github.com/msiemens/tinydb/issues/18>`_).  Consider
+  (see `issue #18 <https://github.com/msiemens/tinydb/issues/18>`_).  Consider
   :ref:`tinyrecord` instead.
 
 - Better support for working with :ref:`Element IDs <element_ids>`.
@@ -41,7 +54,8 @@ see `semver.org <http://semver.org/>`_
 **v1.4.0** (2014-07-22)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- Added ``insert_multiple`` function (see `issue #8 <https://github.com/msiemens/tinydb/issues/8>`_).
+- Added ``insert_multiple`` function
+  (see `issue #8 <https://github.com/msiemens/tinydb/issues/8>`_).
 
 **v1.3.0** (2014-07-02)
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -54,7 +68,8 @@ see `semver.org <http://semver.org/>`_
 **v1.2.0** (2014-06-19)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- Added ``update`` method (see `Issue #6 <https://github.com/msiemens/tinydb/issues/6>`_).
+- Added ``update`` method
+  (see `issue #6 <https://github.com/msiemens/tinydb/issues/6>`_).
 
 **v1.1.1** (2014-06-14)
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -73,7 +88,6 @@ see `semver.org <http://semver.org/>`_
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - Fixed a bug in ``JSONStorage`` that broke the database when removing entries.
-
 
 **v1.0.0** (2013-07-20)
 ^^^^^^^^^^^^^^^^^^^^^^^
