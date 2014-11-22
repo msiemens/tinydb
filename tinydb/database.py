@@ -328,17 +328,19 @@ class Table(object):
         Update all matching elements to have a given set of fields.
 
         :param fields: the fields that the matching elements will have
-        :type fields: dict
+        :type fields: dict | (dict, int) -> None
         :param cond: which elements to update
         :type cond: query
         :param eids: a list of element IDs
         :type eids: list
         """
+        def _update(data, eid):
+            if callable(fields):
+                fields(data[eid])
+            else:
+                data[eid].update(fields)
 
-        self.process_elements(
-            lambda data, eid: transform(data[eid], fields),
-            cond, eids
-        )
+        self.process_elements(_update, cond, eids)
 
     def purge(self):
         """
@@ -475,11 +477,17 @@ class SmartCacheTable(Table):
     def update(self, fields, cond=None, eids=None, transform=update_fields):
         # See Table.update
 
+        def _update(data, eid):
+            if callable(fields):
+                fields(data[eid])
+            else:
+                data[eid].update(fields)
+
         def process(data, eid):
             old_value = data[eid].copy()
 
             # Update element
-            transform(data[eid], fields)
+            _update(data, eid)
             new_value = data[eid]
 
             # Update query cache

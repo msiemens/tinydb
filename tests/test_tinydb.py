@@ -133,16 +133,20 @@ def test_update(db):
 
 @pytest.mark.parametrize('db', dbs())
 def test_update_transform(db):
-    def increment(el, field):
-        el[field] += 1
+    def increment(field):
+        def transform(el):
+            el[field] += 1
+        return transform
 
-    def delete(el, field):
-        del el[field]
+    def delete(field):
+        def transform(el):
+            del el[field]
+        return transform
 
     assert db.count(where('int') == 1) == 3
 
-    db.update('int', where('char') == 'a', transform=increment)
-    db.update('char', where('char') == 'a', transform=delete)
+    db.update(increment('int'), where('char') == 'a')
+    db.update(delete('char'), where('char') == 'a')
 
     assert db.count(where('int') == 2) == 1
     assert db.count(where('char') == 'a') == 0
