@@ -132,6 +132,24 @@ def test_update(db):
 
 
 @pytest.mark.parametrize('db', dbs())
+def test_update_transform(db):
+    def increment(el, field):
+        el[field] += 1
+
+    def delete(el, field):
+        del el[field]
+
+    assert db.count(where('int') == 1) == 3
+
+    db.update('int', where('char') == 'a', transform=increment)
+    db.update('char', where('char') == 'a', transform=delete)
+
+    assert db.count(where('int') == 2) == 1
+    assert db.count(where('char') == 'a') == 0
+    assert db.count(where('int') == 1) == 2
+
+
+@pytest.mark.parametrize('db', dbs())
 def test_update_ids(db):
     db.update({'int': 2}, eids=[1, 2])
 
