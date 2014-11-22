@@ -3,11 +3,7 @@ Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
 from tinydb import JSONStorage
-from tinydb.utils import LRUCache, identity
-
-
-def update_fields(el, fields):
-    el.update(fields)
+from tinydb.utils import LRUCache
 
 
 class Element(dict):
@@ -323,7 +319,7 @@ class Table(object):
 
         self.process_elements(lambda data, eid: data.pop(eid), cond, eids)
 
-    def update(self, fields, cond=None, eids=None, transform=update_fields):
+    def update(self, fields, cond=None, eids=None):
         """
         Update all matching elements to have a given set of fields.
 
@@ -474,7 +470,7 @@ class SmartCacheTable(Table):
 
         return eid
 
-    def update(self, fields, cond=None, eids=None, transform=update_fields):
+    def update(self, fields, cond=None, eids=None):
         # See Table.update
 
         def _update(data, eid):

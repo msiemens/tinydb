@@ -6,10 +6,6 @@ from contextlib import contextmanager
 import warnings
 
 
-def identity(x):
-    return x
-
-
 class LRUCache(dict):
     """
     A simple LRU cache.
