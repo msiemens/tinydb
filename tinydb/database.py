@@ -334,7 +334,7 @@ class Table(object):
         if callable(fields):
             _update = lambda data, eid: fields(data[eid])
         else:
-            _updae = lambda data, eid: data[eid].update(fields)
+            _update = lambda data, eid: data[eid].update(fields)
 
         self.process_elements(_update, cond, eids)
 
@@ -476,7 +476,7 @@ class SmartCacheTable(Table):
         if callable(fields):
             _update = lambda data, eid: fields(data[eid])
         else:
-            _updae = lambda data, eid: data[eid].update(fields)
+            _update = lambda data, eid: data[eid].update(fields)
 
         def process(data, eid):
             old_value = data[eid].copy()
