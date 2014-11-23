@@ -330,11 +330,11 @@ class Table(object):
         :param eids: a list of element IDs
         :type eids: list
         """
-        def _update(data, eid):
-            if callable(fields):
-                fields(data[eid])
-            else:
-                data[eid].update(fields)
+
+        if callable(fields):
+            _update = lambda data, eid: fields(data[eid])
+        else:
+            _updae = lambda data, eid: data[eid].update(fields)
 
         self.process_elements(_update, cond, eids)
 
@@ -473,11 +473,10 @@ class SmartCacheTable(Table):
     def update(self, fields, cond=None, eids=None):
         # See Table.update
 
-        def _update(data, eid):
-            if callable(fields):
-                fields(data[eid])
-            else:
-                data[eid].update(fields)
+        if callable(fields):
+            _update = lambda data, eid: fields(data[eid])
+        else:
+            _updae = lambda data, eid: data[eid].update(fields)
 
         def process(data, eid):
             old_value = data[eid].copy()
