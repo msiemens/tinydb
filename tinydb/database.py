@@ -324,6 +324,7 @@ class Table(object):
         Update all matching elements to have a given set of fields.
 
         :param fields: the fields that the matching elements will have
+                       or a method that will update the elements
         :type fields: dict | (dict, int) -> None
         :param cond: which elements to update
         :type cond: query
