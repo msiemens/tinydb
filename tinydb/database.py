@@ -281,15 +281,18 @@ class Table(object):
 
         return list(self._read().values())
 
-    def insert(self, element):
+    def insert(self, element, eid=None):
         """
         Insert a new element into the table.
 
         :param element: the element to insert
+        :param eid: the eid the inserted element is assigned. If already present, 
+        this yields an update of the element
         :returns: the inserted element's ID
         """
 
-        eid = self._get_next_id()
+        if not eid:
+          eid = self._get_next_id()
 
         data = self._read()
         data[eid] = element
@@ -297,15 +300,19 @@ class Table(object):
 
         return eid
 
-    def insert_multiple(self, elements):
+    def insert_multiple(self, elements, eids=None):
         """
         Insert multiple elements into the table.
 
         :param elements: a list of elements to insert
+        :param eids: a list of eids the inserted elements are assigned. If already present, 
+        this yields an update of the element(s)
         :returns: a list containing the inserted elements' IDs
         """
-
-        return [self.insert(element) for element in elements]
+        if eids:
+          return [self.insert(element, eid) for element, eid in zip(elements, eids)]
+        else
+          return [self.insert(element) for element in elements]
 
     def remove(self, cond=None, eids=None):
         """
@@ -452,11 +459,11 @@ class SmartCacheTable(Table):
         # Just write data, don't clear the query cache
         self._db._write(values, self.name)
 
-    def insert(self, element):
+    def insert(self, element, eid=None):
         # See Table.insert
 
         # Insert element
-        eid = super(SmartCacheTable, self).insert(element)
+        eid = super(SmartCacheTable, self).insert(element, eid)
 
         # Update query cache
         for query in self._query_cache:
