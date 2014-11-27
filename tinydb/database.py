@@ -311,7 +311,7 @@ class Table(object):
         """
         if eids:
           return [self.insert(element, eid) for element, eid in zip(elements, eids)]
-        else
+        else:
           return [self.insert(element) for element in elements]
 
     def remove(self, cond=None, eids=None):
