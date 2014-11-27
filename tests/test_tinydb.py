@@ -5,9 +5,14 @@ import sys
 from . conftest import get_db
 
 from tinydb import TinyDB, where
+from tinydb.database import Table, SmartCacheTable
 from tinydb.storages import MemoryStorage
 
-dbs = lambda: [get_db(), get_db(smart_cache=True)]
+def dbs():
+    yield get_db()
+    yield get_db(smart_cache=True)
+
+# dbs = lambda: [get_db(), get_db(smart_cache=True)]
 
 
 @pytest.mark.parametrize('db', dbs())

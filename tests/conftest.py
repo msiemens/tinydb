@@ -1,4 +1,5 @@
 import pytest
+from tinydb.database import SmartCacheTable
 
 from tinydb.middlewares import CachingMiddleware
 from tinydb.storages import MemoryStorage
@@ -10,7 +11,8 @@ def get_db(smart_cache=False):
     db_.purge_tables()
 
     if smart_cache:
-        db_ = db_.table('_default', smart_cache=True)
+        db_.table_class = SmartCacheTable
+        db_ = db_.table('_default')
 
     db_.insert_multiple({'int': 1, 'char': c} for c in 'abc')
     return db_
