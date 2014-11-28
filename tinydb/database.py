@@ -2,6 +2,7 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
+import warnings
 from tinydb import JSONStorage
 from tinydb.utils import LRUCache
 
@@ -63,7 +64,16 @@ class TinyDB(object):
         if name in self._table_cache:
             return self._table_cache[name]
 
-        table_class = SmartCacheTable if smart_cache else Table
+        if smart_cache:
+            warnings.warn('Passing the smart_cache argument is deprecated. '
+                          'Please set the table class to use via '
+                          '`db.table_class = SmartCacheTable` or '
+                          '`TinyDB.table_class = SmartCacheTable` instead.',
+                          DeprecationWarning)
+
+        # If smart_cache is set, use SmartCacheTable to retain backwards
+        # compatibility
+        table_class = SmartCacheTable if smart_cache else self.table_class
         table = table_class(name, self, **options)
 
         self._table_cache[name] = table
@@ -521,3 +531,7 @@ class SmartCacheTable(Table):
 
         super(SmartCacheTable, self).purge()
         self._query_cache.clear()  # Query cache got invalid
+
+
+# Set the default table class
+TinyDB.table_class = Table

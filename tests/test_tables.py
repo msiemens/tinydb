@@ -1,4 +1,8 @@
-from tinydb import where
+from warnings import catch_warnings
+import pytest
+from tinydb.utils import catch_warning
+from tinydb import where, TinyDB
+from tinydb.database import SmartCacheTable, Table
 
 
 def test_tables_list(db):
@@ -57,7 +61,8 @@ def test_query_cache_size(db):
 
 
 def test_smart_query_cache(db):
-    table = db.table('table3', smart_cache=True)
+    db.table_class = SmartCacheTable
+    table = db.table('table3')
     query = where('int') == 1
     dummy = where('int') == 2
 
@@ -81,6 +86,29 @@ def test_smart_query_cache(db):
     table.remove(where('int') == 1)
 
     assert table.count(where('int') == 1) == 0
+
+
+def test_smart_query_cache_via_kwarg(db):
+    # For backwards compatibility
+    with pytest.raises(DeprecationWarning):
+        with catch_warning(DeprecationWarning):
+            table = db.table('table3', smart_cache=True)
+            assert isinstance(table, SmartCacheTable)
+
+
+def test_custom_table_class_via_class_attribute(db):
+    TinyDB.table_class = SmartCacheTable
+
+    table = db.table('table3')
+    assert isinstance(table, SmartCacheTable)
+
+    TinyDB.table_class = Table
+
+
+def test_custom_table_class_via_instance_attribute(db):
+    db.table_class = SmartCacheTable
+    table = db.table('table3')
+    assert isinstance(table, SmartCacheTable)
 
 
 def test_lru_cache(db):
