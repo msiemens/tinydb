@@ -35,11 +35,11 @@ implementation. TinyDB will auto-detect and use it if possible.
 Handling Data
 -------------
 
-With that out of the way, let's start with inserting and retrieving data from
-your database.
+With that out of the way, let's start with inserting, updating and retrieving
+data from your database.
 
-Inserting
-.........
+Inserting data
+..............
 
 As already described you can insert an element using ``db.insert(...)``.
 In case you want to insert multiple elements, you can use ``db.insert_multiple(...)``:
@@ -47,8 +47,36 @@ In case you want to insert multiple elements, you can use ``db.insert_multiple(.
 >>> db.insert_multiple([{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}])
 >>> db.insert_multiple({'int': 1, 'value': i} for i in range(2))
 
-Retrieving
-..........
+Updating data
+.............
+
+``db.update(fields, query)`` only allows you to update an element by adding
+or overwriting it's values. But sometimes you may need to e.g. remove one field
+or increment it's value. In that case you can pass a function instead of
+``fields``:
+
+>>> from tinydb.operations import delete
+>>> db.update(delete('key1'), where('key') == 'value')
+
+This will remove the key ``key1`` from all matching elements. TinyDB comes
+with these operations:
+
+- ``delete(key)``: delete a key from the element
+- ``increment(key)``: incremenet the value of a key
+- ``decrement(key)``: decremenet the value of a key
+
+Of course you also can write your own operations:
+
+>>> def your_operation(your_arguments):
+...     def transform(element):
+...         # do something with the element
+...         # ...
+...     return transform
+...
+>>> db.update(your_operation(arguments), query)
+
+Retrieving data
+...............
 
 There are several ways to retrieve data from your database. For instance you
 can get the number of stored elements:
@@ -93,11 +121,15 @@ Recap
 Let's summarize the ways to handle data:
 
 +-------------------------------+---------------------------------------------------------------+
-| **Inserting**                                                                                 |
+| **Inserting data**                                                                            |
 +-------------------------------+---------------------------------------------------------------+
 | ``db.insert_multiple(...)``   | Insert multiple elements                                      |
 +-------------------------------+---------------------------------------------------------------+
-| **Getting data**                                                                              |
+| **Updatingg data**                                                                            |
++-------------------------------+---------------------------------------------------------------+
+| ``db.update(operation, ...)`` | Update all matching elements with a special operation         |
++-------------------------------+---------------------------------------------------------------+
+| **Retrieving data**                                                                           |
 +-------------------------------+---------------------------------------------------------------+
 | ``len(db)``                   | Get the number of elements in the database                    |
 +-------------------------------+---------------------------------------------------------------+
