@@ -291,18 +291,15 @@ class Table(object):
 
         return list(self._read().values())
 
-    def insert(self, element, eid=None):
+    def insert(self, element):
         """
         Insert a new element into the table.
 
         :param element: the element to insert
-        :param eid: the eid the inserted element is assigned. If already present, 
-        this yields an update of the element
         :returns: the inserted element's ID
         """
 
-        if not eid:
-          eid = self._get_next_id()
+        eid = self._get_next_id()
 
         data = self._read()
         data[eid] = element
@@ -310,19 +307,15 @@ class Table(object):
 
         return eid
 
-    def insert_multiple(self, elements, eids=None):
+    def insert_multiple(self, elements):
         """
         Insert multiple elements into the table.
 
         :param elements: a list of elements to insert
-        :param eids: a list of eids the inserted elements are assigned. If already present, 
-        this yields an update of the element(s)
         :returns: a list containing the inserted elements' IDs
         """
-        if eids:
-          return [self.insert(element, eid) for element, eid in zip(elements, eids)]
-        else:
-          return [self.insert(element) for element in elements]
+
+        return [self.insert(element) for element in elements]
 
     def remove(self, cond=None, eids=None):
         """
@@ -459,7 +452,46 @@ class Table(object):
 
     close = __exit__
 
+class IndexTable(Table):
+    """
+    A Table with custom identificators (eids).
 
+    Provides the same methods as :class:`~tinydb.database.Table`.
+    """
+    
+    def insert(self, element, eid=None):
+        """
+        Insert a new element into the table.
+
+        :param element: the element to insert
+        :param eid: the eid the inserted element is assigned. If already present, 
+        this yields an update of the element
+        :returns: the inserted element's ID
+        """
+
+        if not eid:
+          eid = self._get_next_id()
+
+        data = self._read()
+        data[eid] = element
+        self._write(data)
+
+        return eid
+
+    def insert_multiple(self, elements, eids=None):
+        """
+        Insert multiple elements into the table.
+
+        :param elements: a list of elements to insert
+        :param eids: a list of eids the inserted elements are assigned. If already present, 
+        this yields an update of the element(s)
+        :returns: a list containing the inserted elements' IDs
+        """
+        if eids:
+          return [self.insert(element, eid) for element, eid in zip(elements, eids)]
+        else:
+          return [self.insert(element) for element in elements]
+  
 class SmartCacheTable(Table):
     """
     A Table with a smarter query cache.
