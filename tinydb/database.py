@@ -506,11 +506,11 @@ class SmartCacheTable(Table):
         # Just write data, don't clear the query cache
         self._db._write(values, self.name)
 
-    def insert(self, element, eid=None):
+    def insert(self, element):
         # See Table.insert
 
         # Insert element
-        eid = super(SmartCacheTable, self).insert(element, eid)
+        eid = super(SmartCacheTable, self).insert(element)
 
         # Update query cache
         for query in self._query_cache:
