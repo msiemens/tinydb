@@ -259,9 +259,9 @@ class Table(object):
 
         raw_data = self._db._read(self.name)
         data = {}
-        for key, value in raw_data.iteritems():
+        for key in list(raw_data):
             eid = int(key)
-            data[eid] = Element(value, eid)
+            data[eid] = Element(raw_data[key], eid)
 
         return data
 
