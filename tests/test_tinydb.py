@@ -337,3 +337,34 @@ def test_unicode_json(tmpdir):
         assert _db.contains(where('value') == unic_str1)
         assert _db.contains(where('value') == byte_str2)
         assert _db.contains(where('value') == unic_str2)
+
+
+def test_eids_json(tmpdir):
+    """
+    Regression test for issue #45
+    """
+    
+    path = str(tmpdir.join('db.json'))
+
+    with TinyDB(path) as _db:
+        _db.purge()
+        assert _db.insert({'int': 1, 'char': 'a'}) == 1
+        assert _db.insert({'int': 1, 'char': 'a'}) == 2
+        
+        _db.purge()
+        assert _db.insert_multiple([{'int': 1, 'char': 'a'},
+                                   {'int': 1, 'char': 'b'},
+                                   {'int': 1, 'char': 'c'}]) == [1, 2, 3]
+        
+        assert _db.contains(eids=[1, 2])
+        assert not _db.contains(eids=[88])
+        
+        _db.update({'int': 2}, eids=[1, 2])
+        assert _db.count(where('int') == 2) == 2
+       
+        el = _db.all()[0]
+        assert _db.get(eid=el.eid) == el
+        assert _db.get(eid=float('NaN')) is None
+
+        _db.remove(eids=[1, 2])
+        assert len(_db) == 1
