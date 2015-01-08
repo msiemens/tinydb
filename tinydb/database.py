@@ -199,7 +199,7 @@ class Table(object):
 
         old_ids = self._read().keys()
         if old_ids:
-            self._last_id = max(int(i, 10) for i in old_ids)
+            self._last_id = max(i for i in old_ids)
         else:
             self._last_id = 0
 
@@ -257,10 +257,11 @@ class Table(object):
         :rtype: dict
         """
 
-        data = self._db._read(self.name)
-
-        for eid in list(data):
-            data[eid] = Element(data[eid], eid)
+        raw_data = self._db._read(self.name)
+        data = {}
+        for key in list(raw_data):
+            eid = int(key)
+            data[eid] = Element(raw_data[key], eid)
 
         return data
 
