@@ -138,6 +138,12 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v2.2.1** (2015-01-09)
+=======================
+
+- Fixed handling of IDs with the JSON backend that converted integers
+  to strings (see `issue #45 <https://github.com/msiemens/tinydb/issues/45>`_)
+
 **v2.2.0** (2014-11-10)
 =======================
 
