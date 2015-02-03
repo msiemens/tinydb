@@ -90,3 +90,9 @@ def test_caching_json_write(tmpdir):
 
     # Assert JSON file has been closed
     assert db._storage._handle.closed
+
+    del db
+
+    # Repoen database
+    db = TinyDB(path, storage=CachingMiddleware(JSONStorage))
+    assert db.all() == [{'key': 'value'}]

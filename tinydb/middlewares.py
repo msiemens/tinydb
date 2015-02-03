@@ -95,7 +95,7 @@ class CachingMiddleware(Middleware):
 
     def read(self):
         if self.cache is None:
-            raise ValueError
+            self.cache = self.storage.read()
         return self.cache
 
     def write(self, data):
