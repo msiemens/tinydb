@@ -4,7 +4,7 @@ from codecs import open
 
 setup(
     name="tinydb",
-    version="2.2.1",
+    version="2.2.2",
     packages=find_packages(),
 
     # development metadata
