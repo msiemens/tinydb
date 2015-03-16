@@ -99,14 +99,7 @@ def with_metaclass(meta, *bases):
 
 @contextmanager
 def catch_warning(warning_cls):
-    warning_filter = [f for f in warnings.filters if f[2] == warning_cls]
-    warnings.filterwarnings(action="error", category=warning_cls)
+    with warnings.catch_warnings(record=True) as w:
+        warnings.filterwarnings('error')
 
-    try:
-        yield  # Run user code
-
-    finally:
-        if warning_filter:
-            # Reset original filter
-            warnings.filterwarnings(action=warning_filter[0][0],
-                                    category=warning_cls)
+        yield
