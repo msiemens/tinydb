@@ -43,6 +43,7 @@ class TinyDB(object):
         storage = kwargs.pop('storage', JSONStorage)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
+        self._serializers = []
 
         self._table_cache = {}
         self._table = self.table('_default')
@@ -101,6 +102,19 @@ class TinyDB(object):
         self._write({})
         self._table_cache.clear()
 
+    def register_serializer(self, serializer):
+        """
+        Register a new Serializer.
+
+        When reading from/writing to the underlying storage, TinyDB
+        will run all objects through the list of registered serializers
+        allowing each one to handle objects it recognizes.
+
+        :param serializer: an instance of the serializer
+        :type serializer: tinydb.serialize.Serializer
+        """
+        self._serializers.append(serializer)
+
     def _read(self):
         """
         Reading access to the backend.
@@ -123,7 +137,22 @@ class TinyDB(object):
         """
 
         try:
-            return self._read()[table]
+            data = self._read()[table]
+
+            # Run deserialization
+            for serializer in self._serializers:
+                tag = '{{{}}}:'.format(serializer.NAME)
+
+                for eid in data:
+                    for field in data[eid]:
+                        try:
+                            if data[eid][field].startswith(tag):
+                                encoded = data[eid][field][len(tag):]
+                                data[eid][field] = serializer.decode(encoded)
+                        except AttributeError:
+                            pass  # Not a string
+
+            return data
         except (KeyError, TypeError):
             return {}
 
@@ -152,8 +181,18 @@ class TinyDB(object):
         data = self._read()
         data[table] = values
 
+        # Run serialization
+        for serializer in self._serializers:
+            for eid in data:
+                for field in data[eid]:
+                    if isinstance(data[eid][field], serializer.OBJ_CLASS):
+                        data[eid][field] = '{{{}}}:{}'.format(
+                            serializer.NAME,
+                            serializer.encode(data[eid][field])
+                        )
+
+        # Finally, store the data
         self._write(data)
-        return
 
     # Methods that are executed on the default table
     # Because magic methods are not handlet by __getattr__ we need to forward
