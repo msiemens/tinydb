@@ -164,10 +164,12 @@ class Query(AndOrMixin):
         :param cond: The condition to check
         :rtype: tinydb.queries.Query
         """
+
         # Check for condition type
         if callable(cond):
             def _cmp(value):
                 return is_sequence(value) and any(cond(e) for e in value)
+
         else:
             def _cmp(value):
                 return is_sequence(value) and any(e in cond for e in value)
@@ -199,10 +201,12 @@ class Query(AndOrMixin):
         :param cond: The condition to check
         :rtype: tinydb.queries.Query
         """
+
         # Check for condition type
         if callable(cond):
             def _cmp(value):
                 return is_sequence(value) and all(cond(e) for e in value)
+
         else:
             def _cmp(value):
                 return is_sequence(value) and all(e in value for e in cond)
@@ -460,7 +464,7 @@ class QueryRegex(AndOrMixin):
     def __init__(self, key, regex, re_method):
         self.regex = regex
         self._key = key
-        self.re_method = re_method
+        self._re_method = re_method
 
     def __call__(self, element):
         """
@@ -470,14 +474,14 @@ class QueryRegex(AndOrMixin):
         if self._key not in element:
             return False
 
-        if self.re_method == 'match':
+        if self._re_method == 'match':
             return re.match(self.regex, element[self._key])
 
-        if self.re_method == 'search':
+        if self._re_method == 'search':
             return re.search(self.regex, element[self._key])
 
     def __repr__(self):
-        return '\'{0}\' {1} /{2}/'.format(self._key, self.re_method,
+        return '\'{0}\' {1} /{2}/'.format(self._key, self._re_method,
                                           self.regex)
 
     def __hash__(self):
@@ -493,20 +497,20 @@ class QueryCustom(AndOrMixin):
 
     def __init__(self, key, test):
         self.test = test
-        self._key = key
+        self.key = key
 
     def __call__(self, element):
         """
         See :meth:`.Query.__call__`.
         """
 
-        if self._key not in element:
+        if self.key not in element:
             return False
 
-        return self.test(element[self._key])
+        return self.test(element[self.key])
 
     def __repr__(self):
-        return '\'{0}\'.test({1})'.format(self._key, self.test)
+        return '\'{0}\'.test({1})'.format(self.key, self.test)
 
 
 class QueryHas(Query):

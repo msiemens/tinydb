@@ -1,8 +1,7 @@
-import os
-import tempfile
 import random
+
 import pytest
-from tinydb.database import TinyDB
+
 
 random.seed()
 

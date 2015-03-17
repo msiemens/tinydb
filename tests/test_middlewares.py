@@ -5,6 +5,7 @@ from tinydb.middlewares import CachingMiddleware
 from tinydb.storages import MemoryStorage, JSONStorage
 
 if 'xrange' not in dir(__builtins__):
+    # noinspection PyShadowingBuiltins
     xrange = range  # Python 3 support
 
 

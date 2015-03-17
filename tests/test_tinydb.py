@@ -1,12 +1,12 @@
 # coding=utf-8
-import pytest
 import sys
 
-from . conftest import get_db
+import pytest
 
+from . conftest import get_db
 from tinydb import TinyDB, where
-from tinydb.database import Table, SmartCacheTable
 from tinydb.storages import MemoryStorage
+
 
 def dbs():
     yield get_db()
@@ -277,8 +277,8 @@ def test_lastid_after_open(tmpdir):
     :type tmpdir: py._path.local.LocalPath
     """
 
-    path = str(tmpdir.join('db.json'))
     NUM = 100
+    path = str(tmpdir.join('db.json'))
 
     with TinyDB(path) as _db:
         _db.insert_multiple({'i': i} for i in range(NUM))
@@ -343,25 +343,25 @@ def test_eids_json(tmpdir):
     """
     Regression test for issue #45
     """
-    
+
     path = str(tmpdir.join('db.json'))
 
     with TinyDB(path) as _db:
         _db.purge()
         assert _db.insert({'int': 1, 'char': 'a'}) == 1
         assert _db.insert({'int': 1, 'char': 'a'}) == 2
-        
+
         _db.purge()
         assert _db.insert_multiple([{'int': 1, 'char': 'a'},
                                    {'int': 1, 'char': 'b'},
                                    {'int': 1, 'char': 'c'}]) == [1, 2, 3]
-        
+
         assert _db.contains(eids=[1, 2])
         assert not _db.contains(eids=[88])
-        
+
         _db.update({'int': 2}, eids=[1, 2])
         assert _db.count(where('int') == 2) == 2
-       
+
         el = _db.all()[0]
         assert _db.get(eid=el.eid) == el
         assert _db.get(eid=float('NaN')) is None

@@ -79,7 +79,7 @@ class TinyDB(object):
         self._table_cache[name] = table
 
         if name not in self._read():
-            self._write({}, name)
+            self._write_table({}, name)
 
         return table
 
@@ -90,60 +90,70 @@ class TinyDB(object):
         :returns: a set of table names
         :rtype: set[str]
         """
+
         return set(self._read().keys())
 
     def purge_tables(self):
         """
         Purge all tables from the database. **CANNOT BE REVERSED!**
         """
+
         self._write({})
         self._table_cache.clear()
 
-    def _read(self, table=None):
+    def _read(self):
         """
         Reading access to the backend.
 
-        :param table: The table, we want to read, or None to read the 'all
-        tables' dict.
-        :type table: str or None
-        :returns: all values
+        :returns: all tables
         :rtype: dict
         """
 
-        if table is not None:
-            # Read specific table
-            try:
-                return self._read()[table]
-            except (KeyError, TypeError):
-                return {}
-
-        # Read all tables
         try:
             return self._storage.read()
         except ValueError:
             return {}
 
-    def _write(self, values, table=None):
+    def _read_table(self, table):
+        """
+        Read a table from the backend.
+
+        :param table: The name of the table to read
+        :return: dict
+        """
+
+        try:
+            return self._read()[table]
+        except (KeyError, TypeError):
+            return {}
+
+    def _write(self, tables):
         """
         Writing access to the backend.
 
-        :param table: The table, we want to write, or None to write the 'all
-        tables' dict.
-        :type table: str or None
-        :param values: the new values to write
-        :type values: list | dict
+        :param tables: The new tables to write
+        :type tables: dict
         """
 
-        if table is not None:
-            # Write specific table
-            data = self._read()
-            data[table] = values
-
-            self._write(data)
-            return
-
         # Write all tables
-        self._storage.write(values)
+        self._storage.write(tables)
+
+    def _write_table(self, values, table):
+        """
+        Write data for a table.
+
+        :param values: The values contained in the table
+        :type values: dict
+        :param table: The name of the table to write
+        :type table: str
+        """
+
+        # Write specific table
+        data = self._read()
+        data[table] = values
+
+        self._write(data)
+        return
 
     # Methods that are executed on the default table
     # Because magic methods are not handlet by __getattr__ we need to forward
@@ -153,6 +163,7 @@ class TinyDB(object):
         """
         Get the total number of elements in the DB.
 
+        >>> db = TinyDB('db.json')
         >>> len(db)
         0
         """
@@ -257,7 +268,7 @@ class Table(object):
         :rtype: dict
         """
 
-        raw_data = self._db._read(self.name)
+        raw_data = self._db._read_table(self.name)
         data = {}
         for key in list(raw_data):
             eid = int(key)
@@ -274,7 +285,7 @@ class Table(object):
         """
 
         self._query_cache.clear()
-        self._db._write(values, self.name)
+        self._db._write_table(values, self.name)
 
     def __len__(self):
         """
@@ -316,7 +327,18 @@ class Table(object):
         :returns: a list containing the inserted elements' IDs
         """
 
-        return [self.insert(element) for element in elements]
+        eids = []
+        data = self._read()
+
+        for element in elements:
+            eid = self._get_next_id()
+            eids.append(eid)
+
+            data[eid] = element
+
+        self._write(data)
+
+        return eids
 
     def remove(self, cond=None, eids=None):
         """
@@ -372,7 +394,7 @@ class Table(object):
         if cond in self._query_cache:
             return self._query_cache[cond]
 
-        elements = [e for e in self.all() if cond(e)]
+        elements = [element for element in self.all() if cond(element)]
         self._query_cache[cond] = elements
 
         return elements
@@ -400,9 +422,9 @@ class Table(object):
             return self._read().get(eid, None)
 
         # Element specified by condition
-        elements = self.search(cond)
-        if elements:
-            return elements[0]
+        for element in self.all():
+            if cond(element):
+                return element
 
     def count(self, cond):
         """
@@ -432,7 +454,7 @@ class Table(object):
             return any(self.get(eid=eid) for eid in eids)
 
         # Element specified by condition
-        return self.count(cond) > 0
+        return self.get(cond) is not None
 
     def __enter__(self):
         """
@@ -466,7 +488,7 @@ class SmartCacheTable(Table):
 
     def _write(self, values):
         # Just write data, don't clear the query cache
-        self._db._write(values, self.name)
+        self._db._write_table(values, self.name)
 
     def insert(self, element):
         # See Table.insert
@@ -481,6 +503,13 @@ class SmartCacheTable(Table):
                 results.append(element)
 
         return eid
+
+    def insert_multiple(self, elements):
+        # See Table.insert_multiple
+
+        # We have to call `SmartCacheTable.insert` here because
+        # `Table.insert_multiple` doesn't call `insert()` for every element
+        return [self.insert(element) for element in elements]
 
     def update(self, fields, cond=None, eids=None):
         # See Table.update
@@ -500,6 +529,7 @@ class SmartCacheTable(Table):
             # Update query cache
             for query in self._query_cache:
                 results = self._query_cache[query]
+
                 if query(old_value):
                     # Remove old value from cache
                     results.remove(old_value)
@@ -516,6 +546,7 @@ class SmartCacheTable(Table):
         def process(data, eid):
             # Update query cache
             for query in self._query_cache:
+
                 results = self._query_cache[query]
                 try:
                     results.remove(data[eid])
