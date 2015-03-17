@@ -74,9 +74,13 @@ def test_catch_warning():
     class MyWarning(Warning):
         pass
 
+    filters = warnings.filters[:]
+
     with pytest.raises(MyWarning):
         with catch_warning(MyWarning):
             warnings.warn("message", MyWarning)
+
+    assert filters == warnings.filters
 
 
 def test_catch_warning_reset_filter():

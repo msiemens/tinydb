@@ -100,6 +100,6 @@ def with_metaclass(meta, *bases):
 @contextmanager
 def catch_warning(warning_cls):
     with warnings.catch_warnings(record=True) as w:
-        warnings.filterwarnings('error')
+        warnings.filterwarnings('error', category=warning_cls)
 
         yield

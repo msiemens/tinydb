@@ -1,4 +1,3 @@
-from warnings import catch_warnings
 import pytest
 from tinydb.utils import catch_warning
 from tinydb import where, TinyDB
