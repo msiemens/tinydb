@@ -7,7 +7,7 @@ Extensions
 **************
 
 | **Repo:**        https://github.com/eugene-eeo/tinyrecord
-| **Status:**      *experimental*
+| **Status:**      *stable*
 | **Description:** Tinyrecord is a library which implements experimental atomic
                    transaction support for the TinyDB NoSQL database. It uses a
                    record-first then execute architecture which allows us to
