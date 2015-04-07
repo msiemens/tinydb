@@ -137,24 +137,30 @@ class TinyDB(object):
         """
 
         try:
-            data = self._read()[table]
-
-            # Run deserialization
-            for serializer in self._serializers:
-                tag = '{{{}}}:'.format(serializer.NAME)
-
-                for eid in data:
-                    for field in data[eid]:
-                        try:
-                            if data[eid][field].startswith(tag):
-                                encoded = data[eid][field][len(tag):]
-                                data[eid][field] = serializer.decode(encoded)
-                        except AttributeError:
-                            pass  # Not a string
-
-            return data
+            return self._deserialize(self._read()[table])
         except (KeyError, TypeError):
             return {}
+
+    def _deserialize(self, data):
+        """
+        Deserialize the data passed in with all registered serializers
+
+        :param data: the data set to deserialize
+        :return: the data set with deserialized values as needed
+        """
+        for serializer in self._serializers:
+            tag = '{{{}}}:'.format(serializer.NAME)  # E.g: '{TinyDate}:'
+
+            for eid in data:
+                for field in data[eid]:
+                    try:
+                        if data[eid][field].startswith(tag):
+                            encoded = data[eid][field][len(tag):]
+                            data[eid][field] = serializer.decode(encoded)
+                    except AttributeError:
+                        pass  # Not a string
+
+        return data
 
     def _write(self, tables):
         """
@@ -181,18 +187,36 @@ class TinyDB(object):
         data = self._read()
         data[table] = values
 
-        # Run serialization
+        # Finally, serialize & store the data
+        self._write(self._serialize(data))
+
+    def _serialize(self, data):
+        """
+        Serialize the data passed in with all registered serializers
+
+        :param data: the data set to serialize
+        :return: the data set with serialized values as needed
+        """
+
         for serializer in self._serializers:
+            # If no serializers are registered, this code will just look up
+            # the serializer list and continue. But if there are serializers,
+            # the inner loop will run very often.
+            # For that reason, the lookup of the name and class are pulled
+            # out into the outer loop:
+
+            serializer_name = serializer.NAME
+            serializer_class = serializer.OBJ_CLASS
+
             for eid in data:
                 for field in data[eid]:
-                    if isinstance(data[eid][field], serializer.OBJ_CLASS):
-                        data[eid][field] = '{{{}}}:{}'.format(
-                            serializer.NAME,
-                            serializer.encode(data[eid][field])
-                        )
+                    if isinstance(data[eid][field], serializer_class):
+                        encoded = serializer.encode(data[eid][field])
+                        tagged = '{{{}}}:{}'.format(serializer_name, encoded)
 
-        # Finally, store the data
-        self._write(data)
+                        data[eid][field] = tagged
+
+        return data
 
     # Methods that are executed on the default table
     # Because magic methods are not handlet by __getattr__ we need to forward
