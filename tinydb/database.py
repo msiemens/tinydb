@@ -30,6 +30,8 @@ class TinyDB(object):
     and getting tables.
     """
 
+    DEFAULT_STORAGE = JSONStorage
+
     def __init__(self, *args, **kwargs):
         """
         Create a new instance of TinyDB.
@@ -40,7 +42,7 @@ class TinyDB(object):
         :param storage: The class of the storage to use. Will be initialized
                         with ``args`` and ``kwargs``.
         """
-        storage = kwargs.pop('storage', JSONStorage)
+        storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
 
@@ -153,7 +155,6 @@ class TinyDB(object):
         data[table] = values
 
         self._write(data)
-        return
 
     # Methods that are executed on the default table
     # Because magic methods are not handlet by __getattr__ we need to forward
