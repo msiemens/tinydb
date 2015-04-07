@@ -10,9 +10,10 @@ small apps that would be blown away by a SQL-DB or an external database server.
 
 TinyDB is:
 
-- **tiny:** The current source code has 1200 lines of code (with about 40% documentation) and 600 lines tests.
-  For comparison: Buzhug_ has about 2000 lines of
-  code (w/o tests), CodernityDB_ has about 8000 lines of code (w/o tests).
+- **tiny:** The current source code has 1800 lines of code (with about 40%
+  documentation) and 1100 lines tests. For comparison: Buzhug_ has about 2500
+  lines of code (w/o tests), CodernityDB_ has about 7000 lines of code
+  (w/o tests).
 
 - **document oriented:** Like MongoDB_, you can store any document
   (represented as ``dict``) in TinyDB.
@@ -27,12 +28,12 @@ TinyDB is:
 - **works on Python 2.6 – 3.4 and PyPy:** TinyDB works on all
   modern versions of Python and PyPy.
 
-- **easily extensible:** You can easily extend TinyDB by writing new
-  storages or modify the behaviour of storages with Middlewares.
+- **powerfully extensible:** You can easily extend TinyDB by writing new
+  storages or modify the behaviour of storages with Middlewares. This includes
+  custom serialization of objects, which the used storage can't handle (e.g.
+  for storing `datetime` objects in a JSON file).
 
-- **nearly 100% test coverage:** If you don't count that ``__repr__``
-  methods and some abstract methods are not tested, TinyDB has a test
-  coverage of 100%.
+- **100% test coverage:** No explanation needed.
 
 
 Example Code
@@ -142,7 +143,7 @@ Changelog
 =======================
 
 - Fixed a data loss when using ``CachingMiddleware`` together with ``JSONStorage``
-  (see `issue #45 <https://github.com/msiemens/tinydb/issues/47>`_)
+  (see `issue #47 <https://github.com/msiemens/tinydb/issues/47>`_)
 
 **v2.2.1** (2015-01-09)
 =======================
