@@ -159,14 +159,20 @@ class SerializationMiddleware(Middleware):
             serializer = self._serializers[serializer_name]
             tag = '{{{}}}:'.format(serializer_name)  # E.g: '{TinyDate}:'
 
-            for eid in data:
-                for field in data[eid]:
-                    try:
-                        if data[eid][field].startswith(tag):
-                            encoded = data[eid][field][len(tag):]
-                            data[eid][field] = serializer.decode(encoded)
-                    except AttributeError:
-                        pass  # Not a string
+            for table_name in data:
+                table = data[table_name]
+
+                for eid in table:
+                    item = data[table_name][eid]
+
+                    for field in item:
+                        try:
+                            if item[field].startswith(tag):
+                                print('Okay!')
+                                encoded = item[field][len(tag):]
+                                item[field] = serializer.decode(encoded)
+                        except AttributeError:
+                            pass  # Not a string
 
         return data
 
@@ -181,12 +187,18 @@ class SerializationMiddleware(Middleware):
             serializer = self._serializers[serializer_name]
             serializer_class = serializer.OBJ_CLASS
 
-            for eid in data:
-                for field in data[eid]:
-                    if isinstance(data[eid][field], serializer_class):
-                        encoded = serializer.encode(data[eid][field])
-                        tagged = '{{{}}}:{}'.format(serializer_name, encoded)
+            for table_name in data:
+                table = data[table_name]
 
-                        data[eid][field] = tagged
+                for eid in table:
+                    item = data[table_name][eid]
+
+                    for field in item:
+                        if isinstance(item[field], serializer_class):
+                            encoded = serializer.encode(item[field])
+                            tagged = '{{{}}}:{}'.format(serializer_name,
+                                                        encoded)
+
+                            item[field] = tagged
 
         self.storage.write(data)

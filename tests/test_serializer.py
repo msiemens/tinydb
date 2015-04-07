@@ -3,7 +3,7 @@ from datetime import datetime
 from tinydb import TinyDB, where
 from tinydb.middlewares import SerializationMiddleware
 from tinydb.serialize import Serializer
-from tinydb.storages import MemoryStorage
+from tinydb.storages import JSONStorage
 
 
 class DateTimeSerializer(Serializer):
@@ -17,10 +17,12 @@ class DateTimeSerializer(Serializer):
         return datetime.strptime(s, self.FORMAT)
 
 
-def test_serializer():
-    serializer = SerializationMiddleware(MemoryStorage)
+def test_serializer(tmpdir):
+    path = str(tmpdir.join('db.json'))
+
+    serializer = SerializationMiddleware(JSONStorage)
     serializer.register_serializer(DateTimeSerializer(), 'TinyDate')
-    db = TinyDB(storage=serializer)
+    db = TinyDB(path, storage=serializer)
 
     date = datetime(2000, 1, 1, 12, 0, 0)
 
