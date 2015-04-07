@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
-from tinydb.utils import with_metaclass, AbstractAttribute
+from tinydb.utils import with_metaclass
 
 
 class Serializer(with_metaclass(ABCMeta, object)):
