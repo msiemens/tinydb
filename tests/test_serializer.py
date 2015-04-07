@@ -27,4 +27,6 @@ def test_serializer(tmpdir):
     date = datetime(2000, 1, 1, 12, 0, 0)
 
     db.insert({'date': date})
+    db.insert({'int': 2})
     assert db.count(where('date') == date) == 1
+    assert db.count(where('int') == 2) == 1
