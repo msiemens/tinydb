@@ -43,7 +43,7 @@ class TinyDB(object):
         storage = kwargs.pop('storage', JSONStorage)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
-        self._serializers = []
+        self._serializers = {}
 
         self._table_cache = {}
         self._table = self.table('_default')
@@ -102,7 +102,7 @@ class TinyDB(object):
         self._write({})
         self._table_cache.clear()
 
-    def register_serializer(self, serializer):
+    def register_serializer(self, serializer, name):
         """
         Register a new Serializer.
 
@@ -110,10 +110,15 @@ class TinyDB(object):
         will run all objects through the list of registered serializers
         allowing each one to handle objects it recognizes.
 
+        .. note:: The name has to be unique among this database instance.
+                  Re-using the same name will overwrite the old serializer.
+                  Also, registering a serializer will be reflected in all
+                  tables when reading/writing them.
+
         :param serializer: an instance of the serializer
         :type serializer: tinydb.serialize.Serializer
         """
-        self._serializers.append(serializer)
+        self._serializers[name] = serializer
 
     def _read(self):
         """
@@ -148,8 +153,9 @@ class TinyDB(object):
         :param data: the data set to deserialize
         :return: the data set with deserialized values as needed
         """
-        for serializer in self._serializers:
-            tag = '{{{}}}:'.format(serializer.NAME)  # E.g: '{TinyDate}:'
+        for serializer_name in self._serializers:
+            serializer = self._serializers[serializer_name]
+            tag = '{{{}}}:'.format(serializer_name)  # E.g: '{TinyDate}:'
 
             for eid in data:
                 for field in data[eid]:
@@ -198,14 +204,14 @@ class TinyDB(object):
         :return: the data set with serialized values as needed
         """
 
-        for serializer in self._serializers:
+        for serializer_name in self._serializers:
             # If no serializers are registered, this code will just look up
             # the serializer list and continue. But if there are serializers,
             # the inner loop will run very often.
-            # For that reason, the lookup of the name and class are pulled
+            # For that reason, the lookup of the serialized class is pulled
             # out into the outer loop:
 
-            serializer_name = serializer.NAME
+            serializer = self._serializers[serializer_name]
             serializer_class = serializer.OBJ_CLASS
 
             for eid in data:

@@ -14,7 +14,6 @@ for ``datetime`` objects could look like:
     from datetime import datetime
 
     class DateTimeSerializer(Serializer):
-        NAME = 'TinyDate'  # A unique name
         OBJ_CLASS = datetime  # The class this serializer handles
 
         def encode(self, obj):
@@ -28,7 +27,7 @@ We can use this Serializer like this:
 .. code-block:: python
 
     >>> db = TinyDB('db.json')
-    >>> db.register_serializer(DateTimeSerializer())
+    >>> db.register_serializer(DateTimeSerializer(), 'TinyDate')
     >>> db.insert({'date': datetime(2000, 1, 1, 12, 0, 0)})
     >>> db.all()
     [{'date': datetime.datetime(2000, 1, 1, 12, 0)}]
