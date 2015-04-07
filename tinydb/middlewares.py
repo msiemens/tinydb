@@ -157,7 +157,7 @@ class SerializationMiddleware(Middleware):
 
         for serializer_name in self._serializers:
             serializer = self._serializers[serializer_name]
-            tag = '{{{}}}:'.format(serializer_name)  # E.g: '{TinyDate}:'
+            tag = '{{{0}}}:'.format(serializer_name)  # E.g: '{TinyDate}:'
 
             for table_name in data:
                 table = data[table_name]
@@ -196,8 +196,8 @@ class SerializationMiddleware(Middleware):
                     for field in item:
                         if isinstance(item[field], serializer_class):
                             encoded = serializer.encode(item[field])
-                            tagged = '{{{}}}:{}'.format(serializer_name,
-                                                        encoded)
+                            tagged = '{{{0}}}:{1}'.format(serializer_name,
+                                                          encoded)
 
                             item[field] = tagged
 
