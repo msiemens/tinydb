@@ -22,12 +22,17 @@ for ``datetime`` objects could look like:
         def decode(self, s):
             return datetime.strptime(s, '%Y-%m-%dT%H:%M:%S')
 
-We can use this Serializer like this:
+To use the new serializer, we need to use the serialization middleware:
 
 .. code-block:: python
 
-    >>> db = TinyDB('db.json')
-    >>> db.register_serializer(DateTimeSerializer(), 'TinyDate')
+    >>> from tinydb.storages import JSONStorage
+    >>> from tinydb.middlewares import SerializationMiddleware
+    >>>
+    >>> serialization = SerializationMiddleware()
+    >>> serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
+    >>>
+    >>> db = TinyDB('db.json', storage=serialization)
     >>> db.insert({'date': datetime(2000, 1, 1, 12, 0, 0)})
     >>> db.all()
     [{'date': datetime.datetime(2000, 1, 1, 12, 0)}]

@@ -2,6 +2,8 @@
 Contains the :class:`base class <tinydb.middlewares.Middleware>` for
 middlewares and implementations.
 """
+from tinydb import TinyDB
+from tinydb.storages import JSONStorage
 
 
 class Middleware(object):
@@ -17,7 +19,7 @@ class Middleware(object):
     example).
     """
 
-    def __init__(self, storage_cls):
+    def __init__(self, storage_cls=TinyDB.DEFAULT_STORAGE):
         self._storage_cls = storage_cls
         self.storage = None
 
@@ -84,7 +86,7 @@ class CachingMiddleware(Middleware):
     #: The number of write operations to cache before writing to disc
     WRITE_CACHE_SIZE = 1000
 
-    def __init__(self, storage_cls):
+    def __init__(self, storage_cls=TinyDB.DEFAULT_STORAGE):
         super(CachingMiddleware, self).__init__(storage_cls)
 
         self.cache = None
@@ -116,3 +118,75 @@ class CachingMiddleware(Middleware):
     def close(self):
         self.flush()
         self.storage.close()
+
+
+class SerializationMiddleware(Middleware):
+    """
+    Provide custom serialization for TinyDB.
+
+    This middleware allows users of TinyDB to register custom serializations.
+    The serialized data will be passed to the wrapped storage and data that
+    is read from the storage will be deserialized.
+    """
+
+    def __init__(self, storage_cls=TinyDB.DEFAULT_STORAGE):
+        super(SerializationMiddleware, self).__init__(storage_cls)
+
+        self._serializers = {}
+
+    def register_serializer(self, serializer, name):
+        """
+        Register a new Serializer.
+
+        When reading from/writing to the underlying storage, TinyDB
+        will run all objects through the list of registered serializers
+        allowing each one to handle objects it recognizes.
+
+        .. note:: The name has to be unique among this database instance.
+                  Re-using the same name will overwrite the old serializer.
+                  Also, registering a serializer will be reflected in all
+                  tables when reading/writing them.
+
+        :param serializer: an instance of the serializer
+        :type serializer: tinydb.serialize.Serializer
+        """
+        self._serializers[name] = serializer
+
+    def read(self):
+        data = self.storage.read()
+
+        for serializer_name in self._serializers:
+            serializer = self._serializers[serializer_name]
+            tag = '{{{}}}:'.format(serializer_name)  # E.g: '{TinyDate}:'
+
+            for eid in data:
+                for field in data[eid]:
+                    try:
+                        if data[eid][field].startswith(tag):
+                            encoded = data[eid][field][len(tag):]
+                            data[eid][field] = serializer.decode(encoded)
+                    except AttributeError:
+                        pass  # Not a string
+
+        return data
+
+    def write(self, data):
+        for serializer_name in self._serializers:
+            # If no serializers are registered, this code will just look up
+            # the serializer list and continue. But if there are serializers,
+            # the inner loop will run very often.
+            # For that reason, the lookup of the serialized class is pulled
+            # out into the outer loop:
+
+            serializer = self._serializers[serializer_name]
+            serializer_class = serializer.OBJ_CLASS
+
+            for eid in data:
+                for field in data[eid]:
+                    if isinstance(data[eid][field], serializer_class):
+                        encoded = serializer.encode(data[eid][field])
+                        tagged = '{{{}}}:{}'.format(serializer_name, encoded)
+
+                        data[eid][field] = tagged
+
+        self.storage.write(data)
