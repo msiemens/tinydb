@@ -139,6 +139,17 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v2.3.0** (2015-04-08)
+=======================
+
+- Added support for custom serialization. That way, you can teach TinyDB
+  to store ``datetime`` objects in a JSON file :)
+  (see `issue #48 <https://github.com/msiemens/tinydb/issues/48>`_ and
+  `pull request #50 <https://github.com/msiemens/tinydb/pull/50>`_)
+- Fixed a performance regression when searching became slower with every search
+  (see `issue #49 <https://github.com/msiemens/tinydb/issues/49>`_)
+- Internal code has been cleaned up
+
 **v2.2.2** (2015-02-12)
 =======================
 
