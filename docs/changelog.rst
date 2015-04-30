@@ -7,6 +7,12 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v2.3.1** (2015-04-30)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Hopefully fix a problem with using TinyDB as a dependency in a ``setup.py`` script
+  (see `issue #51 <https://github.com/msiemens/tinydb/issues/51>`_).
+
 **v2.3.0** (2015-04-08)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
