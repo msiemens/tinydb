@@ -1,6 +1,12 @@
 # coding=utf-8
 from setuptools import setup, find_packages
 from codecs import open
+import os
+
+def read(fname):
+    path = os.path.join(os.path.dirname(__file__), fname)
+    return open(path, encoding='utf-8').read()
+
 
 setup(
     name="tinydb",
@@ -34,5 +40,5 @@ setup(
         "Operating System :: OS Independent"
     ],
 
-    long_description=open('README.rst', encoding='utf-8').read(),
+    long_description=read('README.rst'),
 )
