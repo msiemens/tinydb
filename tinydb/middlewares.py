@@ -168,7 +168,6 @@ class SerializationMiddleware(Middleware):
                     for field in item:
                         try:
                             if item[field].startswith(tag):
-                                print('Okay!')
                                 encoded = item[field][len(tag):]
                                 item[field] = serializer.decode(encoded)
                         except AttributeError:
