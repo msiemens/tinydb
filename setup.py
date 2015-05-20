@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 from codecs import open
 import os
 
+
 def read(fname):
     path = os.path.join(os.path.dirname(__file__), fname)
     return open(path, encoding='utf-8').read()
@@ -10,7 +11,7 @@ def read(fname):
 
 setup(
     name="tinydb",
-    version="2.3.1.post2",
+    version="2.3.2",
     packages=find_packages(),
 
     # development metadata

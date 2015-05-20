@@ -139,6 +139,16 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v2.3.2** (2015-05-20)
+=======================
+
+- Fix a forgotten debug output in the ``SerializationMiddleware``
+  (see `issue #55 <https://github.com/msiemens/tinydb/issues/55>`_).
+- Fix an "ignored exception" warning when using the ``CachingMiddleware``
+  (see `pull request #54 <https://github.com/msiemens/tinydb/pull/54>`_)
+- Fix a problem with symlinks when checking out TinyDB on OSX Yosemite
+  (see `issue #52 <https://github.com/msiemens/tinydb/issues/52>`_).
+
 **v2.3.1** (2015-04-30)
 =======================
 
