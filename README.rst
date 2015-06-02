@@ -95,7 +95,7 @@ The documentation for TinyDB is hosted at ``Read the Docs``: https://tinydb.read
 Supported Python Versions
 *************************
 
-TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3, 3.4 and pypy.
+TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3, 3.4 and PyPy.
 
 
 Extensions
@@ -199,7 +199,7 @@ Changelog
 **v2.0.1** (2014-09-22)
 =======================
 
-- Fixed handling of unicode data in Python 2
+- Fixed handling of Unicode data in Python 2
   (see `issue #28 <https://github.com/msiemens/tinydb/issues/28>`_).
 
 **v2.0.0** (2014-09-05)
@@ -220,7 +220,7 @@ for details.
 - Added support for `nested comparisons <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#nested-queries>`_.
 - Added ``all`` and ``any`` `comparisons on lists <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#nested-queries>`_.
 - Added optional `smart query caching <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#smart-query-cache>`_.
-- The query cache is now a `fixed size lru cache <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#query-caching>`_.
+- The query cache is now a `fixed size LRU cache <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#query-caching>`_.
 
 **v1.4.0** (2014-07-22)
 =======================

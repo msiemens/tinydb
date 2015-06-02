@@ -172,11 +172,11 @@ Two remarks:
    use it as shown here without at least refactoring the loops into a separate
    method.
 
-To wrap a storate with this new middleware, we use it like this:
+To wrap a storage with this new middleware, we use it like this:
 
 .. code-block:: python
 
     db = TinyDB(storage=RemoveEmptyItemsMiddleware(SomeStorageClass))
 
-Here ``SomeStorageClass`` should be repaced with the storage you want to use.
+Here ``SomeStorageClass`` should be replaced with the storage you want to use.
 If you leave it empty, the default storage will be used (which is the ``JSONStorage``).

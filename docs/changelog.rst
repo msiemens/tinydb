@@ -67,7 +67,7 @@ see `semver.org <http://semver.org/>`_
 **v2.0.1** (2014-09-22)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-- Fixed handling of unicode data in Python 2
+- Fixed handling of Unicode data in Python 2
   (see `issue #28 <https://github.com/msiemens/tinydb/issues/28>`_).
 
 **v2.0.0** (2014-09-05)
@@ -88,7 +88,7 @@ see `semver.org <http://semver.org/>`_
 - Added support for :ref:`nested comparisons <nested_queries>`.
 - Added ``all`` and ``any`` :ref:`comparisons on lists <nested_queries>`.
 - Added optional :ref:`smart query caching <smart_cache>`.
-- The query cache is now a :ref:`fixed size lru cache <query_caching>`.
+- The query cache is now a :ref:`fixed size LRU cache <query_caching>`.
 
 **v1.4.0** (2014-07-22)
 ^^^^^^^^^^^^^^^^^^^^^^^

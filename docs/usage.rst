@@ -16,7 +16,7 @@ To convert your data to a format that is writable to disk TinyDB uses the
 `Python JSON <http://docs.python.org/2/library/json.html>`_ module by default.
 It's great when only simple data types are involved but it cannot handle more
 complex data types like custom classes. On Python 2 it also converts strings to
-unicode strings upon reading
+Unicode strings upon reading
 (described `here <http://stackoverflow.com/q/956867/997063>`_).
 
 If that causes problems, you can write
@@ -24,8 +24,8 @@ If that causes problems, you can write
 library like `pickle  <http://docs.python.org/library/pickle.html>`_ or
 `PyYAML  <http://pyyaml.org/>`_.
 
-Alternative JSON libary
-.......................
+Alternative JSON library
+........................
 
 As already mentioned, the default storage relies upon Python's
 JSON module. To improve performance, you can install
@@ -62,8 +62,8 @@ This will remove the key ``key1`` from all matching elements. TinyDB comes
 with these operations:
 
 - ``delete(key)``: delete a key from the element
-- ``increment(key)``: incremenet the value of a key
-- ``decrement(key)``: decremenet the value of a key
+- ``increment(key)``: increment the value of a key
+- ``decrement(key)``: decrement the value of a key
 
 Of course you also can write your own operations:
 
@@ -102,7 +102,7 @@ None
 
 .. caution::
 
-    If multiple elements match the query, propably a random one of them will
+    If multiple elements match the query, probably a random one of them will
     be returned!
 
 Often you don't want to search for elements but only know whether they are
@@ -125,7 +125,7 @@ Let's summarize the ways to handle data:
 +-------------------------------+---------------------------------------------------------------+
 | ``db.insert_multiple(...)``   | Insert multiple elements                                      |
 +-------------------------------+---------------------------------------------------------------+
-| **Updatingg data**                                                                            |
+| **Updating data**                                                                             |
 +-------------------------------+---------------------------------------------------------------+
 | ``db.update(operation, ...)`` | Update all matching elements with a special operation         |
 +-------------------------------+---------------------------------------------------------------+
@@ -187,7 +187,7 @@ Let's sum up the way TinyDB supports working with IDs:
 +----------------------------------+---------------------------------------------------------------+
 | **Working with IDs**                                                                             |
 +----------------------------------+---------------------------------------------------------------+
-| ``db.get(eid=...)``              | Get the elemtent with the given ID                            |
+| ``db.get(eid=...)``              | Get the element with the given ID                             |
 +----------------------------------+---------------------------------------------------------------+
 | ``db.contains(eids=[...])``      | Check if the db contains elements with one of the given IDs   |
 +----------------------------------+---------------------------------------------------------------+
@@ -425,7 +425,7 @@ What's next
 -----------
 
 Congratulations, you've made through the user guide! Now go and build something
-awesome or dive deeper into TinyDB with these ressources:
+awesome or dive deeper into TinyDB with these resources:
 
 - Want to learn how to customize TinyDB (custom serializers, storages,
   middlewares) and what extensions exist? Check out :doc:`extend` and
