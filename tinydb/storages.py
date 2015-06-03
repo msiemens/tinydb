@@ -64,43 +64,47 @@ class Storage(with_metaclass(ABCMeta, object)):
 
         pass
 
-
-class JSONStorage(Storage):
-    """
-    Store the data in a JSON file.
-    """
-
-    def __init__(self, path):
+def JSONStorageFactory(**format):
+    class JSONStorage(Storage):
         """
-        Create a new instance.
-
-        Also creates the storage file, if it doesn't exist.
-
-        :param path: Where to store the JSON data.
-        :type path: str
+        Store the data in a JSON file.
         """
 
-        super(JSONStorage, self).__init__()
-        touch(path)  # Create file if not exists
-        self.path = path
-        self._handle = open(path, 'r+')
+        def __init__(self, path):
+            """
+            Create a new instance.
 
-    def close(self):
-        self._handle.close()
+            Also creates the storage file, if it doesn't exist.
 
-    def __del__(self):
-        self.close()
+            :param path: Where to store the JSON data.
+            :type path: str
+            """
 
-    def read(self):
-        self._handle.seek(0)
-        return json.load(self._handle)
+            super(JSONStorage, self).__init__()
+            touch(path)  # Create file if not exists
+            self.path = path
+            self._handle = open(path, 'r+')
 
-    def write(self, data):
-        self._handle.seek(0)
-        json.dump(data, self._handle)
-        self._handle.flush()
-        self._handle.truncate()
+        def close(self):
+            self._handle.close()
 
+        def __del__(self):
+            self.close()
+
+        def read(self):
+            self._handle.seek(0)
+            return json.load(self._handle)
+
+        def write(self, data):
+            self._handle.seek(0)
+            json.dump(data, self._handle, **format)
+            self._handle.flush()
+            self._handle.truncate()
+    return JSONStorage
+
+JSONStorage = JSONStorageFactory()
+JSONPrettyStorage = JSONStorageFactory(sort_keys=True, 
+                    indent=4, separators=(',', ': '))
 
 class MemoryStorage(Storage):
     """
