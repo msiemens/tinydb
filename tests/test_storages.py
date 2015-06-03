@@ -24,6 +24,26 @@ def test_json(tmpdir):
     assert element == storage.read()
 
 
+def test_json_kwargs(tmpdir):
+    db_file = tmpdir.join('test.db')
+    db = TinyDB(str(db_file), sort_keys=True, indent=4, separators=(',', ': '))
+
+    # Write contents
+    db.insert({'b': 1})
+    db.insert({'a': 1})
+
+    assert db_file.read() == '''{
+    "_default": {
+        "1": {
+            "b": 1
+        },
+        "2": {
+            "a": 1
+        }
+    }
+}'''
+
+
 def test_json_readwrite(tmpdir):
     """
     Regression test for issue #1
