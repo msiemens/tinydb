@@ -384,6 +384,13 @@ To use the in-memory storage, use:
 >>> from tinydb.storages import MemoryStorage
 >>> db = TinyDB(storage=MemoryStorage)
 
+.. hint::
+    All arguments except for the ``storage`` argument are forwarded to the
+    underlying storage. For the JSON storage you can use this to pass
+    additional keyword arguments to Python's
+    `json.dump(...) <https://docs.python.org/2/library/json.html#json.dump>`_
+    method.
+
 Middlewares
 ...........
 
