@@ -242,6 +242,14 @@ a regex or a custom test function:
 >>> db.search(where('char').test(test_func))
 [{'char': 'a', 'int': 1}]
 
+>>> # Custom test with parameters:
+>>> def test_func(val, m, n):
+>>>     return m <= val <= n
+>>> db.search(where('int').test(test_func, 0, 1))
+[{'char': 'a', 'int': 1}]
+>>> db.search(where('int').test(test_func, 2, 3))
+[]
+
 .. _nested_queries:
 
 Nested Queries
@@ -286,35 +294,35 @@ Recap
 
 Again, let's recapitulate the query operations:
 
-+-----------------------------------+-----------------------------------------------------------+
-| **Queries**                                                                                   |
-+-----------------------------------+-----------------------------------------------------------+
-| ``where('field').matches(regex)`` | Match any element matching the regular expression         |
-+-----------------------------------+-----------------------------------------------------------+
-| ``where('field').contains(regex)``| Match any element with a matching substring               |
-+-----------------------------------+-----------------------------------------------------------+
-| ``where('field').test(func)``     | Matches any element for which the function returns        |
-|                                   | ``True``                                                  |
-+-----------------------------------+-----------------------------------------------------------+
-| **Combining Queries**                                                                         |
-+-----------------------------------+-----------------------------------------------------------+
-| ``~ query``                       | Match elements that don't match the query                 |
-+-----------------------------------+-----------------------------------------------------------+
-| ``(query1) & (query2)``           | Match elements that match both queries                    |
-+-----------------------------------+-----------------------------------------------------------+
-| ``(query1) | (query2)``           | Match elements that match one of the queries              |
-+-----------------------------------+-----------------------------------------------------------+
-| **Nested Queries**                |                                                           |
-+-----------------------------------+-----------------------------------------------------------+
-| ``where('field').has('field')``   | Match any element that has the specified item. Perform    |
-|                                   | more queries on this selector as needed                   |
-+-----------------------------------+-----------------------------------------------------------+
-| ``where('field').any(query)``     | Match any element where 'field' is a list where one of    |
-|                                   | the items matches the subquery                            |
-+-----------------------------------+-----------------------------------------------------------+
-| ``where('field').all(query)``     | Match any element where 'field' is a list where all items |
-|                                   | match the subquery                                        |
-+-----------------------------------+-----------------------------------------------------------+
++-------------------------------------+-----------------------------------------------------------+
+| **Queries**                                                                                     |
++-------------------------------------+-----------------------------------------------------------+
+| ``where('field').matches(regex)``   | Match any element matching the regular expression         |
++-------------------------------------+-----------------------------------------------------------+
+| ``where('field').contains(regex)``  | Match any element with a matching substring               |
++-------------------------------------+-----------------------------------------------------------+
+| ``where('field').test(func, *args)``| Matches any element for which the function returns        |
+|                                     | ``True``                                                  |
++-------------------------------------+-----------------------------------------------------------+
+| **Combining Queries**                                                                           |
++-------------------------------------+-----------------------------------------------------------+
+| ``~ query``                         | Match elements that don't match the query                 |
++-------------------------------------+-----------------------------------------------------------+
+| ``(query1) & (query2)``             | Match elements that match both queries                    |
++-------------------------------------+-----------------------------------------------------------+
+| ``(query1) | (query2)``             | Match elements that match one of the queries              |
++-------------------------------------+-----------------------------------------------------------+
+| **Nested Queries**                  |                                                           |
++-------------------------------------+-----------------------------------------------------------+
+| ``where('field').has('field')``     | Match any element that has the specified item. Perform    |
+|                                     | more queries on this selector as needed                   |
++-------------------------------------+-----------------------------------------------------------+
+| ``where('field').any(query)``       | Match any element where 'field' is a list where one of    |
+|                                     | the items matches the subquery                            |
++-------------------------------------+-----------------------------------------------------------+
+| ``where('field').all(query)``       | Match any element where 'field' is a list where all items |
+|                                     | match the subquery                                        |
++-------------------------------------+-----------------------------------------------------------+
 
 
 Tables
