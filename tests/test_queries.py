@@ -112,6 +112,18 @@ def test_custom():
     assert not query({'': None})
 
 
+def test_custom_with_params():
+    def test(value, minimum, maximum):
+        return minimum <= value <= maximum
+
+    query = where('val').test(test, 1, 10)
+
+    assert query({'val': 5})
+    assert not query({'val': 0})
+    assert not query({'val': 11})
+    assert not query({'': None})
+
+
 def test_any():
     query = where('followers').any(where('name') == 'don')
 

@@ -107,7 +107,7 @@ class Query(AndOrMixin):
 
         return QueryRegex(self._key, regex, re_method='search')
 
-    def test(self, func):
+    def test(self, func, *args):
         """
         Run a user-defined test function against a dict value.
 
@@ -117,12 +117,20 @@ class Query(AndOrMixin):
         >>> where('f1').test(test_func)
         'f1'.test(<function test_func at 0xXXXXXXXX>)
 
+        >>> def test_func_with_params(val, minimum, maximum):
+        ...     return minimum <= val <= maximum
+        ...
+        >>> where('f2').test(test_func_with_params, 1, 10)
+        'f2'.test(<function test_func_with_params at 0xXXXXXXXX>)
+
         :param func: The function to run. Has to accept one parameter and
             return a boolean.
+        :param args: Optional list of additional parameters to pass
+            to the function.
         :rtype: QueryCustom
         """
 
-        return QueryCustom(self._key, func)
+        return QueryCustom(self._key, func, args)
 
     def has(self, key):
         """
@@ -495,8 +503,9 @@ class QueryCustom(AndOrMixin):
     See :meth:`.Query.test`.
     """
 
-    def __init__(self, key, test):
+    def __init__(self, key, test, args):
         self.test = test
+        self.args = args
         self.key = key
 
     def __call__(self, element):
@@ -507,7 +516,7 @@ class QueryCustom(AndOrMixin):
         if self.key not in element:
             return False
 
-        return self.test(element[self.key])
+        return self.test(element[self.key], *self.args)
 
     def __repr__(self):
         return '\'{0}\'.test({1})'.format(self.key, self.test)
@@ -541,12 +550,12 @@ class QueryHas(Query):
         self._special = QueryRegex(self._key, regex, re_method='search')
         return self
 
-    def test(self, func):
+    def test(self, func, *args):
         """
         See :meth:`.Query.test`.
         """
 
-        self._special = QueryCustom(self._key, func)
+        self._special = QueryCustom(self._key, func, args)
         return self
 
     def has(self, key):
