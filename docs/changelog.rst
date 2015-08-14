@@ -7,6 +7,13 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v2.4** (2015-08-14)
+^^^^^^^^^^^^^^^^^^^^^
+
+- Allow custom parameters for custom test functions
+  (see `issue #63 <https://github.com/msiemens/tinydb/issues/63>`_ and
+  `pull request #64 <https://github.com/msiemens/tinydb/pull/64>`_).
+
 **v2.3.2** (2015-05-20)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
