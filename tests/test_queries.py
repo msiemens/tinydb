@@ -237,3 +237,13 @@ def test_hash():
     assert (Query().key1 == 2) in d
     assert (Query().key1.key2.key3.exists()) in d
     assert (Query()['key1.key2'].key3.exists()) not in d
+
+
+def test_orm_usage():
+    data = {'name': 'John', 'age': {'year': 2000}}
+
+    User = Query()
+    query1 = User.name == 'John'
+    query2 = User.age.year == 2000
+    assert query1(data)
+    assert query2(data)

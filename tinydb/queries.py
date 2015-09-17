@@ -75,19 +75,20 @@ class Query(object):
     TODO: Docs
     """
 
-    def __init__(self):
-        self.path = []
+    def __init__(self, path=None):
+        if path is None:
+            self.path = []
+        else:
+            self.path = path
 
-    # NOTE: .has replaced by . or []
     def __getattr__(self, item):
-        self.path.append(item)
-        return self
+        return Query(self.path + [item])
 
     __getitem__ = __getattr__
 
     def _generate_test(self, test, hashval):
         if not self.path:
-            raise ValueError('Query has no path to look for')
+            raise ValueError('Query has no path')
 
         def impl(value):
             try:
@@ -143,7 +144,6 @@ class Query(object):
         return self._generate_test(lambda value: value >= rhs,
                                    ('>=', tuple(self.path), rhs))
 
-    # NOTE: Existence of a key has to be queried explicitely
     def exists(self):
         return self._generate_test(lambda _: True,
                                    ('exists', tuple(self.path)))
@@ -152,7 +152,6 @@ class Query(object):
         return self._generate_test(lambda value: re.match(regex, value),
                                    ('matches', tuple(self.path), regex))
 
-    # NOTE: Renamed contains to search
     def search(self, regex):
         return self._generate_test(lambda value: re.search(regex, value),
                                    ('search', tuple(self.path), regex))
