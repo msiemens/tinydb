@@ -23,8 +23,8 @@ Usage example:
 5
 """
 
-from tinydb.queries import where
+from tinydb.queries import Query, where
 from tinydb.storages import Storage, JSONStorage
 from tinydb.database import TinyDB
 
-__all__ = ('TinyDB', 'Storage', 'JSONStorage', 'where')
+__all__ = ('TinyDB', 'Storage', 'JSONStorage', 'Query', 'where')

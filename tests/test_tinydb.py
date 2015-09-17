@@ -83,7 +83,7 @@ def test_insert_multiple(db):
 
     for i in range(10):
         assert db.count(where('int') == i) == 1
-    assert db.count(where('int')) == 10
+    assert db.count(where('int').exists()) == 10
 
     # Insert multiple from inline generator
     db.purge()
