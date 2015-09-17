@@ -94,7 +94,7 @@ see `semver.org <http://semver.org/>`_
 - Better support for working with :ref:`Element IDs <element_ids>`.
 - Added support for :ref:`nested comparisons <nested_queries>`.
 - Added ``all`` and ``any`` :ref:`comparisons on lists <nested_queries>`.
-- Added optional :ref:`smart query caching <smart_cache>`.
+- Added optional :<http://tinydb.readthedocs.org/en/v2.0.0/usage.html#smart-query-cache>`_.
 - The query cache is now a :ref:`fixed size LRU cache <query_caching>`.
 
 **v1.4.0** (2014-07-22)

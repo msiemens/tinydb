@@ -363,17 +363,6 @@ size by passing the ``cache_size`` to the ``table(...)`` function:
 .. hint:: You can set ``cache_size`` to ``None`` to make the cache unlimited in
    size.
 
-.. _smart_cache:
-
-Smart Query Cache
-^^^^^^^^^^^^^^^^^
-
-If you perform lots of queries while the data changes only little, you may
-enable a smarter query cache. It updates the query cache when
-inserting/removing/updating elements so the cache doesn't get invalidated.
-
->>> table = db.table('table_name', smart_cache=True)
-
 Storages & Middlewares
 ----------------------
 

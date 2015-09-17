@@ -16,12 +16,6 @@ API Documentation
     :exclude-members: __dict__, __weakref__
     :member-order: bysource
 
-.. autoclass:: tinydb.database.SmartCacheTable
-    :members:
-    :special-members:
-    :exclude-members: __dict__, __weakref__
-    :member-order: bysource
-
 .. autoclass:: tinydb.database.Element
     :members:
     :special-members:
