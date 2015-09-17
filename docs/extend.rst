@@ -54,10 +54,11 @@ of course you can add your own. Let's look how you could add a
 
         def read(self):
             with open(self.filename) as handle:
-                data = yaml.safe_load(handle.read())  # (2)
-
-            if data is None:  # (3)
-                raise ValueError
+                try:
+                    data = yaml.safe_load(handle.read())  # (2)
+                    return data
+                except yaml.YAMLError:
+                    return None  # (3)
 
         def write(self, data):
             with open(self.filename, 'w') as handle:
@@ -75,8 +76,8 @@ There are some things we should look closer at:
 2. We use ``yaml.safe_load`` as recommended by the
    `PyYAML documentation <http://pyyaml.org/wiki/PyYAMLDocumentation#LoadingYAML>`_
    when processing data from a potentially untrusted source.
-3. If the storage is uninitialized, TinyDB expects the storage to throw a
-   ``ValueError`` so it can do any internal initialization that is necessary.
+3. If the storage is uninitialized, TinyDB expects the storage to return
+   ``None`` so it can do any internal initialization that is necessary.
 4. If your storage needs any cleanup (like closing file handles) before an
    instance is destroyed, you can put it in the ``close()`` method. To run
    these, you'll either have to run ``db.close()`` on your ``TinyDB`` instance

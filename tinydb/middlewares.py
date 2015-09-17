@@ -155,6 +155,9 @@ class SerializationMiddleware(Middleware):
     def read(self):
         data = self.storage.read()
 
+        if data is None:
+            return None
+
         for serializer_name in self._serializers:
             serializer = self._serializers[serializer_name]
             tag = '{{{0}}}:'.format(serializer_name)  # E.g: '{TinyDate}:'

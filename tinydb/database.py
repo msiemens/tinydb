@@ -99,10 +99,7 @@ class TinyDB(object):
         :rtype: dict
         """
 
-        try:
-            return self._storage.read()
-        except ValueError:
-            return {}
+        return self._storage.read() or {}
 
     def _read_table(self, table):
         """
