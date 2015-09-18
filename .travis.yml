@@ -9,9 +9,10 @@ python:
   - "2.7"
   - "2.6"
 install:
+  - pip install -U pytest
   - pip install coveralls
   - pip install pytest-cov
 script:
-  py.test -v --cov tinydb --assert=plain
+  py.test -v --cov tinydb
 after_success:
   coveralls
