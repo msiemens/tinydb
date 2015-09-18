@@ -22,7 +22,7 @@ Basic Usage
 Let's cover the basics before going more into detail. We'll start by setting up
 a TinyDB database:
 
->>> from tinydb import TinyDB, where
+>>> from tinydb import TinyDB, Query
 >>> db = TinyDB('db.json')
 
 You now have a TinyDB database that stores its data in ``db.json``.
@@ -44,22 +44,23 @@ Now you can get all elements stored in the database by running:
 
 Of course you'll also want to search for specific elements. Let's try:
 
->>> db.search(where('type') == 'peach')
+>>> Fruit = Query()
+>>> db.search(Fruit.type == 'peach')
 [{'count': 3, 'type': 'peach'}]
->>> db.search(where('count') > 5)
+>>> db.search(Fruit.count > 5)
 [{'count': 7, 'type': 'apple'}]
 
 
 Next we'll update the ``count`` field of the apples:
 
->>> db.update({'count': 10}, where('type') == 'apple')
+>>> db.update({'count': 10}, Fruit.type == 'apple')
 >>> db.all()
 [{'count': 10, 'type': 'apple'}, {'count': 3, 'type': 'peach'}]
 
 
 In the same manner you can also remove elements:
 
->>> db.remove(where('count') < 5)
+>>> db.remove(Fruit.count < 5)
 >>> db.all()
 [{'count': 10, 'type': 'apple'}]
 
@@ -98,7 +99,9 @@ Before we dive deeper, let's recapitulate the basics:
 +-------------------------------+---------------------------------------------------------------+
 | **Querying**                                                                                  |
 +-------------------------------+---------------------------------------------------------------+
-| ``where('field') == 2``       | Match any element that has a key ``field`` with value         |
+| ``Query()``                   | Create a new query object                                     |
++-------------------------------+---------------------------------------------------------------+
+| ``Query().field == 2``        | Match any element that has a key ``field`` with value         |
 |                               | ``== 2`` (also possible: ``!=`` ``>`` ``>=`` ``<`` ``<=``)    |
 +-------------------------------+---------------------------------------------------------------+
 

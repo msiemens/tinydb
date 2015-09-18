@@ -10,8 +10,8 @@ small apps that would be blown away by a SQL-DB or an external database server.
 
 TinyDB is:
 
-- **tiny:** The current source code has 1800 lines of code (with about 40%
-  documentation) and 1100 lines tests. For comparison: Buzhug_ has about 2500
+- **tiny:** The current source code has 1200 lines of code (with about 40%
+  documentation) and 1000 lines tests. For comparison: Buzhug_ has about 2500
   lines of code (w/o tests), CodernityDB_ has about 7000 lines of code
   (w/o tests).
 
@@ -25,8 +25,8 @@ TinyDB is:
   e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any dependencies
   from PyPI.
 
-- **works on Python 2.6 – 3.5 and PyPy:** TinyDB works on all
-  modern versions of Python and PyPy.
+- **works on Python 2.6 – 3.5 and PyPy:** TinyDB works on all modern versions
+  of Python and PyPy.
 
 - **powerfully extensible:** You can easily extend TinyDB by writing new
   storages or modify the behaviour of storages with Middlewares. This includes
@@ -51,17 +51,18 @@ Query Language
 
 .. code-block:: python
 
+    >>> User = Query()
     >>> # Search for a field value
-    >>> db.search(where('int') == 1)
-    [{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
+    >>> db.search(User.name== 'John')
+    [{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}]
 
     >>> # Combine two queries with logical and
-    >>> db.search((where('int') == 1) & (where('char') == 'b'))
-    [{'int': 1, 'char': 'b'}]
+    >>> db.search((User.name == 'John') & (User.age <= 30))
+    [{'name': 'John', 'age': 22}]
 
     >>> # Combine two queries with logical or
-    >>> db.search((where('char') == 'a') | (where('char') == 'b'))
-    [{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
+    >>> db.search((User.name == 'John') | (User.name == 'Bob'))
+    [{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}, {'name': 'Bob', 'age': 42}]
 
     >>> # More possible comparisons:  !=  <  >  <=  >=
     >>> # More possible checks: where(...).matches(regex), where(...).test(your_test_func)
