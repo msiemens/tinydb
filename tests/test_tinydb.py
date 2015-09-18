@@ -153,16 +153,6 @@ def test_search(db):
     assert len(db.search(where('int') == 1)) == 3  # Query result from cache
 
 
-def test_contians(db):
-    assert db.contains(where('int') == 1)
-    assert not db.contains(where('int') == 0)
-
-
-def test_contains_ids(db):
-    assert db.contains(eids=[1, 2])
-    assert not db.contains(eids=[88])
-
-
 def test_get(db):
     item = db.get(where('char') == 'b')
     assert item['char'] == 'b'
@@ -186,6 +176,7 @@ def test_contains(db):
 
 def test_contains_ids(db):
     assert db.contains(eids=[1, 2])
+    assert not db.contains(eids=[88])
 
 
 def test_get_idempotent(db):

@@ -1,7 +1,4 @@
-import pytest
-from tinydb.utils import catch_warning
-from tinydb import where, TinyDB
-from tinydb.database import Table
+from tinydb import where
 
 
 def test_tables_list(db):

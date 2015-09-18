@@ -2,9 +2,8 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
-import warnings
 from tinydb import JSONStorage
-from tinydb.utils import LRUCache
+from tinydb.utils import LRUCache, iteritems, itervalues
 
 
 class Element(dict):
@@ -81,7 +80,7 @@ class TinyDB(object):
         :rtype: set[str]
         """
 
-        return set(self._read().keys())
+        return set(self._read())
 
     def purge_tables(self):
         """
@@ -99,6 +98,7 @@ class TinyDB(object):
         :rtype: dict
         """
 
+        # Return the storage content or an empty dict if the storage is empty
         return self._storage.read() or {}
 
     def _read_table(self, table):
@@ -111,7 +111,7 @@ class TinyDB(object):
 
         try:
             return self._read()[table]
-        except (KeyError, TypeError):
+        except KeyError:
             return {}
 
     def _write(self, tables):
@@ -194,9 +194,9 @@ class Table(object):
         self._db = db
         self._query_cache = LRUCache(capacity=cache_size)
 
-        old_ids = self._read().keys()
-        if old_ids:
-            self._last_id = max(i for i in old_ids)
+        data = self._read()
+        if data:
+            self._last_id = max(i for i in data)
         else:
             self._last_id = 0
 
@@ -217,7 +217,7 @@ class Table(object):
         :param func: the function to execute on every included element.
                      first argument: all data
                      second argument: the current eid
-        :param cond: elements to use
+        :param cond: elements to use, or
         :param eids: elements to use
         """
 
@@ -254,11 +254,10 @@ class Table(object):
         :rtype: dict
         """
 
-        raw_data = self._db._read_table(self.name)
         data = {}
-        for key in list(raw_data):
+        for key, value in iteritems(self._db._read_table(self.name)):
             eid = int(key)
-            data[eid] = Element(raw_data[key], eid)
+            data[eid] = Element(value, eid)
 
         return data
 
@@ -287,7 +286,7 @@ class Table(object):
         :rtype: list[Element]
         """
 
-        return list(self._read().values())
+        return list(itervalues(self._read()))
 
     def insert(self, element):
         """
@@ -344,7 +343,7 @@ class Table(object):
 
         :param fields: the fields that the matching elements will have
                        or a method that will update the elements
-        :type fields: dict | (dict, int) -> None
+        :type fields: dict | dict -> None
         :param cond: which elements to update
         :type cond: query
         :param eids: a list of element IDs
@@ -352,11 +351,11 @@ class Table(object):
         """
 
         if callable(fields):
-            _update = lambda data, eid: fields(data[eid])
+            self.process_elements(lambda data, eid: fields(data[eid]),
+                                  cond, eids)
         else:
-            _update = lambda data, eid: data[eid].update(fields)
-
-        self.process_elements(_update, cond, eids)
+            self.process_elements(lambda data, eid: data[eid].update(fields),
+                                  cond, eids)
 
     def purge(self):
         """

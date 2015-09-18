@@ -82,7 +82,6 @@ class JSONStorage(Storage):
 
         super(JSONStorage, self).__init__()
         touch(path)  # Create file if not exists
-        self.path = path
         self.kwargs = kwargs
         self._handle = open(path, 'r+')
 
@@ -116,14 +115,13 @@ class MemoryStorage(Storage):
     Store the data as JSON in memory.
     """
 
-    memory = None
-
     def __init__(self):
         """
         Create a new instance.
         """
 
         super(MemoryStorage, self).__init__()
+        self.memory = None
 
     def read(self):
         return self.memory

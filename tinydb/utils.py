@@ -6,6 +6,11 @@ from contextlib import contextmanager
 import warnings
 
 
+# Python 2/3 independant dict iteration
+iteritems = getattr(dict, 'iteritems', dict.items)
+itervalues = getattr(dict, 'itervalues', dict.values)
+
+
 class LRUCache(dict):
     """
     A simple LRU cache.

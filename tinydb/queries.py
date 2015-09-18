@@ -48,7 +48,7 @@ class QueryImpl(object):
         return hash(self.hashval)
 
     def __repr__(self):
-        return 'Query{0}'.format(self.hashval)
+        return 'QueryImpl{0}'.format(self.hashval)
 
     def __eq__(self, other):
         return self.hashval == other.hashval
@@ -103,6 +103,9 @@ class Query(object):
         return QueryImpl(impl, hashval)
 
     def __eq__(self, rhs):
+        """
+        :rtype: QueryImpl
+        """
         if sys.version_info <= (3, 0):  # pragma: no cover
             # Special UTF-8 handling on Python 2
             def test(value):
