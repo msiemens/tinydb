@@ -87,7 +87,8 @@ class JSONStorage(Storage):
         self._handle = open(path, 'r+')
 
     def close(self):
-        self._handle.close()
+        if hasattr(self, '_handle'):
+            self._handle.close()
 
     def __del__(self):
         self.close()
