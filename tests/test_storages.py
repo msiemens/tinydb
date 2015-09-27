@@ -71,6 +71,12 @@ def test_json_readwrite(tmpdir):
     assert get('A short one') is None
 
 
+def test_json_invalid_directory():
+    with pytest.raises(IOError):
+        with TinyDB('/this/is/an/invalid/path/db.json', storage=JSONStorage):
+            pass
+
+
 def test_in_memory():
     # Write contents
     storage = MemoryStorage()

@@ -202,6 +202,30 @@ def test_multiple_dbs():
     assert len(db2) == 1
 
 
+def test_storage_closed_once():
+    class Storage(object):
+
+        def __init__(self):
+            self.closed = False
+
+        def read(self):
+            return {}
+
+        def write(self, data):
+            pass
+
+        def close(self):
+            assert not self.closed
+            self.closed = True
+
+    with TinyDB(storage=Storage) as db:
+        db.close()
+
+    del db
+    # If db.close() is called during cleanup, the assertion will fail and throw
+    # and exception
+
+
 def test_unique_ids(tmpdir):
     """
     :type tmpdir: py._path.local.LocalPath

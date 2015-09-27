@@ -21,6 +21,30 @@ class Element(dict):
             self.eid = eid
 
 
+class StorageProxy(object):
+    def __init__(self, storage, table_name):
+        self._storage = storage
+        self._table_name = table_name
+
+    def read(self):
+        try:
+            raw_data = (self._storage.read() or {})[self._table_name]
+        except KeyError:
+            return {}
+
+        data = {}
+        for key, val in iteritems(raw_data):
+            eid = int(key)
+            data[eid] = Element(val, eid)
+
+        return data
+
+    def write(self, values):
+        data = self._storage.read() or {}
+        data[self._table_name] = values
+        self._storage.write(data)
+
+
 class TinyDB(object):
     """
     The main class of TinyDB.
@@ -41,10 +65,17 @@ class TinyDB(object):
         :param storage: The class of the storage to use. Will be initialized
                         with ``args`` and ``kwargs``.
         """
+
+        # Prepare the storage
+        self._opened = False
+
         storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
 
+        self._opened = True
+
+        # Prepare the default table
         self._table_cache = {}
         self._table = self.table('_default')
 
@@ -63,12 +94,12 @@ class TinyDB(object):
         if name in self._table_cache:
             return self._table_cache[name]
 
-        table = self.table_class(name, self, **options)
+        table = self.table_class(StorageProxy(self._storage, name), **options)
 
         self._table_cache[name] = table
 
-        if name not in self._read():
-            self._write_table({}, name)
+        if not table._read():
+            table._write({})
 
         return table
 
@@ -80,92 +111,33 @@ class TinyDB(object):
         :rtype: set[str]
         """
 
-        return set(self._read())
+        return set(self._storage.read())
 
     def purge_tables(self):
         """
         Purge all tables from the database. **CANNOT BE REVERSED!**
         """
 
-        self._write({})
+        self._storage.write({})
         self._table_cache.clear()
 
-    def _read(self):
+    def close(self):
         """
-        Reading access to the backend.
-
-        :returns: all tables
-        :rtype: dict
+        Close the database.
         """
+        self._opened = False
+        self._storage.close()
 
-        # Return the storage content or an empty dict if the storage is empty
-        return self._storage.read() or {}
-
-    def _read_table(self, table):
-        """
-        Read a table from the backend.
-
-        :param table: The name of the table to read
-        :return: dict
-        """
-
-        try:
-            return self._read()[table]
-        except KeyError:
-            return {}
-
-    def _write(self, tables):
-        """
-        Writing access to the backend.
-
-        :param tables: The new tables to write
-        :type tables: dict
-        """
-
-        # Write all tables
-        self._storage.write(tables)
-
-    def _write_table(self, values, table):
-        """
-        Write data for a table.
-
-        :param values: The values contained in the table
-        :type values: dict
-        :param table: The name of the table to write
-        :type table: str
-        """
-
-        # Write specific table
-        data = self._read()
-        data[table] = values
-
-        self._write(data)
-
-    # Methods that are executed on the default table
-    # Because magic methods are not handlet by __getattr__ we need to forward
-    # them manually here
-
-    def __len__(self):
-        """
-        Get the total number of elements in the DB.
-
-        >>> db = TinyDB('db.json')
-        >>> len(db)
-        0
-        """
-        return len(self._table)
+    def __del__(self):
+        if self._opened is True:
+            self.close()
 
     def __enter__(self):
-        """
-        See :meth:`.Table.__enter__`
-        """
-        return self._table.__enter__()
+        return self
 
     def __exit__(self, *args):
-        """
-        See :meth:`.Table.__exit__`
-        """
-        return self._table.__exit__(*args)
+        if self._opened is True:
+            self.close()
 
     def __getattr__(self, name):
         """
@@ -173,25 +145,36 @@ class TinyDB(object):
         """
         return getattr(self._table, name)
 
+    # Methods that are executed on the default table
+    # Because magic methods are not handlet by __getattr__ we need to forward
+    # them manually here
+
+    def __len__(self):
+        """
+        Get the total number of elements in the default table.
+
+        >>> db = TinyDB('db.json')
+        >>> len(db)
+        0
+        """
+        return len(self._table)
+
 
 class Table(object):
     """
     Represents a single TinyDB Table.
     """
 
-    def __init__(self, name, db, cache_size=10):
+    def __init__(self, storage, cache_size=10):
         """
         Get access to a table.
 
-        :param name: The name of the table.
-        :type name: str
-        :param db: The parent database.
-        :type db: tinydb.database.TinyDB
+        :param storage: Access to the storage
+        :type storage: StorageProxyus
         :param cache_size: Maximum size of query cache.
         """
 
-        self.name = name
-        self._db = db
+        self._storage = storage
         self._query_cache = LRUCache(capacity=cache_size)
 
         data = self._read()
@@ -254,12 +237,7 @@ class Table(object):
         :rtype: dict
         """
 
-        data = {}
-        for key, value in iteritems(self._db._read_table(self.name)):
-            eid = int(key)
-            data[eid] = Element(value, eid)
-
-        return data
+        return self._storage.read()
 
     def _write(self, values):
         """
@@ -270,7 +248,7 @@ class Table(object):
         """
 
         self._query_cache.clear()
-        self._db._write_table(values, self.name)
+        self._storage.write(values)
 
     def __len__(self):
         """
@@ -440,25 +418,6 @@ class Table(object):
 
         # Element specified by condition
         return self.get(cond) is not None
-
-    def __enter__(self):
-        """
-        Allow the database to be used as a context manager.
-
-        :return: the table instance
-        """
-
-        return self
-
-    def __exit__(self, *args):
-        """
-        Try to close the storage after being used as a context manager.
-        """
-
-        _ = args
-        self._db._storage.close()
-
-    close = __exit__
 
 # Set the default table class
 TinyDB.table_class = Table

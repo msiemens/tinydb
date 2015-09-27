@@ -32,7 +32,7 @@ class Middleware(object):
 
         The storage kwarg is used by TinyDB this way::
 
-            self._storage = storage(*args, **kwargs)
+            self.storage = storage(*args, **kwargs)
 
         As we can see, ``storage(...)`` runs the constructor and returns the
         new storage instance.
@@ -46,7 +46,7 @@ class Middleware(object):
                        ^
                        Already an instance!
 
-        So, when running ``self._storage = storage(*args, **kwargs)`` Python
+        So, when running ``self.storage = storage(*args, **kwargs)`` Python
         now will call ``__call__`` and TinyDB will expect the return value to
         be the storage (or Middleware) instance. Returning the instance is
         simple, but we also got the underlying (*real*) StorageClass as an
@@ -91,9 +91,6 @@ class CachingMiddleware(Middleware):
         self.cache = None
         self._cache_modified_count = 0
 
-    def __del__(self):
-        self.flush()  # Flush potentially unwritten data
-
     def read(self):
         if self.cache is None:
             self.cache = self.storage.read()
@@ -115,7 +112,7 @@ class CachingMiddleware(Middleware):
             self._cache_modified_count = 0
 
     def close(self):
-        self.flush()
+        self.flush()  # Flush potentially unwritten data
         self.storage.close()
 
 

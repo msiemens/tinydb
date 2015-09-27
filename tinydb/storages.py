@@ -88,9 +88,6 @@ class JSONStorage(Storage):
     def close(self):
         self._handle.close()
 
-    def __del__(self):
-        self.close()
-
     def read(self):
         # Get the file size
         self._handle.seek(0, 2)
