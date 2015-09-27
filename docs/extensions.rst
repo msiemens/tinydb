@@ -1,6 +1,25 @@
 Extensions
 ==========
 
+``tinydb-serialization``
+************************
+
+| **Repo:**        https://github.com/msiemens/tinydb-serialization
+| **Status:**      *stable*
+| **Description:** ``tinydb-serialization`` provides serialization for objects
+                   that TinyDB otherwise couldn't handle.
+
+``tinydb-smartcache``
+*********************
+
+| **Repo:**        https://github.com/msiemens/tinydb-smartcache
+| **Status:**      *stable*
+| **Description:** ``tinydb-smartcache`` provides a smart query cache for
+                   TinyDB. It updates the query cache when
+                   inserting/removing/updating elements so the cache doesn't
+                   get invalidated. It's useful if you perform lots of queries
+                   while the data changes only little.
+
 .. _tinyrecord:
 
 ``tinyrecord``
