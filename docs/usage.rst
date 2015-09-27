@@ -431,9 +431,8 @@ What's next
 Congratulations, you've made through the user guide! Now go and build something
 awesome or dive deeper into TinyDB with these resources:
 
-- Want to learn how to customize TinyDB (custom serializers, storages,
-  middlewares) and what extensions exist? Check out :doc:`extend` and
-  :doc:`extensions`.
+- Want to learn how to customize TinyDB (storages, middlewares) and what
+  extensions exist? Check out :doc:`extend` and :doc:`extensions`.
 - Want to study the API in detail? Read :doc:`api`.
 - Interested in contributing to the TinyDB development guide? Go on to the
   :doc:`contribute`.

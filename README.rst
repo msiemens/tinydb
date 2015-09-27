@@ -29,9 +29,7 @@ TinyDB is:
   of Python and PyPy.
 
 - **powerfully extensible:** You can easily extend TinyDB by writing new
-  storages or modify the behaviour of storages with Middlewares. This includes
-  custom serialization of objects, which the used storage can't handle (e.g.
-  for storing `datetime` objects in a JSON file).
+  storages or modify the behaviour of storages with Middlewares.
 
 - **100% test coverage:** No explanation needed.
 

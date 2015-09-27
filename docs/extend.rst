@@ -1,42 +1,6 @@
 How to Extend TinyDB
 ====================
 
-Write a Serializer
-------------------
-
-TinyDB's default JSON storage is fairly limited when it comes to supported data
-types. If you need more flexibility, you can implement a Serializer. This allows
-TinyDB to handle classes it couldn't serialize otherwise. Let's see how a
-Serializer for ``datetime`` objects could look like:
-
-.. code-block:: python
-
-    from datetime import datetime
-
-    class DateTimeSerializer(Serializer):
-        OBJ_CLASS = datetime  # The class this serializer handles
-
-        def encode(self, obj):
-            return obj.strftime('%Y-%m-%dT%H:%M:%S')
-
-        def decode(self, s):
-            return datetime.strptime(s, '%Y-%m-%dT%H:%M:%S')
-
-To use the new serializer, we need to use the serialization middleware:
-
-.. code-block:: python
-
-    >>> from tinydb.storages import JSONStorage
-    >>> from tinydb.middlewares import SerializationMiddleware
-    >>>
-    >>> serialization = SerializationMiddleware()
-    >>> serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
-    >>>
-    >>> db = TinyDB('db.json', storage=serialization)
-    >>> db.insert({'date': datetime(2000, 1, 1, 12, 0, 0)})
-    >>> db.all()
-    [{'date': datetime.datetime(2000, 1, 1, 12, 0)}]
-
 Write a custom Storage
 ----------------------
 
