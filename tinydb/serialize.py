@@ -14,7 +14,7 @@ class Serializer(with_metaclass(ABCMeta, object)):
 
     @abstractproperty
     def OBJ_CLASS(self):
-        raise NotImplementedError('To be overriden!')
+        raise NotImplementedError('To be overridden!')
 
     @abstractmethod
     def encode(self, obj):
@@ -25,7 +25,7 @@ class Serializer(with_metaclass(ABCMeta, object)):
         :return:
         :rtype: str
         """
-        raise NotImplementedError('To be overriden!')
+        raise NotImplementedError('To be overridden!')
 
     @abstractmethod
     def decode(self, s):
@@ -36,4 +36,4 @@ class Serializer(with_metaclass(ABCMeta, object)):
         :type s: str
         :return:
         """
-        raise NotImplementedError('To be overriden!')
+        raise NotImplementedError('To be overridden1!')

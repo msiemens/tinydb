@@ -42,7 +42,7 @@ class Storage(with_metaclass(ABCMeta, object)):
         :rtype: dict
         """
 
-        raise NotImplementedError('To be overriden!')
+        raise NotImplementedError('To be overridden!')
 
     @abstractmethod
     def write(self, data):
@@ -55,7 +55,7 @@ class Storage(with_metaclass(ABCMeta, object)):
         :type data: dict
         """
 
-        raise NotImplementedError('To be overriden!')
+        raise NotImplementedError('To be overridden!')
 
     def close(self):
         """
