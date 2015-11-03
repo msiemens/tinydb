@@ -36,4 +36,4 @@ class Serializer(with_metaclass(ABCMeta, object)):
         :type s: str
         :return:
         """
-        raise NotImplementedError('To be overridden1!')
+        raise NotImplementedError('To be overridden!')
