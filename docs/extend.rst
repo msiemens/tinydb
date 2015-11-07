@@ -1,12 +1,21 @@
 How to Extend TinyDB
 ====================
 
-Write a custom Storage
+There are three main ways to extend TinyDB and modify its behaviour:
+
+1. custom storages,
+2. middlewares, and finally
+3. custom table classes.
+
+Let's look at them in this order.
+
+Write a Custom Storage
 ----------------------
 
-By default TinyDB comes with a in-memory storage and a JSON file storage. But
-of course you can add your own. Let's look how you could add a
-`YAML <http://yaml.org/>`_ storage using `PyYAML <http://pyyaml.org/wiki/PyYAML>`_:
+First, we have support for custom storages. By default TinyDB comes with an
+in-memory storage and a JSON file storage. But of course you can add your own.
+Let's look how you could add a `YAML <http://yaml.org/>`_ storage using
+`PyYAML <http://pyyaml.org/wiki/PyYAML>`_:
 
 .. code-block:: python
 
@@ -60,7 +69,7 @@ Finally, using the YAML storage is very straight-forward:
     # ...
 
 
-Write a custom Middleware
+Write a Custom Middleware
 -------------------------
 
 Sometimes you don't want to write a new storage but rather modify the behaviour
@@ -145,3 +154,25 @@ To wrap a storage with this new middleware, we use it like this:
 
 Here ``SomeStorageClass`` should be replaced with the storage you want to use.
 If you leave it empty, the default storage will be used (which is the ``JSONStorage``).
+
+Creating a Custom Table Classes
+-------------------------------
+
+Custom storages and middlewares are useful if you want to modify the way
+TinyDB stores its data. But there are cases where you want to modify how
+TinyDB itself behaves. For that use case TinyDB supports custom table classes.
+Internally TinyDB creates a ``Table`` instance for every table that is used.
+You can overwrite which class is used by setting ``TinyDB.table_class``
+before creating a ``TinyDB`` instance. This class has to support the
+:ref:`Table API <table_api>`. The best way to accomplish that is to subclass
+it:
+
+.. code-block:: python
+
+    from tinydb.database import Table
+
+    class YourTableClass(Table):
+        pass  # Modify original methods as needed
+
+For an more advanced example, see the source of the
+`tinydb-smartcache <https://github.com/msiemens/tinydb-smartcache>`_ extension.
