@@ -5,7 +5,7 @@ Great that you've taken time to check out the TinyDB docs! Before we begin
 looking at TinyDB itself, let's take some time to see whether you should use
 TinyDB.
 
-Why using TinyDB?
+Why Using TinyDB?
 -----------------
 
 - **tiny:** The current source code has 1200 lines of code (with about 40%
@@ -39,11 +39,11 @@ In short: If you need a simple database with a clean API that just works
 without lots of configuration, TinyDB might be the right choice for you.
 
 
-Why **not** using TinyDB?
+Why **Not** Using TinyDB?
 -------------------------
 
-- You need **advanced features** like multiple indexes, an HTTP server,
-  relationships, or similar.
+- You need **advanced features** like access from multiple processes, indexes,
+  a HTTP server, relationships or similar.
 - You are really concerned about **performance** and need a high speed
   database.
 
