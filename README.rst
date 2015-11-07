@@ -138,8 +138,37 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
-**v2.4** (2015-08-14)
-=====================
+**v3.0.0** (2015-11-XX)
+=======================
+
+-  Overhauled Query model:
+
+   -  ``where('...').contains('...')`` has been renamed to
+      ``where('...').search('...')``.
+   -  Support for ORM-like usage:
+      ``User = Query(); db.find(User.name == 'John')``.
+   -  ``where('foo')`` is an alias for ``Query().foo``.
+   -  ``where('foo').has('bar')`` is replaced by either
+      ``where('foo').bar`` or ``Query().foo.bar``.
+
+      -  In case the key is not a valid Python identifier, array
+         notation can be used: ``where('a.b.c')`` is now
+         ``Query()['a.b.c']``.
+
+   -  Checking for the existence of a key has to be done explicitely:
+      ``where('foo').exists()``.
+
+-  Migrations from v1 to v2 have been removed.
+-  ``SmartCacheTable`` has been moved to `msiemens/tinydb-smartcache`_.
+-  Serialization has been moved to `msiemens/tinydb-serialization`_.
+- Empty storages are now expected to return ``None`` instead of raising ``ValueError``.
+  (see `issue #67 <https://github.com/msiemens/tinydb/issues/67>`_.
+
+.. _msiemens/tinydb-smartcache: https://github.com/msiemens/tinydb-smartcache
+.. _msiemens/tinydb-serialization: https://github.com/msiemens/tinydb-serialization
+
+**v2.4.0** (2015-08-14)
+=======================
 
 - Allow custom parameters for custom test functions
   (see `issue #63 <https://github.com/msiemens/tinydb/issues/63>`_ and

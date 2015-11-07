@@ -1,7 +1,37 @@
 Upgrading to Newer Releases
 ===========================
 
+.. _upgrade_v3_0:
+
+Version 3.0
+-----------
+
 .. _upgrade_v2_0:
+
+Breaking API Changes
+^^^^^^^^^^^^^^^^^^^^
+
+-  Querying (see `Issue #62 <https://github.com/msiemens/tinydb/issues/62>`_):
+
+   -  ``where('...').contains('...')`` has been renamed to
+      ``where('...').search('...')``.
+   -  ``where('foo').has('bar')`` is replaced by either
+      ``where('foo').bar`` or ``Query().foo.bar``.
+
+      -  In case the key is not a valid Python identifier, array
+         notation can be used: ``where('a.b.c')`` is now
+         ``Query()['a.b.c']``.
+
+  -  Checking for the existence of a key has to be done explicitely:
+     ``where('foo').exists()``.
+
+-  ``SmartCacheTable`` has been moved to `msiemens/tinydb-smartcache`_.
+-  Serialization has been moved to `msiemens/tinydb-serialization`_.
+-  Empty storages are now expected to return ``None`` instead of raising
+   ``ValueError`` (see `Issue #67 <https://github.com/msiemens/tinydb/issues/67>`_).
+
+.. _msiemens/tinydb-smartcache: https://github.com/msiemens/tinydb-smartcache
+.. _msiemens/tinydb-serialization: https://github.com/msiemens/tinydb-serialization
 
 Version 2.0
 -----------
