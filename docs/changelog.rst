@@ -37,7 +37,7 @@ see `semver.org <http://semver.org/>`_
 .. _msiemens/tinydb-serialization: https://github.com/msiemens/tinydb-serialization
 
 **v2.4.0** (2015-08-14)
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 - Allow custom parameters for custom test functions
   (see `issue #63 <https://github.com/msiemens/tinydb/issues/63>`_ and
