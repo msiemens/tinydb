@@ -51,7 +51,7 @@ Query Language
 
     >>> User = Query()
     >>> # Search for a field value
-    >>> db.search(User.name== 'John')
+    >>> db.search(User.name == 'John')
     [{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}]
 
     >>> # Combine two queries with logical and
