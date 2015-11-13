@@ -138,7 +138,7 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
-**v3.0.0** (2015-11-XX)
+**v3.0.0** (2015-11-13)
 =======================
 
 -  Overhauled Query model:

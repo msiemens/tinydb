@@ -7,7 +7,7 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
-**v3.0.0** (2015-11-XX)
+**v3.0.0** (2015-11-13)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 -  Overhauled Query model:
