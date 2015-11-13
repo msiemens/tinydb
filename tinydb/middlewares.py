@@ -3,7 +3,6 @@ Contains the :class:`base class <tinydb.middlewares.Middleware>` for
 middlewares and implementations.
 """
 from tinydb import TinyDB
-from tinydb.storages import JSONStorage
 
 
 class Middleware(object):
@@ -33,7 +32,7 @@ class Middleware(object):
 
         The storage kwarg is used by TinyDB this way::
 
-            self._storage = storage(*args, **kwargs)
+            self.storage = storage(*args, **kwargs)
 
         As we can see, ``storage(...)`` runs the constructor and returns the
         new storage instance.
@@ -47,7 +46,7 @@ class Middleware(object):
                        ^
                        Already an instance!
 
-        So, when running ``self._storage = storage(*args, **kwargs)`` Python
+        So, when running ``self.storage = storage(*args, **kwargs)`` Python
         now will call ``__call__`` and TinyDB will expect the return value to
         be the storage (or Middleware) instance. Returning the instance is
         simple, but we also got the underlying (*real*) StorageClass as an
@@ -92,9 +91,6 @@ class CachingMiddleware(Middleware):
         self.cache = None
         self._cache_modified_count = 0
 
-    def __del__(self):
-        self.flush()  # Flush potentially unwritten data
-
     def read(self):
         if self.cache is None:
             self.cache = self.storage.read()
@@ -116,88 +112,5 @@ class CachingMiddleware(Middleware):
             self._cache_modified_count = 0
 
     def close(self):
-        self.flush()
+        self.flush()  # Flush potentially unwritten data
         self.storage.close()
-
-
-class SerializationMiddleware(Middleware):
-    """
-    Provide custom serialization for TinyDB.
-
-    This middleware allows users of TinyDB to register custom serializations.
-    The serialized data will be passed to the wrapped storage and data that
-    is read from the storage will be deserialized.
-    """
-
-    def __init__(self, storage_cls=TinyDB.DEFAULT_STORAGE):
-        super(SerializationMiddleware, self).__init__(storage_cls)
-
-        self._serializers = {}
-
-    def register_serializer(self, serializer, name):
-        """
-        Register a new Serializer.
-
-        When reading from/writing to the underlying storage, TinyDB
-        will run all objects through the list of registered serializers
-        allowing each one to handle objects it recognizes.
-
-        .. note:: The name has to be unique among this database instance.
-                  Re-using the same name will overwrite the old serializer.
-                  Also, registering a serializer will be reflected in all
-                  tables when reading/writing them.
-
-        :param serializer: an instance of the serializer
-        :type serializer: tinydb.serialize.Serializer
-        """
-        self._serializers[name] = serializer
-
-    def read(self):
-        data = self.storage.read()
-
-        for serializer_name in self._serializers:
-            serializer = self._serializers[serializer_name]
-            tag = '{{{0}}}:'.format(serializer_name)  # E.g: '{TinyDate}:'
-
-            for table_name in data:
-                table = data[table_name]
-
-                for eid in table:
-                    item = data[table_name][eid]
-
-                    for field in item:
-                        try:
-                            if item[field].startswith(tag):
-                                encoded = item[field][len(tag):]
-                                item[field] = serializer.decode(encoded)
-                        except AttributeError:
-                            pass  # Not a string
-
-        return data
-
-    def write(self, data):
-        for serializer_name in self._serializers:
-            # If no serializers are registered, this code will just look up
-            # the serializer list and continue. But if there are serializers,
-            # the inner loop will run very often.
-            # For that reason, the lookup of the serialized class is pulled
-            # out into the outer loop:
-
-            serializer = self._serializers[serializer_name]
-            serializer_class = serializer.OBJ_CLASS
-
-            for table_name in data:
-                table = data[table_name]
-
-                for eid in table:
-                    item = data[table_name][eid]
-
-                    for field in item:
-                        if isinstance(item[field], serializer_class):
-                            encoded = serializer.encode(item[field])
-                            tagged = '{{{0}}}:{1}'.format(serializer_name,
-                                                          encoded)
-
-                            item[field] = tagged
-
-        self.storage.write(data)

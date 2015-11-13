@@ -4,14 +4,14 @@
 
 |Build Status| |Coverage| |Version|
 
-TinyDB is a tiny, document oriented database optimized for your happiness :)
-It's written in pure Python and has no external requirements. The target are
+TinyDB is a lightweight document oriented database optimized for your happiness :)
+It's written in pure Python and has no external dependencies. The target are
 small apps that would be blown away by a SQL-DB or an external database server.
 
 TinyDB is:
 
-- **tiny:** The current source code has 1800 lines of code (with about 40%
-  documentation) and 1100 lines tests. For comparison: Buzhug_ has about 2500
+- **tiny:** The current source code has 1200 lines of code (with about 40%
+  documentation) and 1000 lines tests. For comparison: Buzhug_ has about 2500
   lines of code (w/o tests), CodernityDB_ has about 7000 lines of code
   (w/o tests).
 
@@ -25,13 +25,11 @@ TinyDB is:
   e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any dependencies
   from PyPI.
 
-- **works on Python 2.6 – 3.4 and PyPy:** TinyDB works on all
-  modern versions of Python and PyPy.
+- **works on Python 2.6 – 3.5 and PyPy:** TinyDB works on all modern versions
+  of Python and PyPy.
 
 - **powerfully extensible:** You can easily extend TinyDB by writing new
-  storages or modify the behaviour of storages with Middlewares. This includes
-  custom serialization of objects, which the used storage can't handle (e.g.
-  for storing `datetime` objects in a JSON file).
+  storages or modify the behaviour of storages with Middlewares.
 
 - **100% test coverage:** No explanation needed.
 
@@ -51,17 +49,18 @@ Query Language
 
 .. code-block:: python
 
+    >>> User = Query()
     >>> # Search for a field value
-    >>> db.search(where('int') == 1)
-    [{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
+    >>> db.search(User.name == 'John')
+    [{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}]
 
     >>> # Combine two queries with logical and
-    >>> db.search((where('int') == 1) & (where('char') == 'b'))
-    [{'int': 1, 'char': 'b'}]
+    >>> db.search((User.name == 'John') & (User.age <= 30))
+    [{'name': 'John', 'age': 22}]
 
     >>> # Combine two queries with logical or
-    >>> db.search((where('char') == 'a') | (where('char') == 'b'))
-    [{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
+    >>> db.search((User.name == 'John') | (User.name == 'Bob'))
+    [{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}, {'name': 'Bob', 'age': 42}]
 
     >>> # More possible comparisons:  !=  <  >  <=  >=
     >>> # More possible checks: where(...).matches(regex), where(...).test(your_test_func)
@@ -95,7 +94,7 @@ The documentation for TinyDB is hosted at ``Read the Docs``: https://tinydb.read
 Supported Python Versions
 *************************
 
-TinyDB has been tested with Python 2.6, 2.7, 3.2, 3.3, 3.4 and PyPy.
+TinyDB has been tested with Python 2.6, 2.7, 3.2 - 3.5 and PyPy.
 
 
 Extensions
@@ -139,8 +138,37 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
-**v2.4** (2015-08-14)
-=====================
+**v3.0.0** (2015-11-13)
+=======================
+
+-  Overhauled Query model:
+
+   -  ``where('...').contains('...')`` has been renamed to
+      ``where('...').search('...')``.
+   -  Support for ORM-like usage:
+      ``User = Query(); db.find(User.name == 'John')``.
+   -  ``where('foo')`` is an alias for ``Query().foo``.
+   -  ``where('foo').has('bar')`` is replaced by either
+      ``where('foo').bar`` or ``Query().foo.bar``.
+
+      -  In case the key is not a valid Python identifier, array
+         notation can be used: ``where('a.b.c')`` is now
+         ``Query()['a.b.c']``.
+
+   -  Checking for the existence of a key has to be done explicitely:
+      ``where('foo').exists()``.
+
+-  Migrations from v1 to v2 have been removed.
+-  ``SmartCacheTable`` has been moved to `msiemens/tinydb-smartcache`_.
+-  Serialization has been moved to `msiemens/tinydb-serialization`_.
+- Empty storages are now expected to return ``None`` instead of raising ``ValueError``.
+  (see `issue #67 <https://github.com/msiemens/tinydb/issues/67>`_.
+
+.. _msiemens/tinydb-smartcache: https://github.com/msiemens/tinydb-smartcache
+.. _msiemens/tinydb-serialization: https://github.com/msiemens/tinydb-serialization
+
+**v2.4.0** (2015-08-14)
+=======================
 
 - Allow custom parameters for custom test functions
   (see `issue #63 <https://github.com/msiemens/tinydb/issues/63>`_ and

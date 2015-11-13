@@ -59,7 +59,7 @@ def test_caching_write(storage):
     # Write contents
     storage.write(element)
 
-    storage.__del__()  # Assume, the storage got deleted
+    storage.close()
 
     # Verify contents: Cache should be emptied and written to storage
     assert storage.storage.memory

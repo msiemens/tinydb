@@ -1,7 +1,4 @@
-import pytest
-from tinydb.utils import catch_warning
-from tinydb import where, TinyDB
-from tinydb.database import SmartCacheTable, Table
+from tinydb import where
 
 
 def test_tables_list(db):
@@ -59,57 +56,6 @@ def test_query_cache_size(db):
     assert len(table._query_cache) == 1
 
 
-def test_smart_query_cache(db):
-    db.table_class = SmartCacheTable
-    table = db.table('table3')
-    query = where('int') == 1
-    dummy = where('int') == 2
-
-    assert not table.search(query)
-    assert not table.search(dummy)
-
-    # Test insert
-    table.insert({'int': 1})
-
-    assert len(table._query_cache) == 2
-    assert len(table._query_cache[query]) == 1
-
-    # Test update
-    table.update({'int': 2}, where('int') == 1)
-
-    assert len(table._query_cache[dummy]) == 1
-    assert table.count(query) == 0
-
-    # Test remove
-    table.insert({'int': 1})
-    table.remove(where('int') == 1)
-
-    assert table.count(where('int') == 1) == 0
-
-
-def test_smart_query_cache_via_kwarg(db):
-    # For backwards compatibility
-    with pytest.raises(DeprecationWarning):
-        with catch_warning(DeprecationWarning):
-            table = db.table('table3', smart_cache=True)
-            assert isinstance(table, SmartCacheTable)
-
-
-def test_custom_table_class_via_class_attribute(db):
-    TinyDB.table_class = SmartCacheTable
-
-    table = db.table('table3')
-    assert isinstance(table, SmartCacheTable)
-
-    TinyDB.table_class = Table
-
-
-def test_custom_table_class_via_instance_attribute(db):
-    db.table_class = SmartCacheTable
-    table = db.table('table3')
-    assert isinstance(table, SmartCacheTable)
-
-
 def test_lru_cache(db):
     # Test integration into TinyDB
     table = db.table('table3', cache_size=2)
@@ -122,3 +68,9 @@ def test_lru_cache(db):
 
     table.remove(where('int') == 1)
     assert not table._query_cache.lru
+
+    table.search(query)
+
+    assert len(table._query_cache) == 1
+    table.clear_cache()
+    assert len(table._query_cache) == 0

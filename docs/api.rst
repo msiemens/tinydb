@@ -10,13 +10,9 @@ API Documentation
     :exclude-members: __dict__, __weakref__
     :member-order: bysource
 
-.. autoclass:: tinydb.database.Table
-    :members:
-    :special-members:
-    :exclude-members: __dict__, __weakref__
-    :member-order: bysource
+.. _table_api:
 
-.. autoclass:: tinydb.database.SmartCacheTable
+.. autoclass:: tinydb.database.Table
     :members:
     :special-members:
     :exclude-members: __dict__, __weakref__

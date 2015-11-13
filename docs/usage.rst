@@ -32,11 +32,139 @@ JSON module. To improve performance, you can install
 `ujson <http://pypi.python.org/pypi/ujson>`_ , an extremely fast JSON
 implementation. TinyDB will auto-detect and use it if possible.
 
+Queries
+-------
+
+With that out of the way, let's start with TinyDB's rich set of queries.
+There are two main ways to construct queries. The first one resembles the
+syntax of popular ORM tools:
+
+>>> from tinydb import Query
+>>> User = Query()
+>>> db.search(User.name == 'John')
+
+As you can see, we first create a new Query object and then use it to specify
+which fields to check. Searching for nested fields is just as easy:
+
+>>> db.search(User.birthday.year == 1990)
+
+Not all fields can be accessed this way if the field name is not a valid Python
+identifier. In this case, you can switch to array indexing notation:
+
+>>> # This would be invalid Python syntax:
+>>> db.search(User.country-code == 'foo')
+>>> # Use this instead:
+>>> db.search(User['country-code'] == 'foo')
+
+The second, traditional way of constructing queries is as follows:
+
+>>> from tinydb import where
+>>> db.search(where('field') == 'value')
+
+Using ``where('field')`` is a shorthand for the following code:
+
+>>> db.search(Query()['field'] == 'value')
+
+Advanced queries
+................
+
+In the :doc:`getting-started` you've learned about the basic comparisons
+(``==``, ``<``, ``>``, ...). In addition to these TinyDB supports the following
+queries:
+
+>>> # Existence of a field:
+>>> db.search(User.name.exists())
+
+>>> # Regex:
+>>> db.search(User.name.matches('[aZ]*'))
+>>> db.search(User.name.search('b+'))
+
+>>> # Custom test:
+>>> test_func = lambda s: s == 'John'
+>>> db.search(User.name.test(test_func))
+
+>>> # Custom test with parameters:
+>>> def test_func(val, m, n):
+>>>     return m <= val <= n
+>>> db.search(User.age.test(test_func, 0, 21))
+>>> db.search(User.age.test(test_func, 21, 99))
+
+When a field contains a list, you also can use the following methods:
+
+>>> # Using a query:
+>>> # User is member of at least one admin group
+>>> db.search(User.groups.any(Group.name == 'admin'))
+>>> # User is only member of admin groups
+>>> db.search(User.groups.all(Group.name == 'admin'))
+
+>>> # Using a list of values:
+>>> # User is member of at least one group which is 'admin' or 'user'
+>>> db.search(User.groups.any(['admin', 'user']))
+>>> # User's groups are all either 'admin' or 'user'
+>>> db.search(User.groups.all(['admin', 'user']))
+
+Query modifiers
+...............
+
+TinyDB also allows you to use logical operations to modify and combine
+queries:
+
+>>> # Negate a query:
+>>> db.search(~ User.name == 'John')
+
+>>> # Logical AND:
+>>> db.search((User.name == 'John') & (User.age <= 30))
+
+>>> # Logical OR:
+>>> db.search((User.name == 'John') | (User.name == 'Bob'))
+
+.. note::
+
+    When using ``&`` or ``|``, make sure you wrap the conditions on both sides
+    with parentheses or Python will mess up the comparison.
+
+Recap
+.....
+
+Let's review the query operations we've learned:
+
++-------------------------------------+-----------------------------------------------------------+
+| **Queries**                                                                                     |
++-------------------------------------+-----------------------------------------------------------+
+| ``Query().field.exists()``          | Match any element where a field called ``field`` exists   |
++-------------------------------------+-----------------------------------------------------------+
+| ``Query().field.matches(regex)``    | Match any element matching the regular expression         |
++-------------------------------------+-----------------------------------------------------------+
+| ``Query().field.contains(regex)``   | Match any element with a matching substring               |
++-------------------------------------+-----------------------------------------------------------+
+| ``Query().field.test(func, *args)`` | Matches any element for which the function returns        |
+|                                     | ``True``                                                  |
++-------------------------------------+-----------------------------------------------------------+
+| ``Query().field.all(query | list)`` | If given a query, matches all elements where all elements |
+|                                     | in the list ``field`` match the query.                    |
+|                                     | If given a list, matches all elements where all elements  |
+|                                     | in the list ``field`` are a member of the given list      |
++-------------------------------------+-----------------------------------------------------------+
+| ``Query().field.any(query | list)`` | If given a query, matches all elements where at least one |
+|                                     | element in the list ``field`` match the query.            |
+|                                     | If given a list, matches all elements where at least one  |
+|                                     | elements in the list ``field`` are a member of the given  |
+|                                     | list                                                      |
++-------------------------------------+-----------------------------------------------------------+
+| **Logical operations on queries**                                                               |
++-------------------------------------+-----------------------------------------------------------+
+| ``~ query``                         | Match elements that don't match the query                 |
++-------------------------------------+-----------------------------------------------------------+
+| ``(query1) & (query2)``             | Match elements that match both queries                    |
++-------------------------------------+-----------------------------------------------------------+
+| ``(query1) | (query2)``             | Match elements that match at least one of the queries     |
++-------------------------------------+-----------------------------------------------------------+
+
 Handling Data
 -------------
 
-With that out of the way, let's start with inserting, updating and retrieving
-data from your database.
+Next, let's look at some more ways to insert, update and retrieve data from
+your database.
 
 Inserting data
 ..............
@@ -44,7 +172,7 @@ Inserting data
 As already described you can insert an element using ``db.insert(...)``.
 In case you want to insert multiple elements, you can use ``db.insert_multiple(...)``:
 
->>> db.insert_multiple([{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}])
+>>> db.insert_multiple([{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}])
 >>> db.insert_multiple({'int': 1, 'value': i} for i in range(2))
 
 Updating data
@@ -56,7 +184,7 @@ or increment it's value. In that case you can pass a function instead of
 ``fields``:
 
 >>> from tinydb.operations import delete
->>> db.update(delete('key1'), where('key') == 'value')
+>>> db.update(delete('key1'), User.name == 'John')
 
 This will remove the key ``key1`` from all matching elements. TinyDB comes
 with these operations:
@@ -88,16 +216,16 @@ Then of course you can use ``db.search(...)`` as described in the :doc:`getting-
 section. But sometimes you want to get only one matching element. Instead of using
 
 >>> try:
-...     result = db.search(where('value') == 1)[0]
+...     result = db.search(User.name == 'John')[0]
 ... except IndexError:
 ...     pass
 
 
 you can use ``db.get(...)``:
 
->>> db.get(where('value') == 1)
-{'int': 1, 'value': 1}
->>> db.get(where('value') == 100)
+>>> db.get(User.name == 'John')
+{'name': 'John', 'age': 22}
+>>> db.get(User.name == 'Bobby')
 None
 
 .. caution::
@@ -108,12 +236,12 @@ None
 Often you don't want to search for elements but only know whether they are
 stored in the database. In this case ``db.contains(...)`` is your friend:
 
->>> db.contains(where('char') == 'a')
+>>> db.contains(User.name == 'John')
 
 In a similar manner you can look up the number of elements matching a query:
 
->>> db.count(where('int') == 1)
-3
+>>> db.count(User.name == 'John')
+2
 
 Recap
 ^^^^^
@@ -149,7 +277,7 @@ Using Element IDs
 Internally TinyDB associates an ID with every element you insert. It's returned
 after inserting an element:
 
->>> db.insert({'value': 1})
+>>> db.insert({'name': 'John', 'age': 22})
 3
 >>> db.insert_multiple([{...}, {...}, {...}])
 [4, 5, 6]
@@ -157,7 +285,7 @@ after inserting an element:
 In addition you can get the ID of already inserted elements using
 ``element.eid``:
 
->>> el = db.get(where('value') == 1)
+>>> el = db.get(User.name == 'John')
 >>> el.eid
 3
 
@@ -197,134 +325,6 @@ Let's sum up the way TinyDB supports working with IDs:
 +----------------------------------+---------------------------------------------------------------+
 
 
-Queries
--------
-
-TinyDB lets you use a rich set of queries. In the :doc:`getting-started` you've
-learned about the basic comparisons (``==``, ``<``, ``>``, ...). In addition
-to that TinyDB enables you run logical operations on queries.
-
->>> # Negate a query:
->>> db.search(~ where('int') == 1)
-
->>> # Logical AND:
->>> db.search((where('int') == 1) & (where('char') == 'b'))
-[{'int': 1, 'char': 'b'}]
-
->>> # Logical OR:
->>> db.search((where('char') == 'a') | (where('char') == 'b'))
-[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
-
-.. note::
-
-    When using ``&`` or ``|``, make sure you wrap the conditions on both sides
-    with parentheses or Python will mess up the comparison.
-
-You also can search for elements where a specific key exists:
-
->>> db.search(where('char'))
-[{'int': 1, 'char': 'a'}, {'int': 1, 'char': 'b'}]
-
-Advanced queries
-................
-
-In addition to these checks TinyDB supports checking against
-a regex or a custom test function:
-
->>> # Regex:
->>> db.search(where('char').matches('[aZ]*'))
-[{'int': 1, 'char': 'abc'}, {'int': 1, 'char': 'def'}]
->>> db.search(where('char').contains('b+'))
-[{'int': 1, 'char': 'abbc'}, {'int': 1, 'char': 'bb'}]
-
->>> # Custom test:
->>> test_func = lambda c: c == 'a'
->>> db.search(where('char').test(test_func))
-[{'char': 'a', 'int': 1}]
-
->>> # Custom test with parameters:
->>> def test_func(val, m, n):
->>>     return m <= val <= n
->>> db.search(where('int').test(test_func, 0, 1))
-[{'char': 'a', 'int': 1}]
->>> db.search(where('int').test(test_func, 2, 3))
-[]
-
-.. _nested_queries:
-
-Nested Queries
-..............
-
-You can insert nested elements into your database:
-
->>> db.insert({'field': {'name': {'first_name': 'John', 'last_name': 'Doe'}}})
-
-To search for a nested field, use ``where('field').has(...)``. You can apply
-any queries you already know to this selector:
-
->>> db.search(where('field').has('name'))
-[{'field': ...}]
->>> db.search(where('field').has('name').has('last_name') == 'Doe')
-[{'field': ...}]
-
-You also can use lists inside of elements:
-
->>> db.insert({'field': [{'val': 1}, {'val': 2}, {'val': 3}])
-
-Using ``where('field').any(...)`` and ``where('field').all(...)`` you can
-specify checks for the list's items using either a nested query or a sequence
-such as a list. They behave similarly to Python's `any` and `all`:
-
->>> # Nested Query:
->>> db.search(where('field').any(where('val') == 1))
-True
->>> db.search(where('field').all(where('val') > 0))
-True
-
->>> # List:
->>> db.search(where('field').any([{'val': 1}, {'val': 4}]))
-True
->>> db.search(where('field').all([{'val': 1}, {'val': 4}]))
-False
->>> db.search(where('field').all([{'val': 1}, {'val': 3}]))
-True
-
-Recap
-.....
-
-Again, let's recapitulate the query operations:
-
-+-------------------------------------+-----------------------------------------------------------+
-| **Queries**                                                                                     |
-+-------------------------------------+-----------------------------------------------------------+
-| ``where('field').matches(regex)``   | Match any element matching the regular expression         |
-+-------------------------------------+-----------------------------------------------------------+
-| ``where('field').contains(regex)``  | Match any element with a matching substring               |
-+-------------------------------------+-----------------------------------------------------------+
-| ``where('field').test(func, *args)``| Matches any element for which the function returns        |
-|                                     | ``True``                                                  |
-+-------------------------------------+-----------------------------------------------------------+
-| **Combining Queries**                                                                           |
-+-------------------------------------+-----------------------------------------------------------+
-| ``~ query``                         | Match elements that don't match the query                 |
-+-------------------------------------+-----------------------------------------------------------+
-| ``(query1) & (query2)``             | Match elements that match both queries                    |
-+-------------------------------------+-----------------------------------------------------------+
-| ``(query1) | (query2)``             | Match elements that match one of the queries              |
-+-------------------------------------+-----------------------------------------------------------+
-| **Nested Queries**                  |                                                           |
-+-------------------------------------+-----------------------------------------------------------+
-| ``where('field').has('field')``     | Match any element that has the specified item. Perform    |
-|                                     | more queries on this selector as needed                   |
-+-------------------------------------+-----------------------------------------------------------+
-| ``where('field').any(query)``       | Match any element where 'field' is a list where one of    |
-|                                     | the items matches the subquery                            |
-+-------------------------------------+-----------------------------------------------------------+
-| ``where('field').all(query)``       | Match any element where 'field' is a list where all items |
-|                                     | match the subquery                                        |
-+-------------------------------------+-----------------------------------------------------------+
-
-
 Tables
 ------
 
@@ -362,17 +362,6 @@ size by passing the ``cache_size`` to the ``table(...)`` function:
 
 .. hint:: You can set ``cache_size`` to ``None`` to make the cache unlimited in
    size.
-
-.. _smart_cache:
-
-Smart Query Cache
-^^^^^^^^^^^^^^^^^
-
-If you perform lots of queries while the data changes only little, you may
-enable a smarter query cache. It updates the query cache when
-inserting/removing/updating elements so the cache doesn't get invalidated.
-
->>> table = db.table('table_name', smart_cache=True)
 
 Storages & Middlewares
 ----------------------
@@ -442,9 +431,8 @@ What's next
 Congratulations, you've made through the user guide! Now go and build something
 awesome or dive deeper into TinyDB with these resources:
 
-- Want to learn how to customize TinyDB (custom serializers, storages,
-  middlewares) and what extensions exist? Check out :doc:`extend` and
-  :doc:`extensions`.
+- Want to learn how to customize TinyDB (storages, middlewares) and what
+  extensions exist? Check out :doc:`extend` and :doc:`extensions`.
 - Want to study the API in detail? Read :doc:`api`.
 - Interested in contributing to the TinyDB development guide? Go on to the
   :doc:`contribute`.

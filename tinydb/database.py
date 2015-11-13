@@ -2,9 +2,8 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
-import warnings
 from tinydb import JSONStorage
-from tinydb.utils import LRUCache
+from tinydb.utils import LRUCache, iteritems, itervalues
 
 
 class Element(dict):
@@ -20,6 +19,30 @@ class Element(dict):
         if value is not None:
             self.update(value)
             self.eid = eid
+
+
+class StorageProxy(object):
+    def __init__(self, storage, table_name):
+        self._storage = storage
+        self._table_name = table_name
+
+    def read(self):
+        try:
+            raw_data = (self._storage.read() or {})[self._table_name]
+        except KeyError:
+            return {}
+
+        data = {}
+        for key, val in iteritems(raw_data):
+            eid = int(key)
+            data[eid] = Element(val, eid)
+
+        return data
+
+    def write(self, values):
+        data = self._storage.read() or {}
+        data[self._table_name] = values
+        self._storage.write(data)
 
 
 class TinyDB(object):
@@ -42,14 +65,21 @@ class TinyDB(object):
         :param storage: The class of the storage to use. Will be initialized
                         with ``args`` and ``kwargs``.
         """
+
+        # Prepare the storage
+        self._opened = False
+
         storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
 
+        self._opened = True
+
+        # Prepare the default table
         self._table_cache = {}
         self._table = self.table('_default')
 
-    def table(self, name='_default', smart_cache=False, **options):
+    def table(self, name='_default', **options):
         """
         Get access to a specific table.
 
@@ -58,30 +88,18 @@ class TinyDB(object):
 
         :param name: The name of the table.
         :type name: str
-        :param smart_cache: Use a smarter query caching.
-                            See :class:`tinydb.database.SmartCacheTable`
         :param cache_size: How many query results to cache.
         """
 
         if name in self._table_cache:
             return self._table_cache[name]
 
-        if smart_cache:
-            warnings.warn('Passing the smart_cache argument is deprecated. '
-                          'Please set the table class to use via '
-                          '`db.table_class = SmartCacheTable` or '
-                          '`TinyDB.table_class = SmartCacheTable` instead.',
-                          DeprecationWarning)
-
-        # If smart_cache is set, use SmartCacheTable to retain backwards
-        # compatibility
-        table_class = SmartCacheTable if smart_cache else self.table_class
-        table = table_class(name, self, **options)
+        table = self.table_class(StorageProxy(self._storage, name), **options)
 
         self._table_cache[name] = table
 
-        if name not in self._read():
-            self._write_table({}, name)
+        if not table._read():
+            table._write({})
 
         return table
 
@@ -93,94 +111,33 @@ class TinyDB(object):
         :rtype: set[str]
         """
 
-        return set(self._read().keys())
+        return set(self._storage.read())
 
     def purge_tables(self):
         """
         Purge all tables from the database. **CANNOT BE REVERSED!**
         """
 
-        self._write({})
+        self._storage.write({})
         self._table_cache.clear()
 
-    def _read(self):
+    def close(self):
         """
-        Reading access to the backend.
-
-        :returns: all tables
-        :rtype: dict
+        Close the database.
         """
+        self._opened = False
+        self._storage.close()
 
-        try:
-            return self._storage.read()
-        except ValueError:
-            return {}
-
-    def _read_table(self, table):
-        """
-        Read a table from the backend.
-
-        :param table: The name of the table to read
-        :return: dict
-        """
-
-        try:
-            return self._read()[table]
-        except (KeyError, TypeError):
-            return {}
-
-    def _write(self, tables):
-        """
-        Writing access to the backend.
-
-        :param tables: The new tables to write
-        :type tables: dict
-        """
-
-        # Write all tables
-        self._storage.write(tables)
-
-    def _write_table(self, values, table):
-        """
-        Write data for a table.
-
-        :param values: The values contained in the table
-        :type values: dict
-        :param table: The name of the table to write
-        :type table: str
-        """
-
-        # Write specific table
-        data = self._read()
-        data[table] = values
-
-        self._write(data)
-
-    # Methods that are executed on the default table
-    # Because magic methods are not handlet by __getattr__ we need to forward
-    # them manually here
-
-    def __len__(self):
-        """
-        Get the total number of elements in the DB.
-
-        >>> db = TinyDB('db.json')
-        >>> len(db)
-        0
-        """
-        return len(self._table)
+    def __del__(self):
+        if self._opened is True:
+            self.close()
 
     def __enter__(self):
-        """
-        See :meth:`.Table.__enter__`
-        """
-        return self._table.__enter__()
+        return self
 
     def __exit__(self, *args):
-        """
-        See :meth:`.Table.__exit__`
-        """
-        return self._table.__exit__(*args)
+        if self._opened is True:
+            self.close()
 
     def __getattr__(self, name):
         """
@@ -188,30 +145,41 @@ class TinyDB(object):
         """
         return getattr(self._table, name)
 
+    # Methods that are executed on the default table
+    # Because magic methods are not handlet by __getattr__ we need to forward
+    # them manually here
+
+    def __len__(self):
+        """
+        Get the total number of elements in the default table.
+
+        >>> db = TinyDB('db.json')
+        >>> len(db)
+        0
+        """
+        return len(self._table)
+
 
 class Table(object):
     """
     Represents a single TinyDB Table.
     """
 
-    def __init__(self, name, db, cache_size=10):
+    def __init__(self, storage, cache_size=10):
         """
         Get access to a table.
 
-        :param name: The name of the table.
-        :type name: str
-        :param db: The parent database.
-        :type db: tinydb.database.TinyDB
+        :param storage: Access to the storage
+        :type storage: StorageProxyus
         :param cache_size: Maximum size of query cache.
         """
 
-        self.name = name
-        self._db = db
+        self._storage = storage
         self._query_cache = LRUCache(capacity=cache_size)
 
-        old_ids = self._read().keys()
-        if old_ids:
-            self._last_id = max(i for i in old_ids)
+        data = self._read()
+        if data:
+            self._last_id = max(i for i in data)
         else:
             self._last_id = 0
 
@@ -232,7 +200,7 @@ class Table(object):
         :param func: the function to execute on every included element.
                      first argument: all data
                      second argument: the current eid
-        :param cond: elements to use
+        :param cond: elements to use, or
         :param eids: elements to use
         """
 
@@ -250,6 +218,14 @@ class Table(object):
                     func(data, eid)
 
         self._write(data)
+
+    def clear_cache(self):
+        """
+        Clear the query cache.
+
+        A simple helper that clears the internal query cache.
+        """
+        self._query_cache.clear()
 
     def _get_next_id(self):
         """
@@ -269,13 +245,7 @@ class Table(object):
         :rtype: dict
         """
 
-        raw_data = self._db._read_table(self.name)
-        data = {}
-        for key in list(raw_data):
-            eid = int(key)
-            data[eid] = Element(raw_data[key], eid)
-
-        return data
+        return self._storage.read()
 
     def _write(self, values):
         """
@@ -286,7 +256,7 @@ class Table(object):
         """
 
         self._query_cache.clear()
-        self._db._write_table(values, self.name)
+        self._storage.write(values)
 
     def __len__(self):
         """
@@ -302,7 +272,7 @@ class Table(object):
         :rtype: list[Element]
         """
 
-        return list(self._read().values())
+        return list(itervalues(self._read()))
 
     def insert(self, element):
         """
@@ -359,7 +329,7 @@ class Table(object):
 
         :param fields: the fields that the matching elements will have
                        or a method that will update the elements
-        :type fields: dict | (dict, int) -> None
+        :type fields: dict | dict -> None
         :param cond: which elements to update
         :type cond: query
         :param eids: a list of element IDs
@@ -367,11 +337,11 @@ class Table(object):
         """
 
         if callable(fields):
-            _update = lambda data, eid: fields(data[eid])
+            self.process_elements(lambda data, eid: fields(data[eid]),
+                                  cond, eids)
         else:
-            _update = lambda data, eid: data[eid].update(fields)
-
-        self.process_elements(_update, cond, eids)
+            self.process_elements(lambda data, eid: data[eid].update(fields),
+                                  cond, eids)
 
     def purge(self):
         """
@@ -456,115 +426,6 @@ class Table(object):
 
         # Element specified by condition
         return self.get(cond) is not None
-
-    def __enter__(self):
-        """
-        Allow the database to be used as a context manager.
-
-        :return: the table instance
-        """
-
-        return self
-
-    def __exit__(self, *args):
-        """
-        Try to close the storage after being used as a context manager.
-        """
-
-        _ = args
-        self._db._storage.close()
-
-    close = __exit__
-
-
-class SmartCacheTable(Table):
-    """
-    A Table with a smarter query cache.
-
-    Provides the same methods as :class:`~tinydb.database.Table`.
-
-    The query cache gets updated on insert/update/remove. Useful when in cases
-    where many searches are done but data isn't changed often.
-    """
-
-    def _write(self, values):
-        # Just write data, don't clear the query cache
-        self._db._write_table(values, self.name)
-
-    def insert(self, element):
-        # See Table.insert
-
-        # Insert element
-        eid = super(SmartCacheTable, self).insert(element)
-
-        # Update query cache
-        for query in self._query_cache:
-            results = self._query_cache[query]
-            if query(element):
-                results.append(element)
-
-        return eid
-
-    def insert_multiple(self, elements):
-        # See Table.insert_multiple
-
-        # We have to call `SmartCacheTable.insert` here because
-        # `Table.insert_multiple` doesn't call `insert()` for every element
-        return [self.insert(element) for element in elements]
-
-    def update(self, fields, cond=None, eids=None):
-        # See Table.update
-
-        if callable(fields):
-            _update = lambda data, eid: fields(data[eid])
-        else:
-            _update = lambda data, eid: data[eid].update(fields)
-
-        def process(data, eid):
-            old_value = data[eid].copy()
-
-            # Update element
-            _update(data, eid)
-            new_value = data[eid]
-
-            # Update query cache
-            for query in self._query_cache:
-                results = self._query_cache[query]
-
-                if query(old_value):
-                    # Remove old value from cache
-                    results.remove(old_value)
-
-                elif query(new_value):
-                    # Add new value to cache
-                    results.append(new_value)
-
-        self.process_elements(process, cond, eids)
-
-    def remove(self, cond=None, eids=None):
-        # See Table.remove
-
-        def process(data, eid):
-            # Update query cache
-            for query in self._query_cache:
-
-                results = self._query_cache[query]
-                try:
-                    results.remove(data[eid])
-                except ValueError:
-                    pass
-
-            # Remove element
-            data.pop(eid)
-
-        self.process_elements(process, cond, eids)
-
-    def purge(self):
-        # See Table.purge
-
-        super(SmartCacheTable, self).purge()
-        self._query_cache.clear()  # Query cache got invalid
-
 
 # Set the default table class
 TinyDB.table_class = Table

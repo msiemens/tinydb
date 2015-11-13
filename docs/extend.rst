@@ -1,48 +1,21 @@
 How to Extend TinyDB
 ====================
 
-Write a Serializer
-------------------
+There are three main ways to extend TinyDB and modify its behaviour:
 
-TinyDB's default JSON storage is fairly limited when it comes to supported data
-types. If you need more flexibility, you can implement a Serializer. This allows
-TinyDB to handle classes it couldn't serialize otherwise. Let's see how a
-Serializer for ``datetime`` objects could look like:
+1. custom storages,
+2. middlewares, and finally
+3. custom table classes.
 
-.. code-block:: python
+Let's look at them in this order.
 
-    from datetime import datetime
-
-    class DateTimeSerializer(Serializer):
-        OBJ_CLASS = datetime  # The class this serializer handles
-
-        def encode(self, obj):
-            return obj.strftime('%Y-%m-%dT%H:%M:%S')
-
-        def decode(self, s):
-            return datetime.strptime(s, '%Y-%m-%dT%H:%M:%S')
-
-To use the new serializer, we need to use the serialization middleware:
-
-.. code-block:: python
-
-    >>> from tinydb.storages import JSONStorage
-    >>> from tinydb.middlewares import SerializationMiddleware
-    >>>
-    >>> serialization = SerializationMiddleware()
-    >>> serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
-    >>>
-    >>> db = TinyDB('db.json', storage=serialization)
-    >>> db.insert({'date': datetime(2000, 1, 1, 12, 0, 0)})
-    >>> db.all()
-    [{'date': datetime.datetime(2000, 1, 1, 12, 0)}]
-
-Write a custom Storage
+Write a Custom Storage
 ----------------------
 
-By default TinyDB comes with a in-memory storage and a JSON file storage. But
-of course you can add your own. Let's look how you could add a
-`YAML <http://yaml.org/>`_ storage using `PyYAML <http://pyyaml.org/wiki/PyYAML>`_:
+First, we have support for custom storages. By default TinyDB comes with an
+in-memory storage and a JSON file storage. But of course you can add your own.
+Let's look how you could add a `YAML <http://yaml.org/>`_ storage using
+`PyYAML <http://pyyaml.org/wiki/PyYAML>`_:
 
 .. code-block:: python
 
@@ -54,10 +27,11 @@ of course you can add your own. Let's look how you could add a
 
         def read(self):
             with open(self.filename) as handle:
-                data = yaml.safe_load(handle.read())  # (2)
-
-            if data is None:  # (3)
-                raise ValueError
+                try:
+                    data = yaml.safe_load(handle.read())  # (2)
+                    return data
+                except yaml.YAMLError:
+                    return None  # (3)
 
         def write(self, data):
             with open(self.filename, 'w') as handle:
@@ -75,8 +49,8 @@ There are some things we should look closer at:
 2. We use ``yaml.safe_load`` as recommended by the
    `PyYAML documentation <http://pyyaml.org/wiki/PyYAMLDocumentation#LoadingYAML>`_
    when processing data from a potentially untrusted source.
-3. If the storage is uninitialized, TinyDB expects the storage to throw a
-   ``ValueError`` so it can do any internal initialization that is necessary.
+3. If the storage is uninitialized, TinyDB expects the storage to return
+   ``None`` so it can do any internal initialization that is necessary.
 4. If your storage needs any cleanup (like closing file handles) before an
    instance is destroyed, you can put it in the ``close()`` method. To run
    these, you'll either have to run ``db.close()`` on your ``TinyDB`` instance
@@ -95,7 +69,7 @@ Finally, using the YAML storage is very straight-forward:
     # ...
 
 
-Write a custom Middleware
+Write a Custom Middleware
 -------------------------
 
 Sometimes you don't want to write a new storage but rather modify the behaviour
@@ -180,3 +154,25 @@ To wrap a storage with this new middleware, we use it like this:
 
 Here ``SomeStorageClass`` should be replaced with the storage you want to use.
 If you leave it empty, the default storage will be used (which is the ``JSONStorage``).
+
+Creating a Custom Table Classes
+-------------------------------
+
+Custom storages and middlewares are useful if you want to modify the way
+TinyDB stores its data. But there are cases where you want to modify how
+TinyDB itself behaves. For that use case TinyDB supports custom table classes.
+Internally TinyDB creates a ``Table`` instance for every table that is used.
+You can overwrite which class is used by setting ``TinyDB.table_class``
+before creating a ``TinyDB`` instance. This class has to support the
+:ref:`Table API <table_api>`. The best way to accomplish that is to subclass
+it:
+
+.. code-block:: python
+
+    from tinydb.database import Table
+
+    class YourTableClass(Table):
+        pass  # Modify original methods as needed
+
+For an more advanced example, see the source of the
+`tinydb-smartcache <https://github.com/msiemens/tinydb-smartcache>`_ extension.

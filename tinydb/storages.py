@@ -37,7 +37,7 @@ class Storage(with_metaclass(ABCMeta, object)):
         Read the last stored state.
 
         Any kind of deserialization should go here.
-        Raise ``ValueError`` here to indicate that the storage is empty.
+        Return ``None`` here to indicate that the storage is empty.
 
         :rtype: dict
         """
@@ -82,19 +82,23 @@ class JSONStorage(Storage):
 
         super(JSONStorage, self).__init__()
         touch(path)  # Create file if not exists
-        self.path = path
         self.kwargs = kwargs
         self._handle = open(path, 'r+')
 
     def close(self):
         self._handle.close()
 
-    def __del__(self):
-        self.close()
-
     def read(self):
-        self._handle.seek(0)
-        return json.load(self._handle)
+        # Get the file size
+        self._handle.seek(0, 2)
+        size = self._handle.tell()
+
+        if not size:
+            # File is empty
+            return None
+        else:
+            self._handle.seek(0)
+            return json.load(self._handle)
 
     def write(self, data):
         self._handle.seek(0)
@@ -108,18 +112,15 @@ class MemoryStorage(Storage):
     Store the data as JSON in memory.
     """
 
-    memory = None
-
     def __init__(self):
         """
         Create a new instance.
         """
 
         super(MemoryStorage, self).__init__()
+        self.memory = None
 
     def read(self):
-        if self.memory is None:
-            raise ValueError
         return self.memory
 
     def write(self, data):

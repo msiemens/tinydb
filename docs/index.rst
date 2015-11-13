@@ -4,11 +4,12 @@ Welcome to TinyDB!
 Welcome to TinyDB, your tiny, document oriented database optimized for your
 happiness :)
 
->>> from tinydb import TinyDB, where
+>>> from tinydb import TinyDB, Query
 >>> db = TinyDB('path/to/db.json')
->>> db.insert({'int': 1, 'char': 'a'})
->>> db.search(where('int') == 1)
-[{'int': 1, 'char': 'a'}]
+>>> User = Query()
+>>> db.insert({'name': 'John', 'age': 22})
+>>> db.search(User.name == 'John')
+[{'name': 'John', 'age': 22}]
 
 User's Guide
 ------------
