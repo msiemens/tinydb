@@ -56,12 +56,16 @@ class QueryImpl(object):
     # --- Query modifiers -----------------------------------------------------
 
     def __and__(self, other):
+        # We use a frozenset for the hash as the AND operation is commutative
+        # (a | b == b | a)
         return QueryImpl(lambda value: self(value) and other(value),
-                         ('and', self.hashval, other.hashval))
+                         ('and', frozenset([self.hashval, other.hashval])))
 
     def __or__(self, other):
+        # We use a frozenset for the hash as the OR operation is commutative
+        # (a & b == b & a)
         return QueryImpl(lambda value: self(value) or other(value),
-                         ('or', self.hashval, other.hashval))
+                         ('or', frozenset([self.hashval, other.hashval])))
 
     def __invert__(self):
         return QueryImpl(lambda value: not self(value),
@@ -70,9 +74,11 @@ class QueryImpl(object):
 
 class Query(object):
     """
-    Builds queries.
+    A Query builder.
 
-    TODO: Docs
+    The:class:`~tinydb.queries.Query` class is actually more like a query
+    builder. It creates and returns :class:`~tinydb.queries.QueryImpl` objects
+    which represent the actual query.
     """
 
     def __init__(self, path=None):
@@ -87,6 +93,13 @@ class Query(object):
     __getitem__ = __getattr__
 
     def _generate_test(self, test, hashval):
+        """
+        Generate a query based on a test function.
+
+        :param test: The test the query executes.
+        :param hashval: The hash of the query.
+        :return: A :class:`~tinydb.queries.QueryImpl` object
+        """
         if not self.path:
             raise ValueError('Query has no path')
 

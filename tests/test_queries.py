@@ -231,12 +231,20 @@ def test_has():
 def test_hash():
     d = {
         Query().key1 == 2: True,
-        Query().key1.key2.key3.exists(): True
+        Query().key1.key2.key3.exists(): True,
+        Query().key1.exists() & Query().key2.exists(): True,
+        Query().key1.exists() | Query().key2.exists(): True,
     }
 
     assert (Query().key1 == 2) in d
     assert (Query().key1.key2.key3.exists()) in d
     assert (Query()['key1.key2'].key3.exists()) not in d
+
+    # Commutative property of & and |
+    assert (Query().key1.exists() & Query().key2.exists()) in d
+    assert (Query().key2.exists() & Query().key1.exists()) in d
+    assert (Query().key1.exists() | Query().key2.exists()) in d
+    assert (Query().key2.exists() | Query().key1.exists()) in d
 
 
 def test_orm_usage():

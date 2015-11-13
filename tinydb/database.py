@@ -219,6 +219,14 @@ class Table(object):
 
         self._write(data)
 
+    def clear_cache(self):
+        """
+        Clear the query cache.
+
+        A simple helper that clears the internal query cache.
+        """
+        self._query_cache.clear()
+
     def _get_next_id(self):
         """
         Increment the ID used the last time and return it

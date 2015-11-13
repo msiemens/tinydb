@@ -68,3 +68,9 @@ def test_lru_cache(db):
 
     table.remove(where('int') == 1)
     assert not table._query_cache.lru
+
+    table.search(query)
+
+    assert len(table._query_cache) == 1
+    table.clear_cache()
+    assert len(table._query_cache) == 0
