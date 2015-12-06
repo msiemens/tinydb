@@ -5,7 +5,7 @@ Great that you've taken time to check out the TinyDB docs! Before we begin
 looking at TinyDB itself, let's take some time to see whether you should use
 TinyDB.
 
-Why Using TinyDB?
+Why Use TinyDB?
 -----------------
 
 - **tiny:** The current source code has 1200 lines of code (with about 40%
@@ -23,10 +23,6 @@ Why Using TinyDB?
   e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any dependencies
   from PyPI.
 
-- **written in pure Python:** TinyDB neither needs an external server (as
-  e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any dependencies
-  from PyPI.
-
 - **works on Python 2.6 – 3.5 and PyPy:** TinyDB works on all modern versions
   of Python and PyPy.
 
@@ -39,7 +35,7 @@ In short: If you need a simple database with a clean API that just works
 without lots of configuration, TinyDB might be the right choice for you.
 
 
-Why **Not** Using TinyDB?
+Why **Not** Use TinyDB?
 -------------------------
 
 - You need **advanced features** like access from multiple processes, indexes,
