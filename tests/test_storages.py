@@ -6,7 +6,8 @@ import pytest
 random.seed()
 
 from tinydb import TinyDB, where
-from tinydb.storages import JSONStorage, MemoryStorage, Storage
+from tinydb.storages import JSONStorage, MemoryStorage, Storage, \
+    GzipJSONStorage
 
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
            'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
@@ -103,3 +104,40 @@ def test_custom():
 
     with pytest.raises(TypeError):
         MyStorage()
+
+def test_json(tmpdir):
+    # Write contents
+    path = str(tmpdir.join('test.db.gz'))
+    storage = GzipJSONStorage(path)
+    storage.write(element)
+
+    # Verify contents
+    assert element == storage.read()
+
+
+def test_gzjson_readwrite(tmpdir):
+    """
+    Regression test for issue #1
+    """
+    path = str(tmpdir.join('test.db.gz'))
+
+    # Create TinyDB instance
+    db = TinyDB(path, storage=GzipJSONStorage)
+
+    item = {'name': 'A very long entry'}
+    item2 = {'name': 'A short one'}
+
+    get = lambda s: db.get(where('name') == s)
+
+    db.insert(item)
+    assert get('A very long entry') == item
+
+    db.remove(where('name') == 'A very long entry')
+    assert get('A very long entry') is None
+
+    db.insert(item2)
+    assert get('A short one') == item2
+
+    db.remove(where('name') == 'A short one')
+    assert get('A short one') is None
+
