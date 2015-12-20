@@ -5,6 +5,7 @@ implementations.
 
 from abc import ABCMeta, abstractmethod
 import os
+import pickletools
 
 from tinydb.utils import with_metaclass
 
@@ -169,6 +170,7 @@ class PickleStorage(Storage):
 
     def write(self, data):
         self._handle.seek(0)
-        pickle.dump(data, self._handle, **self.kwargs)
+        pickle_data = pickletools.optimize(pickle.dumps(data))
+        self._handle.write(pickle_data, **self.kwargs)
         self._handle.flush()
         self._handle.truncate()
