@@ -290,7 +290,7 @@ In addition you can get the ID of already inserted elements using
 3
 
 Different TinyDB methods also work with IDs, namely: ``update``, ``remove``,
-``contains`` and ``get``.
+``contains`` and ``get``. The first two also return a list of affected IDs.
 
 >>> db.update({'value': 2}, eids=[1, 2])
 >>> db.contains(eids=[1])

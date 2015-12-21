@@ -109,6 +109,10 @@ def test_remove_ids(db):
     assert len(db) == 1
 
 
+def test_remove_returns_ids(db):
+    assert db.remove(where('char') == 'b') == [2]
+
+
 def test_update(db):
     assert db.count(where('int') == 1) == 3
 
@@ -116,6 +120,14 @@ def test_update(db):
 
     assert db.count(where('int') == 2) == 1
     assert db.count(where('int') == 1) == 2
+
+
+def test_update_returns_ids(db):
+    db.purge()
+    assert db.insert({'int': 1, 'char': 'a'}) == 1
+    assert db.insert({'int': 1, 'char': 'a'}) == 2
+
+    assert db.update({'char': 'b'}, where('int') == 1) == [1, 2]
 
 
 def test_update_transform(db):

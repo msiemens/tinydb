@@ -29,9 +29,7 @@ You now have a TinyDB database that stores its data in ``db.json``.
 What about inserting some data? TinyDB expects the data to be Python ``dict``\s:
 
 >>> db.insert({'type': 'apple', 'count': 7})
-1
 >>> db.insert({'type': 'peach', 'count': 3})
-2
 
 .. note:: The ``insert`` method returns the inserted element's ID. Read more
           about it here: :ref:`element_ids`.

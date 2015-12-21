@@ -202,6 +202,7 @@ class Table(object):
                      second argument: the current eid
         :param cond: elements to use, or
         :param eids: elements to use
+        :returns: the element IDs that were affected during processed
         """
 
         data = self._read()
@@ -212,12 +213,18 @@ class Table(object):
                 func(data, eid)
 
         else:
+            # Collect affected eids
+            eids = []
+
             # Processed elements specified by condition
             for eid in list(data):
                 if cond(data[eid]):
                     func(data, eid)
+                    eids.append(eid)
 
         self._write(data)
+
+        return eids
 
     def clear_cache(self):
         """
@@ -319,9 +326,11 @@ class Table(object):
         :type cond: query
         :param eids: a list of element IDs
         :type eids: list
+        :returns: a list containing the removed element's ID
         """
 
-        self.process_elements(lambda data, eid: data.pop(eid), cond, eids)
+        return self.process_elements(lambda data, eid: data.pop(eid),
+                                     cond, eids)
 
     def update(self, fields, cond=None, eids=None):
         """
@@ -334,14 +343,19 @@ class Table(object):
         :type cond: query
         :param eids: a list of element IDs
         :type eids: list
+        :returns: a list containing the updated element's ID
         """
 
         if callable(fields):
-            self.process_elements(lambda data, eid: fields(data[eid]),
-                                  cond, eids)
+            return self.process_elements(
+                lambda data, eid: fields(data[eid]),
+                cond, eids
+            )
         else:
-            self.process_elements(lambda data, eid: data[eid].update(fields),
-                                  cond, eids)
+            return self.process_elements(
+                lambda data, eid: data[eid].update(fields),
+                cond, eids
+            )
 
     def purge(self):
         """
