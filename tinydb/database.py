@@ -291,6 +291,9 @@ class Table(object):
 
         eid = self._get_next_id()
 
+        if not isinstance(element, dict):
+            raise ValueError('Element is not a dictionary')
+
         data = self._read()
         data[eid] = element
         self._write(data)

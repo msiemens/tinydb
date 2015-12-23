@@ -366,3 +366,13 @@ def test_eids_json(tmpdir):
 
         _db.remove(eids=[1, 2])
         assert len(_db) == 1
+
+
+def test_insert_string(tmpdir):
+    path = str(tmpdir.join('db.json'))
+
+    with TinyDB(path) as _db:
+        with pytest.raises(ValueError):
+            _db.insert([1, 2, 3])  # Fails
+
+        _db.insert({'value': 1})  # Does not fail
