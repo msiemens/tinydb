@@ -7,6 +7,15 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v3.1.0** (2015-12-31)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- ``db.update(...)`` and ``db.remove(...)`` now return affected element IDs
+  (see `issue #83 <https://github.com/msiemens/tinydb/issues/83>`_).
+- Inserting an invalid element (i.e. not a ``dict``) now raises an error
+  instead of corrupting the database (see
+  `issue #74 <https://github.com/msiemens/tinydb/issues/74>`_).
+
 **v3.0.0** (2015-11-13)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
