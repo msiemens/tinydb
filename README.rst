@@ -139,7 +139,7 @@ Changelog
 *********
 
 **v3.1.0** (2015-12-31)
-^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 - ``db.update(...)`` and ``db.remove(...)`` now return affected element IDs
   (see `issue #83 <https://github.com/msiemens/tinydb/issues/83>`_).
