@@ -29,21 +29,23 @@ class LRUCache(dict):
 
     def refresh(self, key):
         """
-        Push a key to the head of the LRU queue
+        Push a key to the tail of the LRU queue
         """
         if key in self.lru:
             self.lru.remove(key)
         self.lru.append(key)
 
     def get(self, key, default=None):
+        item = super(LRUCache, self).get(key, default)
         self.refresh(key)
 
-        return super(LRUCache, self).get(key, default)
+        return item
 
     def __getitem__(self, key):
+        item = super(LRUCache, self).__getitem__(key)
         self.refresh(key)
 
-        return super(LRUCache, self).__getitem__(key)
+        return item
 
     def __setitem__(self, key, value):
         super(LRUCache, self).__setitem__(key, value)

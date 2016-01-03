@@ -12,6 +12,11 @@ def test_lru_cache():
     _ = cache["a"]  # move to front in lru queue
     cache["d"] = 4  # move oldest item out of lru queue
 
+    try:
+        _ = cache['f']
+    except KeyError:
+        pass
+
     assert cache.lru == ["c", "a", "d"]
 
 
@@ -41,6 +46,11 @@ def test_lru_cache_delete():
     cache["a"] = 1
     cache["b"] = 2
     del cache["a"]
+
+    try:
+        del cache['f']
+    except KeyError:
+        pass
 
     assert cache.lru == ["b"]
 
