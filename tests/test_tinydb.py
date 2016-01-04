@@ -372,7 +372,15 @@ def test_insert_string(tmpdir):
     path = str(tmpdir.join('db.json'))
 
     with TinyDB(path) as _db:
+        data = [{'int': 1}, {'int': 2}]
+        _db.insert_multiple(data)
+
         with pytest.raises(ValueError):
             _db.insert([1, 2, 3])  # Fails
 
-        _db.insert({'value': 1})  # Does not fail
+        with pytest.raises(ValueError):
+            _db.insert(set(['bark']))  # Fails
+
+        assert data == _db.all()
+
+        _db.insert({'int': 3})  # Does not fail

@@ -33,6 +33,11 @@ TinyDB is:
 
 - **100% test coverage:** No explanation needed.
 
+To dive straight into all the details, head over to the `TinyDB docs
+<https://tinydb.readthedocs.org/>`_. You can also discuss everything related
+to TinyDB like general development, extensions or showcase your TinyDB-based
+projects on the `discussion forum <http://forum.m-siemens.de/.>`_.
+
 
 Example Code
 ************
@@ -83,12 +88,6 @@ Using Middlewares
     >>> from tinydb.storages import JSONStorage
     >>> from tinydb.middlewares import CachingMiddleware
     >>> db = TinyDB('/path/to/db.json', storage=CachingMiddleware(JSONStorage))
-
-
-Documentation
-*************
-
-The documentation for TinyDB is hosted at ``Read the Docs``: https://tinydb.readthedocs.org/
 
 
 Supported Python Versions
