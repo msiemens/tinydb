@@ -102,7 +102,8 @@ class JSONStorage(Storage):
 
     def write(self, data):
         self._handle.seek(0)
-        json.dump(data, self._handle, **self.kwargs)
+        serialized = json.dumps(data, **self.kwargs)
+        self._handle.write(serialized)
         self._handle.flush()
         self._handle.truncate()
 

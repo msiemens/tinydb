@@ -384,3 +384,19 @@ def test_insert_string(tmpdir):
         assert data == _db.all()
 
         _db.insert({'int': 3})  # Does not fail
+
+
+
+def test_insert_invalid_dict(tmpdir):
+    path = str(tmpdir.join('db.json'))
+
+    with TinyDB(path) as _db:
+        data = [{'int': 1}, {'int': 2}]
+        _db.insert_multiple(data)
+
+        with pytest.raises(TypeError):
+            _db.insert({'int': set(['bark'])})  # Fails
+
+        assert data == _db.all()
+
+        _db.insert({'int': 3})  # Does not fail
