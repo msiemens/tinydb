@@ -137,6 +137,14 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v3.1.1** (2016-01-23)
+=======================
+
+- Inserting a dictionary with data that is not JSON serializable doesn't
+  lead to corrupt files anymore (see `issue #89 <https://github.com/msiemens/tinydb/issues/89>`_).
+- Fix a bug in the LRU cache that may lead to an invalid query cache
+  (see `issue #87 <https://github.com/msiemens/tinydb/issues/87>`_).
+
 **v3.1.0** (2015-12-31)
 =======================
 

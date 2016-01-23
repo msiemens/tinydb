@@ -11,7 +11,7 @@ def read(fname):
 
 setup(
     name="tinydb",
-    version="3.1.0",
+    version="3.1.1",
     packages=find_packages(),
 
     # development metadata
