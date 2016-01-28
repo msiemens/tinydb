@@ -386,7 +386,6 @@ def test_insert_string(tmpdir):
         _db.insert({'int': 3})  # Does not fail
 
 
-
 def test_insert_invalid_dict(tmpdir):
     path = str(tmpdir.join('db.json'))
 

@@ -1,7 +1,7 @@
 import warnings
 import pytest
 
-from tinydb.utils import LRUCache, catch_warning
+from tinydb.utils import LRUCache, catch_warning, freeze, FrozenDict
 
 
 def test_lru_cache():
@@ -106,3 +106,16 @@ def test_catch_warning_reset_filter():
     filters = [f for f in warnings.filters if f[2] == MyWarning]
     assert filters
     assert filters[0][0] == 'once'
+
+
+def test_freeze():
+    frozen = freeze([0, 1, 2, {'a': [1, 2, 3]}])
+    assert isinstance(frozen, tuple)
+    assert isinstance(frozen[3], FrozenDict)
+    assert isinstance(frozen[3]['a'], tuple)
+
+    with pytest.raises(TypeError):
+        frozen[0] = 10
+
+    with pytest.raises(TypeError):
+        frozen[3]['a'] = 10

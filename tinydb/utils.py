@@ -5,7 +5,6 @@ Utility functions.
 from contextlib import contextmanager
 import warnings
 
-
 # Python 2/3 independant dict iteration
 iteritems = getattr(dict, 'iteritems', dict.items)
 itervalues = getattr(dict, 'itervalues', dict.values)
@@ -93,6 +92,7 @@ def with_metaclass(meta, *bases):
     This has the advantage over six.with_metaclass of not introducing
     dummy classes into the final MRO.
     """
+
     class Metaclass(meta):
         __call__ = type.__call__
         __init__ = type.__init__
@@ -101,6 +101,7 @@ def with_metaclass(meta, *bases):
             if this_bases is None:
                 return type.__new__(cls, name, (), d)
             return meta(name, bases, d)
+
     return Metaclass('temporary_class', None, {})
 
 
@@ -110,3 +111,18 @@ def catch_warning(warning_cls):
         warnings.filterwarnings('error', category=warning_cls)
 
         yield
+
+
+class FrozenDict(dict):
+    def __hash__(self):
+        return hash(frozenset(self))
+
+    def __setitem__(self, key, value):
+        raise TypeError('\'FrozenDict\' object does not support item assignment')
+
+
+def freeze(obj):
+    if isinstance(obj, dict):
+        return FrozenDict((k, freeze(v)) for k, v in obj.items())
+    elif isinstance(obj, list):
+        return tuple(freeze(el) for el in obj)

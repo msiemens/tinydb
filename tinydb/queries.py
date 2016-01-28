@@ -19,7 +19,7 @@ False
 import re
 import sys
 
-from tinydb.utils import catch_warning
+from tinydb.utils import catch_warning, freeze
 
 __all__ = ('Query', 'where')
 
@@ -138,11 +138,11 @@ class Query(object):
                 return value == rhs
 
         return self._generate_test(lambda value: test(value),
-                                   ('==', tuple(self.path), rhs))
+                                   ('==', tuple(self.path), freeze(rhs)))
 
     def __ne__(self, rhs):
         return self._generate_test(lambda value: value != rhs,
-                                   ('!=', tuple(self.path), rhs))
+                                   ('!=', tuple(self.path), freeze(rhs)))
 
     def __lt__(self, rhs):
         return self._generate_test(lambda value: value < rhs,
@@ -186,7 +186,7 @@ class Query(object):
                 return is_sequence(value) and any(e in cond for e in value)
 
         return self._generate_test(lambda value: _cmp(value),
-                                   ('any', tuple(self.path), cond))
+                                   ('any', tuple(self.path), freeze(cond)))
 
     def all(self, cond):
         if callable(cond):
@@ -198,7 +198,7 @@ class Query(object):
                 return is_sequence(value) and all(e in value for e in cond)
 
         return self._generate_test(lambda value: _cmp(value),
-                                   ('all', tuple(self.path), cond))
+                                   ('all', tuple(self.path), freeze(cond)))
 
 
 def where(key):
