@@ -115,7 +115,7 @@ def catch_warning(warning_cls):
 
 class FrozenDict(dict):
     def __hash__(self):
-        return hash(frozenset(self))
+        return hash(tuple(sorted(self.items())))
 
     def _immutable(self, *args, **kws):
         raise TypeError('object is immutable')
@@ -136,3 +136,5 @@ def freeze(obj):
         return tuple(freeze(el) for el in obj)
     elif isinstance(obj, set):
         return frozenset(obj)
+    else:
+        return obj
