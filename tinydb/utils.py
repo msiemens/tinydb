@@ -117,8 +117,16 @@ class FrozenDict(dict):
     def __hash__(self):
         return hash(frozenset(self))
 
-    def __setitem__(self, key, value):
-        raise TypeError('\'FrozenDict\' object does not support item assignment')
+    def _immutable(self, *args, **kws):
+        raise TypeError('object is immutable')
+
+    __setitem__ = _immutable
+    __delitem__ = _immutable
+    clear = _immutable
+    update = _immutable
+    setdefault = _immutable
+    pop = _immutable
+    popitem = _immutable
 
 
 def freeze(obj):
@@ -126,3 +134,5 @@ def freeze(obj):
         return FrozenDict((k, freeze(v)) for k, v in obj.items())
     elif isinstance(obj, list):
         return tuple(freeze(el) for el in obj)
+    elif isinstance(obj, set):
+        return frozenset(obj)
