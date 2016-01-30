@@ -7,6 +7,13 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v3.1.2** (2016-01-30)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fix a bug when using unhashable elements (lists, dicts) with
+  ``Query.any`` or ``Query.all`` queries
+  (see `a forum post by karibul <https://forum.m-siemens.de/d/4-error-with-any-and-all-queries>`_).
+
 **v3.1.1** (2016-01-23)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
