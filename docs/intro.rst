@@ -36,10 +36,13 @@ without lots of configuration, TinyDB might be the right choice for you.
 
 
 Why **Not** Use TinyDB?
--------------------------
+-----------------------
 
-- You need **advanced features** like access from multiple processes, indexes,
-  a HTTP server, relationships or similar.
+- You need **advanced features** like:
+    - access from multiple processes or threads,
+    - creating indexes for tables,
+    - a HTTP server,
+    - managing relationships between tables or similar.
 - You are really concerned about **performance** and need a high speed
   database.
 
