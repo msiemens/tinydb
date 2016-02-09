@@ -399,3 +399,13 @@ def test_insert_invalid_dict(tmpdir):
         assert data == _db.all()
 
         _db.insert({'int': 3})  # Does not fail
+
+
+def test_gc(tmpdir):
+    # See https://github.com/msiemens/tinydb/issues/92
+    path = str(tmpdir.join('db.json'))
+    table = TinyDB(path).table('foo')
+    table.insert({'something': 'else'})
+    table.insert({'int': 13})
+    assert len(table.search(where('int') == 13)) == 1
+    assert table.all() == [{'something': 'else'}, {'int': 13}]

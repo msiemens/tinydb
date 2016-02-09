@@ -128,10 +128,6 @@ class TinyDB(object):
         self._opened = False
         self._storage.close()
 
-    def __del__(self):
-        if self._opened is True:
-            self.close()
-
     def __enter__(self):
         return self
 
