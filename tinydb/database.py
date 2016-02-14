@@ -458,7 +458,8 @@ class Table(object):
         if eids is not None:
             # Elements specified by ID
             elements = dict((e[key], e) for e in [
-                self.get(eid=eid) for eid in eids] if key in e)
+                self.get(eid=eid) for eid in eids]
+                if e is not None and key in e)
             return elements[max(elements.keys())] if elements else None
 
         # Element specified by condition
@@ -484,7 +485,8 @@ class Table(object):
         if eids is not None:
             # Elements specified by ID
             elements = dict((e[key], e) for e in [
-                self.get(eid=eid) for eid in eids] if key in e)
+                self.get(eid=eid) for eid in eids]
+                if e is not None and key in e)
             return elements[min(elements.keys())] if elements else None
 
         # Element specified by condition
