@@ -420,3 +420,13 @@ def test_max(db):
     assert db.max('char', where('int') == 2)['char'] == 'f'
     assert db.max('char')['int'] == 2
     assert db.max('char')['char'] == 'f'
+
+def test_min(db):
+    assert db.min('char', where('int') == 1)['char'] == 'a'
+    assert db.min('char', where('int') == 2) is None
+    assert db.min('float', where('int') == 1) is None
+    db.insert_multiple({'int': 2, 'char': c} for c in 'def')
+    assert db.min('char', where('int') == 1)['char'] == 'a'
+    assert db.min('char', where('int') == 2)['char'] == 'd'
+    assert db.min('char')['int'] == 1
+    assert db.min('char')['char'] == 'a'
