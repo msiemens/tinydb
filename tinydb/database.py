@@ -440,5 +440,59 @@ class Table(object):
         # Element specified by condition
         return self.get(cond) is not None
 
+    def max(self, key, cond=None, eids=None):
+        """
+        Get one element matching a condition or an ID which contains
+        field ``key`` and have max value in this field among other
+        elements matching condition or an ID.
+
+        Returns ``None`` if the element doesn't exist
+
+        :param key: name of field
+        :type key: string
+        :param cond: the condition use
+        :type cond: Query
+        :param eids: the element IDs to look for
+        """
+
+        if eids is not None:
+            # Elements specified by ID
+            elements = dict((e[key], e) for e in [
+                self.get(eid=eid) for eid in eids]
+                if e is not None and key in e)
+            return elements[max(elements.keys())] if elements else None
+
+        # Element specified by condition
+        elements = dict((e[key], e) for e in (self.search(
+            cond) if cond is not None else self.all()) if key in e)
+        return elements[max(elements.keys())] if elements else None
+
+    def min(self, key, cond=None, eids=None):
+        """
+        Get one element matching a condition or an ID which contains
+        field ``key`` and have min value in this field among other
+        elements matching condition or an ID.
+
+        Returns ``None`` if the element doesn't exist
+
+        :param key: name of field
+        :type key: string
+        :param cond: the condition use
+        :type cond: Query
+        :param eids: the element IDs to look for
+        """
+
+        if eids is not None:
+            # Elements specified by ID
+            elements = dict((e[key], e) for e in [
+                self.get(eid=eid) for eid in eids]
+                if e is not None and key in e)
+            return elements[min(elements.keys())] if elements else None
+
+        # Element specified by condition
+        elements = dict((e[key], e) for e in (self.search(
+            cond) if cond is not None else self.all()) if key in e)
+        return elements[min(elements.keys())] if elements else None
+
 # Set the default table class
 TinyDB.table_class = Table

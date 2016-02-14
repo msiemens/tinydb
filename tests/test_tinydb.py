@@ -409,3 +409,37 @@ def test_gc(tmpdir):
     table.insert({'int': 13})
     assert len(table.search(where('int') == 13)) == 1
     assert table.all() == [{'something': 'else'}, {'int': 13}]
+
+
+def test_max(db):
+    assert db.max('char', where('int') == 1)['char'] == 'c'
+    assert db.max('char', where('int') == 2) is None
+    assert db.max('float', where('int') == 1) is None
+    assert db.max('char', eids=[1, 2])['char'] == 'b'
+    assert db.max('char', eids=[4]) is None
+    db.insert_multiple({'int': 2, 'char': c} for c in 'def')
+    assert db.max('char', where('int') == 1)['char'] == 'c'
+    assert db.max('char', where('int') == 2)['char'] == 'f'
+    assert db.max('char', eids=[1, 2])['char'] == 'b'
+    assert db.max('char', eids=[5, 6])['char'] == 'f'
+    assert db.max('char')['int'] == 2
+    assert db.max('char')['char'] == 'f'
+    assert db.max('char', eids=[1, 4])['int'] == 2
+    assert db.max('char', eids=[1, 4])['char'] == 'd'
+
+
+def test_min(db):
+    assert db.min('char', where('int') == 1)['char'] == 'a'
+    assert db.min('char', where('int') == 2) is None
+    assert db.min('float', where('int') == 1) is None
+    assert db.min('char', eids=[2, 3])['char'] == 'b'
+    assert db.min('char', eids=[4]) is None
+    db.insert_multiple({'int': 2, 'char': c} for c in 'def')
+    assert db.min('char', where('int') == 1)['char'] == 'a'
+    assert db.min('char', where('int') == 2)['char'] == 'd'
+    assert db.min('char', eids=[1, 2])['char'] == 'a'
+    assert db.min('char', eids=[5, 6])['char'] == 'e'
+    assert db.min('char')['int'] == 1
+    assert db.min('char')['char'] == 'a'
+    assert db.min('char', eids=[1, 4])['int'] == 1
+    assert db.min('char', eids=[1, 4])['char'] == 'a'
