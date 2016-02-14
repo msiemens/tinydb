@@ -457,13 +457,13 @@ class Table(object):
 
         if eids is not None:
             # Elements specified by ID
-            elements = {e[key]: e for e in [
-                self.get(eid=eid) for eid in eids] if key in e}
+            elements = dict((e[key], e) for e in [
+                self.get(eid=eid) for eid in eids] if key in e)
             return elements[max(elements.keys())] if elements else None
 
         # Element specified by condition
-        elements = {e[key]: e for e in (self.search(
-            cond) if cond is not None else self.all()) if key in e}
+        elements = dict((e[key], e) for e in (self.search(
+            cond) if cond is not None else self.all()) if key in e)
         return elements[max(elements.keys())] if elements else None
 
     def min(self, key, cond=None, eids=None):
@@ -483,13 +483,13 @@ class Table(object):
 
         if eids is not None:
             # Elements specified by ID
-            elements = {e[key]: e for e in [
-                self.get(eid=eid) for eid in eids] if key in e}
+            elements = dict((e[key], e) for e in [
+                self.get(eid=eid) for eid in eids] if key in e)
             return elements[min(elements.keys())] if elements else None
 
         # Element specified by condition
-        elements = {e[key]: e for e in (self.search(
-            cond) if cond is not None else self.all()) if key in e}
+        elements = dict((e[key], e) for e in (self.search(
+            cond) if cond is not None else self.all()) if key in e)
         return elements[min(elements.keys())] if elements else None
 
 # Set the default table class
