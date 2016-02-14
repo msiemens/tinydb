@@ -137,6 +137,12 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v3.1.3** (2016-02-14)
+=======================
+
+- Fix a bug when that breaks the JSONStorage when the ``TinyDB`` instance gets garbagge collected
+  (see `issue #92 <https://github.com/msiemens/tinydb/issues/92>`_).
+
 **v3.1.2** (2016-01-30)
 =======================
 
