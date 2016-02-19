@@ -135,7 +135,8 @@ Let's review the query operations we've learned:
 +-------------------------------------+-----------------------------------------------------------+
 | ``Query().field.matches(regex)``    | Match any element matching the regular expression         |
 +-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.contains(regex)``   | Match any element with a matching substring               |
+| ``Query().field.search(regex)``     | Match any element with substring matching the regular     |
+|                                     | expression                                                |
 +-------------------------------------+-----------------------------------------------------------+
 | ``Query().field.test(func, *args)`` | Matches any element for which the function returns        |
 |                                     | ``True``                                                  |
