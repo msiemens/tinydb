@@ -74,11 +74,33 @@ class QueryImpl(object):
 
 class Query(object):
     """
-    A Query builder.
+    TinyDB Queries.
 
-    The:class:`~tinydb.queries.Query` class is actually more like a query
-    builder. It creates and returns :class:`~tinydb.queries.QueryImpl` objects
-    which represent the actual query.
+    Allows to build queries for TinyDB databases. There are two main ways of
+    using queries:
+
+    1) ORM-like usage:
+
+    >>> User = Query('user')
+    >>> db.find(User.name == 'John Doe')
+    >>> db.find(User['logged-in'] == True)
+
+    2) Classical usage:
+
+    >>> db.find(where('value') == True)
+
+    Note that ``where(...)`` is a shorthand for ``Query(...)`` allowing for
+    a more fluent syntax.
+
+    Besides the methods documented here you can combine queries using the
+    binary AND and OR operators:
+
+    >>> db.find(where('field1').exists() & where('field2') == 5)  # Binary AND
+    >>> db.find(where('field1').exists() | where('field2') == 5)  # Binary OR
+
+    Queries are executed by calling the resulting object. They expect to get the
+    element to test as the first argument and return ``True`` or ``False``
+    depending on whether the elements matches the query or not.
     """
 
     def __init__(self, path=None):
@@ -117,7 +139,11 @@ class Query(object):
 
     def __eq__(self, rhs):
         """
-        :rtype: QueryImpl
+        Test a dict value for equality.
+
+        >>> Query('f1') == 42
+
+        :param rhs: The value to compare against
         """
         if sys.version_info <= (3, 0):  # pragma: no cover
             # Special UTF-8 handling on Python 2
@@ -141,42 +167,133 @@ class Query(object):
                                    ('==', tuple(self.path), freeze(rhs)))
 
     def __ne__(self, rhs):
+        """
+        Test a dict value for inequality.
+
+        >>> Query('f1') != 42
+
+        :param rhs: The value to compare against
+        """
         return self._generate_test(lambda value: value != rhs,
                                    ('!=', tuple(self.path), freeze(rhs)))
 
     def __lt__(self, rhs):
+        """
+        Test a dict value for being lower than another value.
+
+        >>> Query('f1') < 42
+
+        :param rhs: The value to compare against
+        """
         return self._generate_test(lambda value: value < rhs,
                                    ('<', tuple(self.path), rhs))
 
     def __le__(self, rhs):
+        """
+        Test a dict value for being lower than or equal to another value.
+
+        >>> where('f1') <= 42
+
+        :param rhs: The value to compare against
+        """
         return self._generate_test(lambda value: value <= rhs,
                                    ('<=', tuple(self.path), rhs))
 
     def __gt__(self, rhs):
+        """
+        Test a dict value for being greater than another value.
+
+        >>> Query('f1') > 42
+
+        :param rhs: The value to compare against
+        """
         return self._generate_test(lambda value: value > rhs,
                                    ('>', tuple(self.path), rhs))
 
     def __ge__(self, rhs):
+        """
+        Test a dict value for being greater than or equal to another value.
+
+        >>> Query('f1') >= 42
+
+        :param rhs: The value to compare against
+        """
         return self._generate_test(lambda value: value >= rhs,
                                    ('>=', tuple(self.path), rhs))
 
     def exists(self):
+        """
+        Test for a dict where a provided key exists.
+
+        >>> Query('f1').exists() >= 42
+
+        :param rhs: The value to compare against
+        """
         return self._generate_test(lambda _: True,
                                    ('exists', tuple(self.path)))
 
     def matches(self, regex):
+        """
+        Run a regex test against a dict value (whole string has to match).
+
+        >>> Query('f1').matches(r'^\w+$')
+
+        :param regex: The regular expression to use for matching
+        """
         return self._generate_test(lambda value: re.match(regex, value),
                                    ('matches', tuple(self.path), regex))
 
     def search(self, regex):
+        """
+        Run a regex test against a dict value (only substring string has to
+        match).
+
+        >>> Query('f1').search(r'^\w+$')
+
+        :param regex: The regular expression to use for matching
+        """
         return self._generate_test(lambda value: re.search(regex, value),
                                    ('search', tuple(self.path), regex))
 
     def test(self, func, *args):
+        """
+        Run a user-defined test function against a dict value.
+
+        >>> def test_func(val):
+        ...     return val == 42
+        ...
+        >>> Query('f1').test(test_func)
+
+        :param func: The function to call, passing the dict as the first
+                     argument
+        :param args: Additional arguments to pass to the test function
+        """
         return self._generate_test(lambda value: func(value, *args),
                                    ('test', tuple(self.path), func, args))
 
     def any(self, cond):
+        """
+        Checks if a condition is met by any element in a list,
+        where a condition can also be a sequence (e.g. list).
+
+        >>> Query('f1').any(Query('f2') == 1)
+
+        Matches::
+
+            {'f1': [{'f2': 1}, {'f2': 0}]}
+
+        >>> Query('f1').any([1, 2, 3])
+        # Match f1 that contains any element from [1, 2, 3]
+
+        Matches::
+
+            {'f1': [1, 2]}
+            {'f1': [3, 4, 5]}
+
+        :param cond: Either a query that at least one element has to match or
+                     a list of which at least one element has to be contained
+                     in the tested element.
+-        """
         if callable(cond):
             def _cmp(value):
                 return is_sequence(value) and any(cond(e) for e in value)
@@ -189,6 +306,26 @@ class Query(object):
                                    ('any', tuple(self.path), freeze(cond)))
 
     def all(self, cond):
+        """
+        Checks if a condition is met by any element in a list,
+        where a condition can also be a sequence (e.g. list).
+
+        >>> Query('f1').all(Query('f2') == 1)
+
+        Matches::
+
+            {'f1': [{'f2': 1}, {'f2': 1}]}
+
+        >>> Query('f1').all([1, 2, 3])
+        # Match f1 that contains any element from [1, 2, 3]
+
+        Matches::
+
+            {'f1': [1, 2, 3, 4, 5]}
+
+        :param cond: Either a query that all elements have to match or a list
+                     which has to be contained in the tested element.
+        """
         if callable(cond):
             def _cmp(value):
                 return is_sequence(value) and all(cond(e) for e in value)
