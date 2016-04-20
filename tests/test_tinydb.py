@@ -414,5 +414,5 @@ def test_gc(tmpdir):
 def test_non_default_table():
     db = TinyDB(storage=MemoryStorage)
     assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
-    db = TinyDB(storage=MemoryStorage, table='non-default')
+    db = TinyDB(storage=MemoryStorage, default_table='non-default')
     assert ['non-default'] == list(db.tables())

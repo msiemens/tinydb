@@ -68,7 +68,7 @@ class TinyDB(object):
         """
 
         storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
-        table = kwargs.pop('table', TinyDB.DEFAULT_TABLE)
+        table = kwargs.pop('default_table', TinyDB.DEFAULT_TABLE)
 
         # Prepare the storage
         self._opened = False
