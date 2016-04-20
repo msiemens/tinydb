@@ -53,6 +53,7 @@ class TinyDB(object):
     and getting tables.
     """
 
+    DEFAULT_TABLE = '_default'
     DEFAULT_STORAGE = JSONStorage
 
     def __init__(self, *args, **kwargs):
@@ -66,20 +67,23 @@ class TinyDB(object):
                         with ``args`` and ``kwargs``.
         """
 
+        storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
+        table = kwargs.pop('default_table', TinyDB.DEFAULT_TABLE)
+
         # Prepare the storage
         self._opened = False
 
-        storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
 
         self._opened = True
 
         # Prepare the default table
-        self._table_cache = {}
-        self._table = self.table('_default')
 
-    def table(self, name='_default', **options):
+        self._table_cache = {}
+        self._table = self.table(table)
+
+    def table(self, name=DEFAULT_TABLE, **options):
         """
         Get access to a specific table.
 
