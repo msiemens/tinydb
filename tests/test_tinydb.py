@@ -409,3 +409,10 @@ def test_gc(tmpdir):
     table.insert({'int': 13})
     assert len(table.search(where('int') == 13)) == 1
     assert table.all() == [{'something': 'else'}, {'int': 13}]
+
+
+def test_non_default_table():
+    db = TinyDB(storage=MemoryStorage)
+    assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
+    db = TinyDB(storage=MemoryStorage, table='non-default')
+    assert ['non-default'] == list(db.tables())

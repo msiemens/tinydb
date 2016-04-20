@@ -67,17 +67,19 @@ class TinyDB(object):
                         with ``args`` and ``kwargs``.
         """
 
+        storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
+        table = kwargs.pop('table', TinyDB.DEFAULT_TABLE)
+
         # Prepare the storage
         self._opened = False
 
-        storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
 
         self._opened = True
 
         # Prepare the default table
-        table = kwargs.pop('table', TinyDB.DEFAULT_TABLE)
+
         self._table_cache = {}
         self._table = self.table(table)
 
