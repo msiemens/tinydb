@@ -1,12 +1,10 @@
 Upgrading to Newer Releases
 ===========================
 
-.. _upgrade_v3_0:
-
 Version 3.0
 -----------
 
-.. _upgrade_v2_0:
+.. _upgrade_v3_0:
 
 Breaking API Changes
 ^^^^^^^^^^^^^^^^^^^^
@@ -32,6 +30,8 @@ Breaking API Changes
 
 .. _msiemens/tinydb-smartcache: https://github.com/msiemens/tinydb-smartcache
 .. _msiemens/tinydb-serialization: https://github.com/msiemens/tinydb-serialization
+
+.. _upgrade_v2_0:
 
 Version 2.0
 -----------

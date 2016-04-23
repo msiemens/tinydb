@@ -105,7 +105,7 @@ see `semver.org <http://semver.org/>`_
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - Fixed a data loss when using ``CachingMiddleware`` together with ``JSONStorage``
-  (see `issue #45 <https://github.com/msiemens/tinydb/issues/47>`_)
+  (see `issue #47 <https://github.com/msiemens/tinydb/issues/47>`_)
 
 **v2.2.1** (2015-01-09)
 ^^^^^^^^^^^^^^^^^^^^^^^
