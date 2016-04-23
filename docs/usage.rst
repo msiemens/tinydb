@@ -341,17 +341,26 @@ To remove all tables from a database, use:
 
 >>> db.purge_tables()
 
-.. note::
-
-    TinyDB uses a table named ``_default`` as default table. All operations
-    on the database object (like ``db.insert(...)``) operate on this table.
-
-.. _query_caching:
-
 You can get a list with the names of all tables in your database:
 
 >>> db.tables()
 {'_default', 'table_name'}
+
+Default Table
+.............
+
+TinyDB uses a table named ``_default`` as the default table. All operations
+on the database object (like ``db.insert(...)``) operate on this table.
+The name of this table can be modified by either passing ``default_table``
+to the ``TinyDB`` constructor or by setting the ``DEFAULT_TABLE`` class
+variable to modify the default table name for all instances:
+
+>>> #1: for a single instance only
+>>> TinyDB(storage=SomeStorage, default_table='my-default')
+>>> #2: for all instances
+>>> TinyDB.DEFAULT_TABLE = 'my-default'
+
+.. _query_caching:
 
 Query Caching
 .............
@@ -388,6 +397,11 @@ To use the in-memory storage, use:
     additional keyword arguments to Python's
     `json.dump(...) <https://docs.python.org/2/library/json.html#json.dump>`_
     method.
+
+To modify the default storage for all ``TinyDB`` instances, set the
+``DEFAULT_STORAGE`` class variable:
+
+>>> TinyDB.DEFAULT_STORAGE = MemoryStorage
 
 Middlewares
 ...........
