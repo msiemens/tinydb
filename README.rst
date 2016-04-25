@@ -166,7 +166,7 @@ Changelog
 **v3.2.0** (2016-04-25)
 =======================
 
-- Add a way to specify the default table name via `default_table <http://tinydb.readthedocs.org/en/v3.2.0/usage.html#default_table>`_
+- Add a way to specify the default table name via `default_table <http://tinydb.readthedocs.org/en/v3.2.0/usage.html#default-table>`_
   (see `pull request #98 <https://github.com/msiemens/tinydb/pull/98>`_).
 - Add ``db.purge_table(name)`` to remove a single table
   (see `pull request #100 <https://github.com/msiemens/tinydb/pull/100>`_).
