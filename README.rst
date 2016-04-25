@@ -170,8 +170,9 @@ Changelog
   (see `pull request #98 <https://github.com/msiemens/tinydb/pull/98>`_).
 - Add ``db.purge_table(name)`` to remove a single table
   (see `pull request #100 <https://github.com/msiemens/tinydb/pull/100>`_).
-    - Along the way: celebrating 100 issues and pull requests! Thanks
-      everyone for every single contribution!
+
+  - Along the way: celebrating 100 issues and pull requests! Thanks everyone for every single contribution!
+
 - Extend API documentation (see `issue #96 <https://github.com/msiemens/tinydb/issues/96>`_).
 
 **v3.1.3** (2016-02-14)

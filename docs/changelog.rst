@@ -15,7 +15,7 @@ see `semver.org <http://semver.org/>`_
 - Add ``db.purge_table(name)`` to remove a single table
   (see `pull request #100 <https://github.com/msiemens/tinydb/pull/100>`_).
 
-    - Along the way: celebrating 100 issues and pull requests! Thanks everyone for every single contribution!
+  - Along the way: celebrating 100 issues and pull requests! Thanks everyone for every single contribution!
 
 - Extend API documentation (see `issue #96 <https://github.com/msiemens/tinydb/issues/96>`_).
 
