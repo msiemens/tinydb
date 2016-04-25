@@ -428,6 +428,7 @@ def test_non_default_table():
 def test_purge_table():
     db = TinyDB(storage=MemoryStorage)
     assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
+
     db.purge_table(TinyDB.DEFAULT_TABLE)
     assert [] == list(db.tables())
 
