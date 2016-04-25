@@ -134,11 +134,13 @@ def test_update_transform(db):
     def increment(field):
         def transform(el):
             el[field] += 1
+
         return transform
 
     def delete(field):
         def transform(el):
             del el[field]
+
         return transform
 
     assert db.count(where('int') == 1) == 3
@@ -216,7 +218,6 @@ def test_multiple_dbs():
 
 def test_storage_closed_once():
     class Storage(object):
-
         def __init__(self):
             self.closed = False
 
@@ -351,8 +352,8 @@ def test_eids_json(tmpdir):
 
         _db.purge()
         assert _db.insert_multiple([{'int': 1, 'char': 'a'},
-                                   {'int': 1, 'char': 'b'},
-                                   {'int': 1, 'char': 'c'}]) == [1, 2, 3]
+                                    {'int': 1, 'char': 'b'},
+                                    {'int': 1, 'char': 'c'}]) == [1, 2, 3]
 
         assert _db.contains(eids=[1, 2])
         assert not _db.contains(eids=[88])
@@ -422,3 +423,18 @@ def test_non_default_table():
     TinyDB.DEFAULT_TABLE = 'non-default'
     db = TinyDB(storage=MemoryStorage)
     assert ['non-default'] == list(db.tables())
+
+
+def test_purge_table():
+    db = TinyDB(storage=MemoryStorage)
+    assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
+    db.purge_table(TinyDB.DEFAULT_TABLE)
+    assert [] == list(db.tables())
+
+    table_name = 'some-other-table'
+    db = TinyDB(storage=MemoryStorage)
+    db.table(table_name)
+    assert [TinyDB.DEFAULT_TABLE, table_name] == list(db.tables())
+
+    db.purge_table(table_name)
+    assert [TinyDB.DEFAULT_TABLE] == list(db.tables())

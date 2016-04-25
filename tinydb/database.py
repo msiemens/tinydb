@@ -44,6 +44,14 @@ class StorageProxy(object):
         data[self._table_name] = values
         self._storage.write(data)
 
+    def purge_table(self):
+        try:
+            data = self._storage.read() or {}
+            del data[self._table_name]
+            self._storage.write(data)
+        except KeyError:
+            pass
+
 
 class TinyDB(object):
     """
@@ -124,6 +132,19 @@ class TinyDB(object):
 
         self._storage.write({})
         self._table_cache.clear()
+
+    def purge_table(self, name):
+        """
+        Purge a specific table from the database. **CANNOT BE REVERSED!**
+
+        :param name: The name of the table.
+        :type name: str
+        """
+        if name in self._table_cache:
+            del self._table_cache[name]
+
+        proxy = StorageProxy(self._storage, name)
+        proxy.purge_table()
 
     def close(self):
         """
