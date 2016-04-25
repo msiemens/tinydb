@@ -350,6 +350,8 @@ Finally, you can get a list with the names of all tables in your database:
 >>> db.tables()
 {'_default', 'table_name'}
 
+.. _default_table:
+
 Default Table
 .............
 
