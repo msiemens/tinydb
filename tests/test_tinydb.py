@@ -438,3 +438,6 @@ def test_purge_table():
 
     db.purge_table(table_name)
     assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
+
+    db.purge_table('non-existent-table-name')
+    assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
