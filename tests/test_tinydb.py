@@ -417,12 +417,12 @@ def test_non_default_table():
     assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
 
     db = TinyDB(storage=MemoryStorage, default_table='non-default')
-    assert ['non-default'] == list(db.tables())
+    assert set(['non-default']) == db.tables()
 
     db.purge_tables()
     TinyDB.DEFAULT_TABLE = 'non-default'
     db = TinyDB(storage=MemoryStorage)
-    assert ['non-default'] == list(db.tables())
+    assert set(['non-default']) == list(db.tables())
 
 
 def test_purge_table():
@@ -434,10 +434,10 @@ def test_purge_table():
     table_name = 'some-other-table'
     db = TinyDB(storage=MemoryStorage)
     db.table(table_name)
-    assert [TinyDB.DEFAULT_TABLE, table_name] == list(db.tables())
+    assert set([TinyDB.DEFAULT_TABLE, table_name]) == db.tables()
 
     db.purge_table(table_name)
-    assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
+    assert set([TinyDB.DEFAULT_TABLE]) == db.tables()
 
     db.purge_table('non-existent-table-name')
-    assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
+    assert set([TinyDB.DEFAULT_TABLE]) == db.tables()
