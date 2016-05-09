@@ -47,4 +47,4 @@ Breaking API Changes
 
 Apart from that the API remains compatible to v1.4 and prior.
 
-For migration from v1 to v2, check out the `v2.0 documentation <http://tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
+For migration from v1 to v2, check out the `v2.0 documentation <http://tinydb.readthedocs.io/en/v2.0/upgrade.html#upgrade-v2-0>`_

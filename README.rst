@@ -34,7 +34,7 @@ TinyDB is:
 - **100% test coverage:** No explanation needed.
 
 To dive straight into all the details, head over to the `TinyDB docs
-<https://tinydb.readthedocs.org/>`_. You can also discuss everything related
+<https://tinydb.readthedocs.io/>`_. You can also discuss everything related
 to TinyDB like general development, extensions or showcase your TinyDB-based
 projects on the `discussion forum <http://forum.m-siemens.de/.>`_.
 
@@ -166,7 +166,7 @@ Changelog
 **v3.2.0** (2016-04-25)
 =======================
 
-- Add a way to specify the default table name via `default_table <http://tinydb.readthedocs.org/en/v3.2.0/usage.html#default-table>`_
+- Add a way to specify the default table name via `default_table <http://tinydb.readthedocs.io/en/v3.2.0/usage.html#default-table>`_
   (see `pull request #98 <https://github.com/msiemens/tinydb/pull/98>`_).
 - Add ``db.purge_table(name)`` to remove a single table
   (see `pull request #100 <https://github.com/msiemens/tinydb/pull/100>`_).
@@ -307,22 +307,22 @@ Changelog
 **v2.0.0** (2014-09-05)
 =======================
 
-`Upgrade Notes <http://tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
+`Upgrade Notes <http://tinydb.readthedocs.io/en/v2.0/upgrade.html#upgrade-v2-0>`_
 
 **Warning:** TinyDB changed the way data is stored. You may need to migrate
-your databases to the new scheme. Check out the `Upgrade Notes <http://tinydb.readthedocs.org/en/v2.0/upgrade.html#upgrade-v2-0>`_
+your databases to the new scheme. Check out the `Upgrade Notes <http://tinydb.readthedocs.io/en/v2.0/upgrade.html#upgrade-v2-0>`_
 for details.
 
 - The syntax ``query in db`` has been removed, use ``db.contains`` instead.
 - The ``ConcurrencyMiddleware`` has been removed due to a insecure implementation
   (see `Issue #18 <https://github.com/msiemens/tinydb/issues/18>`_).  Consider
-  `tinyrecord <http://tinydb.readthedocs.org/en/v2.0/extensions.html#tinyrecord>`_ instead.
+  `tinyrecord <http://tinydb.readthedocs.io/en/v2.0/extensions.html#tinyrecord>`_ instead.
 
-- Better support for working with `Element IDs <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#using-element-ids>`_.
-- Added support for `nested comparisons <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#nested-queries>`_.
-- Added ``all`` and ``any`` `comparisons on lists <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#nested-queries>`_.
-- Added optional `smart query caching <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#smart-query-cache>`_.
-- The query cache is now a `fixed size LRU cache <http://tinydb.readthedocs.org/en/v2.0.0/usage.html#query-caching>`_.
+- Better support for working with `Element IDs <http://tinydb.readthedocs.io/en/v2.0.0/usage.html#using-element-ids>`_.
+- Added support for `nested comparisons <http://tinydb.readthedocs.io/en/v2.0.0/usage.html#nested-queries>`_.
+- Added ``all`` and ``any`` `comparisons on lists <http://tinydb.readthedocs.io/en/v2.0.0/usage.html#nested-queries>`_.
+- Added optional `smart query caching <http://tinydb.readthedocs.io/en/v2.0.0/usage.html#smart-query-cache>`_.
+- The query cache is now a `fixed size LRU cache <http://tinydb.readthedocs.io/en/v2.0.0/usage.html#query-caching>`_.
 
 **v1.4.0** (2014-07-22)
 =======================
