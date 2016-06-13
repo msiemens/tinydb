@@ -30,6 +30,7 @@ class StorageProxy(object):
         try:
             raw_data = (self._storage.read() or {})[self._table_name]
         except KeyError:
+            self.write({})
             return {}
 
         data = {}
