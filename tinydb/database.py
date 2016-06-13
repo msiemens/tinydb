@@ -110,7 +110,7 @@ class TinyDB(object):
 
         self._table_cache[name] = table
 
-        if not table._read():
+        if table._read() is None:
             table._write({})
 
         return table
