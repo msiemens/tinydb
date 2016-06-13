@@ -110,9 +110,9 @@ class TinyDB(object):
         table = self.table_class(StorageProxy(self._storage, name), **options)
 
         self._table_cache[name] = table
-
-        if table._read() is None:
-            table._write({})
+        
+        # table._read will create an empty table in the storage, if necessary
+        table._read()
 
         return table
 
