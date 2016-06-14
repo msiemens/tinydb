@@ -30,6 +30,7 @@ class StorageProxy(object):
         try:
             raw_data = (self._storage.read() or {})[self._table_name]
         except KeyError:
+            self.write({})
             return {}
 
         data = {}
@@ -109,9 +110,9 @@ class TinyDB(object):
         table = self.table_class(StorageProxy(self._storage, name), **options)
 
         self._table_cache[name] = table
-
-        if not table._read():
-            table._write({})
+        
+        # table._read will create an empty table in the storage, if necessary
+        table._read()
 
         return table
 

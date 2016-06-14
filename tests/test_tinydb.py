@@ -5,7 +5,7 @@ import pytest
 
 from tinydb import TinyDB, where
 from tinydb.storages import MemoryStorage
-
+from tinydb.middlewares import Middleware
 
 def test_purge(db):
     db.purge()
@@ -442,3 +442,13 @@ def test_purge_table():
 
     db.purge_table('non-existent-table-name')
     assert set([TinyDB.DEFAULT_TABLE]) == db.tables()
+
+def test_empty_write(tmpdir):
+    path = str(tmpdir.join('db.json'))
+    
+    class ReadOnlyMiddleware(Middleware):
+        def write(self, data):
+            raise AssertionError('No write for unchanged db')
+    
+    TinyDB(path)
+    TinyDB(path, storage=ReadOnlyMiddleware())
