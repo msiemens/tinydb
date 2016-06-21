@@ -284,11 +284,14 @@ after inserting an element:
 [4, 5, 6]
 
 In addition you can get the ID of already inserted elements using
-``element.eid``:
+``element.eid``. This works both with ``get`` and ``all``:
 
 >>> el = db.get(User.name == 'John')
 >>> el.eid
 3
+>>> el = db.all()[0]
+>>> el.eid
+12
 
 Different TinyDB methods also work with IDs, namely: ``update``, ``remove``,
 ``contains`` and ``get``. The first two also return a list of affected IDs.
