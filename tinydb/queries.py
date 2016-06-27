@@ -105,12 +105,12 @@ class Query(object):
 
     def __init__(self, path=None):
         if path is None:
-            self.path = []
+            self._path = []
         else:
-            self.path = path
+            self._path = path
 
     def __getattr__(self, item):
-        return Query(self.path + [item])
+        return Query(self._path + [item])
 
     __getitem__ = __getattr__
 
@@ -122,13 +122,13 @@ class Query(object):
         :param hashval: The hash of the query.
         :return: A :class:`~tinydb.queries.QueryImpl` object
         """
-        if not self.path:
+        if not self._path:
             raise ValueError('Query has no path')
 
         def impl(value):
             try:
                 # Resolve the path
-                for part in self.path:
+                for part in self._path:
                     value = value[part]
             except (KeyError, TypeError):
                 return False
@@ -164,7 +164,7 @@ class Query(object):
                 return value == rhs
 
         return self._generate_test(lambda value: test(value),
-                                   ('==', tuple(self.path), freeze(rhs)))
+                                   ('==', tuple(self._path), freeze(rhs)))
 
     def __ne__(self, rhs):
         """
@@ -175,7 +175,7 @@ class Query(object):
         :param rhs: The value to compare against
         """
         return self._generate_test(lambda value: value != rhs,
-                                   ('!=', tuple(self.path), freeze(rhs)))
+                                   ('!=', tuple(self._path), freeze(rhs)))
 
     def __lt__(self, rhs):
         """
@@ -186,7 +186,7 @@ class Query(object):
         :param rhs: The value to compare against
         """
         return self._generate_test(lambda value: value < rhs,
-                                   ('<', tuple(self.path), rhs))
+                                   ('<', tuple(self._path), rhs))
 
     def __le__(self, rhs):
         """
@@ -197,7 +197,7 @@ class Query(object):
         :param rhs: The value to compare against
         """
         return self._generate_test(lambda value: value <= rhs,
-                                   ('<=', tuple(self.path), rhs))
+                                   ('<=', tuple(self._path), rhs))
 
     def __gt__(self, rhs):
         """
@@ -208,7 +208,7 @@ class Query(object):
         :param rhs: The value to compare against
         """
         return self._generate_test(lambda value: value > rhs,
-                                   ('>', tuple(self.path), rhs))
+                                   ('>', tuple(self._path), rhs))
 
     def __ge__(self, rhs):
         """
@@ -219,7 +219,7 @@ class Query(object):
         :param rhs: The value to compare against
         """
         return self._generate_test(lambda value: value >= rhs,
-                                   ('>=', tuple(self.path), rhs))
+                                   ('>=', tuple(self._path), rhs))
 
     def exists(self):
         """
@@ -230,7 +230,7 @@ class Query(object):
         :param rhs: The value to compare against
         """
         return self._generate_test(lambda _: True,
-                                   ('exists', tuple(self.path)))
+                                   ('exists', tuple(self._path)))
 
     def matches(self, regex):
         """
@@ -241,7 +241,7 @@ class Query(object):
         :param regex: The regular expression to use for matching
         """
         return self._generate_test(lambda value: re.match(regex, value),
-                                   ('matches', tuple(self.path), regex))
+                                   ('matches', tuple(self._path), regex))
 
     def search(self, regex):
         """
@@ -253,7 +253,7 @@ class Query(object):
         :param regex: The regular expression to use for matching
         """
         return self._generate_test(lambda value: re.search(regex, value),
-                                   ('search', tuple(self.path), regex))
+                                   ('search', tuple(self._path), regex))
 
     def test(self, func, *args):
         """
@@ -269,7 +269,7 @@ class Query(object):
         :param args: Additional arguments to pass to the test function
         """
         return self._generate_test(lambda value: func(value, *args),
-                                   ('test', tuple(self.path), func, args))
+                                   ('test', tuple(self._path), func, args))
 
     def any(self, cond):
         """
@@ -303,7 +303,7 @@ class Query(object):
                 return is_sequence(value) and any(e in cond for e in value)
 
         return self._generate_test(lambda value: _cmp(value),
-                                   ('any', tuple(self.path), freeze(cond)))
+                                   ('any', tuple(self._path), freeze(cond)))
 
     def all(self, cond):
         """
@@ -335,7 +335,7 @@ class Query(object):
                 return is_sequence(value) and all(e in value for e in cond)
 
         return self._generate_test(lambda value: _cmp(value),
-                                   ('all', tuple(self.path), freeze(cond)))
+                                   ('all', tuple(self._path), freeze(cond)))
 
 
 def where(key):
