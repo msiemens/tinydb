@@ -219,7 +219,7 @@ Changelog
    -  ``where('...').contains('...')`` has been renamed to
       ``where('...').search('...')``.
    -  Support for ORM-like usage:
-      ``User = Query(); db.find(User.name == 'John')``.
+      ``User = Query(); db.search(User.name == 'John')``.
    -  ``where('foo')`` is an alias for ``Query().foo``.
    -  ``where('foo').has('bar')`` is replaced by either
       ``where('foo').bar`` or ``Query().foo.bar``.

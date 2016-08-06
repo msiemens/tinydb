@@ -82,12 +82,12 @@ class Query(object):
     1) ORM-like usage:
 
     >>> User = Query('user')
-    >>> db.find(User.name == 'John Doe')
-    >>> db.find(User['logged-in'] == True)
+    >>> db.search(User.name == 'John Doe')
+    >>> db.search(User['logged-in'] == True)
 
     2) Classical usage:
 
-    >>> db.find(where('value') == True)
+    >>> db.search(where('value') == True)
 
     Note that ``where(...)`` is a shorthand for ``Query(...)`` allowing for
     a more fluent syntax.
@@ -95,8 +95,8 @@ class Query(object):
     Besides the methods documented here you can combine queries using the
     binary AND and OR operators:
 
-    >>> db.find(where('field1').exists() & where('field2') == 5)  # Binary AND
-    >>> db.find(where('field1').exists() | where('field2') == 5)  # Binary OR
+    >>> db.search(where('field1').exists() & where('field2') == 5)  # Binary AND
+    >>> db.search(where('field1').exists() | where('field2') == 5)  # Binary OR
 
     Queries are executed by calling the resulting object. They expect to get the
     element to test as the first argument and return ``True`` or ``False``
