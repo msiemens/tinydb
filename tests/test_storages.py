@@ -1,4 +1,6 @@
+import os
 import random
+import tempfile
 
 import pytest
 
@@ -69,6 +71,29 @@ def test_json_readwrite(tmpdir):
 
     db.remove(where('name') == 'A short one')
     assert get('A short one') is None
+
+
+def test_create_dirs():
+    temp_dir = tempfile.gettempdir()
+    db_dir = ''
+    db_file = ''
+
+    while True:
+        dname = os.path.join(temp_dir, str(random.getrandbits(20)))
+        if not os.path.exists(dname):
+            db_dir = dname
+            db_file = os.path.join(db_dir, 'db.json')
+            break
+
+    db_conn = JSONStorage(db_file, create_dirs=True)
+    db_conn.close()
+
+    db_exists = os.path.exists(db_file)
+
+    os.remove(db_file)
+    os.rmdir(db_dir)
+
+    assert db_exists
 
 
 def test_json_invalid_directory():

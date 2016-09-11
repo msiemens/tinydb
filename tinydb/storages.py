@@ -15,7 +15,11 @@ except ImportError:
     import json
 
 
-def touch(fname, times=None):
+def touch(fname, times=None, create_dirs=False):
+    if create_dirs:
+        base_dir = os.path.dirname(fname)
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
     with open(fname, 'a'):
         os.utime(fname, times)
 
@@ -70,7 +74,7 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path, **kwargs):
+    def __init__(self, path, create_dirs=False, **kwargs):
         """
         Create a new instance.
 
@@ -81,7 +85,7 @@ class JSONStorage(Storage):
         """
 
         super(JSONStorage, self).__init__()
-        touch(path)  # Create file if not exists
+        touch(path, create_dirs=create_dirs)  # Create file if not exists
         self.kwargs = kwargs
         self._handle = open(path, 'r+')
 
