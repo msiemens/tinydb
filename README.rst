@@ -163,11 +163,13 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
-**v3.2.0** (2016-06-29)
+**v3.2.1** (2016-06-29)
 =======================
 
 - Fix a bug with queries on elements that have a ``path`` key
   (see `pull request #107 <https://github.com/msiemens/tinydb/pull/107>`_).
+- Don't write to the database file needlessly when opening the database
+  (see `pull request #104 <https://github.com/msiemens/tinydb/pull/104>`).
 
 **v3.2.0** (2016-04-25)
 =======================
