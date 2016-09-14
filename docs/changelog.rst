@@ -13,7 +13,7 @@ see `semver.org <http://semver.org/>`_
 - Fix a bug with queries on elements that have a ``path`` key
   (see `pull request #107 <https://github.com/msiemens/tinydb/pull/107>`_).
 - Don't write to the database file needlessly when opening the database
-  (see `pull request #104 <https://github.com/msiemens/tinydb/pull/104>`).
+  (see `pull request #104 <https://github.com/msiemens/tinydb/pull/104>`_).
 
 **v3.2.0** (2016-04-25)
 ^^^^^^^^^^^^^^^^^^^^^^^
