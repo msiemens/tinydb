@@ -93,7 +93,7 @@ Using Middlewares
 Supported Python Versions
 *************************
 
-TinyDB has been tested with Python 2.6, 2.7, 3.2 - 3.5 and PyPy.
+TinyDB has been tested with Python 2.6, 2.7, 3.3 - 3.5 and PyPy.
 
 
 Extensions
