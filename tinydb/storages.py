@@ -94,7 +94,7 @@ class JSONStorage(Storage):
 
     def read(self):
         # Get the file size
-        self._handle.seek(0, 2)
+        self._handle.seek(0, os.SEEK_END)
         size = self._handle.tell()
 
         if not size:
