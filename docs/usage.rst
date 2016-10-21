@@ -180,8 +180,8 @@ Updating data
 .............
 
 ``db.update(fields, query)`` only allows you to update an element by adding
-or overwriting it's values. But sometimes you may need to e.g. remove one field
-or increment it's value. In that case you can pass a function instead of
+or overwriting its values. But sometimes you may need to e.g. remove one field
+or increment its value. In that case you can pass a function instead of
 ``fields``:
 
 >>> from tinydb.operations import delete
