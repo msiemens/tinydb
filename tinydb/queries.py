@@ -81,7 +81,7 @@ class Query(object):
 
     1) ORM-like usage:
 
-    >>> User = Query('user')
+    >>> User = Query()
     >>> db.search(User.name == 'John Doe')
     >>> db.search(User['logged-in'] == True)
 
@@ -103,14 +103,14 @@ class Query(object):
     depending on whether the elements matches the query or not.
     """
 
-    def __init__(self, path=None):
-        if path is None:
-            self._path = []
-        else:
-            self._path = path
+    def __init__(self):
+        self._path = []
 
     def __getattr__(self, item):
-        return Query(self._path + [item])
+        query = Query()
+        query._path = self._path + [item]
+
+        return query
 
     __getitem__ = __getattr__
 
@@ -141,7 +141,7 @@ class Query(object):
         """
         Test a dict value for equality.
 
-        >>> Query('f1') == 42
+        >>> Query().f1 == 42
 
         :param rhs: The value to compare against
         """
@@ -170,7 +170,7 @@ class Query(object):
         """
         Test a dict value for inequality.
 
-        >>> Query('f1') != 42
+        >>> Query().f1 != 42
 
         :param rhs: The value to compare against
         """
@@ -181,7 +181,7 @@ class Query(object):
         """
         Test a dict value for being lower than another value.
 
-        >>> Query('f1') < 42
+        >>> Query().f1 < 42
 
         :param rhs: The value to compare against
         """
@@ -203,7 +203,7 @@ class Query(object):
         """
         Test a dict value for being greater than another value.
 
-        >>> Query('f1') > 42
+        >>> Query().f1 > 42
 
         :param rhs: The value to compare against
         """
@@ -214,7 +214,7 @@ class Query(object):
         """
         Test a dict value for being greater than or equal to another value.
 
-        >>> Query('f1') >= 42
+        >>> Query().f1 >= 42
 
         :param rhs: The value to compare against
         """
@@ -225,7 +225,7 @@ class Query(object):
         """
         Test for a dict where a provided key exists.
 
-        >>> Query('f1').exists() >= 42
+        >>> Query().f1.exists() >= 42
 
         :param rhs: The value to compare against
         """
@@ -236,7 +236,7 @@ class Query(object):
         """
         Run a regex test against a dict value (whole string has to match).
 
-        >>> Query('f1').matches(r'^\w+$')
+        >>> Query().f1.matches(r'^\w+$')
 
         :param regex: The regular expression to use for matching
         """
@@ -248,7 +248,7 @@ class Query(object):
         Run a regex test against a dict value (only substring string has to
         match).
 
-        >>> Query('f1').search(r'^\w+$')
+        >>> Query().f1.search(r'^\w+$')
 
         :param regex: The regular expression to use for matching
         """
@@ -262,7 +262,7 @@ class Query(object):
         >>> def test_func(val):
         ...     return val == 42
         ...
-        >>> Query('f1').test(test_func)
+        >>> Query().f1.test(test_func)
 
         :param func: The function to call, passing the dict as the first
                      argument
@@ -276,13 +276,13 @@ class Query(object):
         Checks if a condition is met by any element in a list,
         where a condition can also be a sequence (e.g. list).
 
-        >>> Query('f1').any(Query('f2') == 1)
+        >>> Query().f1.any(Query().f2 == 1)
 
         Matches::
 
             {'f1': [{'f2': 1}, {'f2': 0}]}
 
-        >>> Query('f1').any([1, 2, 3])
+        >>> Query().f1.any([1, 2, 3])
         # Match f1 that contains any element from [1, 2, 3]
 
         Matches::
@@ -310,13 +310,13 @@ class Query(object):
         Checks if a condition is met by any element in a list,
         where a condition can also be a sequence (e.g. list).
 
-        >>> Query('f1').all(Query('f2') == 1)
+        >>> Query().f1.all(Query().f2 == 1)
 
         Matches::
 
             {'f1': [{'f2': 1}, {'f2': 1}]}
 
-        >>> Query('f1').all([1, 2, 3])
+        >>> Query().f1.all([1, 2, 3])
         # Match f1 that contains any element from [1, 2, 3]
 
         Matches::
