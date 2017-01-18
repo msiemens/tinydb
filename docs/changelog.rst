@@ -7,6 +7,12 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v3.2.2** (2017-01-16)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fix the ``Query`` constructor to prevent wrong usage
+  (see `issue #117 <https://github.com/msiemens/tinydb/issues/117>`_).
+
 **v3.2.1** (2016-06-29)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
