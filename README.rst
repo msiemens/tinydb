@@ -44,7 +44,7 @@ Example Code
 
 .. code-block:: python
 
-    >>> from tinydb import TinyDB, where
+    >>> from tinydb import TinyDB, Query
     >>> db = TinyDB('/path/to/db.json')
     >>> db.insert({'int': 1, 'char': 'a'})
     >>> db.insert({'int': 1, 'char': 'b'})
