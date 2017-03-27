@@ -141,6 +141,17 @@ def test_custom():
     assert not query({'': None})
     assert hash(query)
 
+    def in_list(value, l):
+        return value in l
+
+    query = Query().val.test(in_list, tuple([25, 35]))
+    assert not query({'val': 20})
+    assert query({'val': 25})
+    assert not query({'val': 30})
+    assert query({'val': 35})
+    assert not query({'val': 36})
+    assert hash(query)
+
 
 def test_custom_with_params():
     def test(value, minimum, maximum):
