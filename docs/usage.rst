@@ -6,8 +6,8 @@
 Advanced Usage
 ==============
 
-Remarks on Storages
--------------------
+Remarks on Storage
+------------------
 
 Before we dive deeper into the usage of TinyDB, we should stop for a moment
 and discuss how TinyDB stores data.
@@ -382,8 +382,8 @@ size by passing the ``cache_size`` to the ``table(...)`` function:
 .. hint:: You can set ``cache_size`` to ``None`` to make the cache unlimited in
    size.
 
-Storages & Middlewares
-----------------------
+Storage & Middleware
+--------------------
 
 Storage Types
 .............
@@ -412,10 +412,10 @@ To modify the default storage for all ``TinyDB`` instances, set the
 
 >>> TinyDB.DEFAULT_STORAGE = MemoryStorage
 
-Middlewares
-...........
+Middleware
+..........
 
-Middlewares wrap around existing storages allowing you to customize their
+Middleware wraps around existing storage allowing you to customize their
 behaviour.
 
 >>> from tinydb.storages import JSONStorage
@@ -424,7 +424,7 @@ behaviour.
 
 .. hint::
 
-    You can nest middlewares:
+    You can nest middleware:
 
     >>> db = TinyDB('/path/to/db.json', storage=FirstMiddleware(SecondMiddleware(JSONStorage)))
 
