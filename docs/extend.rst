@@ -69,7 +69,7 @@ Finally, using the YAML storage is very straight-forward:
     # ...
 
 
-Write a Custom Middleware
+Write Custom Middleware
 -------------------------
 
 Sometimes you don't want to write a new storage module but rather modify the behaviour
