@@ -3,17 +3,17 @@ How to Extend TinyDB
 
 There are three main ways to extend TinyDB and modify its behaviour:
 
-1. custom storages,
-2. middlewares, and finally
+1. custom storage,
+2. custom middleware, and
 3. custom table classes.
 
 Let's look at them in this order.
 
-Write a Custom Storage
+Write Custom Storage
 ----------------------
 
-First, we have support for custom storages. By default TinyDB comes with an
-in-memory storage and a JSON file storage. But of course you can add your own.
+First, we have support for custom storage. By default TinyDB comes with an
+in-memory storage mechanism and a JSON file storage mechanism. But of course you can add your own.
 Let's look how you could add a `YAML <http://yaml.org/>`_ storage using
 `PyYAML <http://pyyaml.org/wiki/PyYAML>`_:
 
@@ -72,11 +72,11 @@ Finally, using the YAML storage is very straight-forward:
 Write a Custom Middleware
 -------------------------
 
-Sometimes you don't want to write a new storage but rather modify the behaviour
-of an existing one. As an example we'll build a middleware that filters out
+Sometimes you don't want to write a new storage module but rather modify the behaviour
+of an existing one. As an example we'll build middleware that filters out
 any empty items.
 
-Because middlewares act as a wrapper around a storage, they needs a ``read()``
+Because middleware acts as a wrapper around a storage, they needs a ``read()``
 and a ``write(data)`` method. In addition, they can access the underlying storage
 via ``self.storage``. Before we start implementing we should look at the structure
 of the data that the middleware receives. Here's what the data that goes through
@@ -142,11 +142,11 @@ Two remarks:
 
 1. You have to use the ``super(...)`` call as shown in the example. To run your
    own initialization, add it below the ``super(...)`` call.
-2. This is an example for a middleware, not an example for clean code. Don't
+2. This is an example for middleware, not an example for clean code. Don't
    use it as shown here without at least refactoring the loops into a separate
    method.
 
-To wrap a storage with this new middleware, we use it like this:
+To wrap storage with this new middleware, we use it like this:
 
 .. code-block:: python
 
@@ -158,7 +158,7 @@ If you leave it empty, the default storage will be used (which is the ``JSONStor
 Creating a Custom Table Classes
 -------------------------------
 
-Custom storages and middlewares are useful if you want to modify the way
+Custom storage and middleware are useful if you want to modify the way
 TinyDB stores its data. But there are cases where you want to modify how
 TinyDB itself behaves. For that use case TinyDB supports custom table classes.
 Internally TinyDB creates a ``Table`` instance for every table that is used.
