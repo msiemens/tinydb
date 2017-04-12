@@ -402,12 +402,12 @@ class Table(object):
         """
 
         if cond in self._query_cache:
-            return self._query_cache[cond]
+            return self._query_cache[cond][:]
 
         elements = [element for element in self.all() if cond(element)]
         self._query_cache[cond] = elements
 
-        return elements
+        return elements[:]
 
     def get(self, cond=None, eid=None):
         """

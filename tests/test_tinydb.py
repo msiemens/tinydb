@@ -443,6 +443,7 @@ def test_purge_table():
     db.purge_table('non-existent-table-name')
     assert set([TinyDB.DEFAULT_TABLE]) == db.tables()
 
+
 def test_empty_write(tmpdir):
     path = str(tmpdir.join('db.json'))
     
@@ -452,3 +453,20 @@ def test_empty_write(tmpdir):
     
     TinyDB(path)
     TinyDB(path, storage=ReadOnlyMiddleware())
+
+
+def test_query_cache():
+    db = TinyDB(storage=MemoryStorage)
+    db.insert_multiple([
+        {'name': 'foo', 'value': 42},
+        {'name': 'bar', 'value': -1337}
+    ])
+
+    query = where('value') > 0
+
+    results = db.search(query)
+    assert len(results) == 1
+    # Now, modify the result ist
+    results.extend([1])
+
+    assert db.search(query) == [{'name': 'foo', 'value': 42}]
