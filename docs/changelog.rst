@@ -7,6 +7,12 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v3.2.3** (2017-04-22)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fix bug with accidental modifications to the query cache when modifying
+  the list of search results (see `issue #132 <https://github.com/msiemens/tinydb/issues/132>`_).
+
 **v3.2.2** (2017-01-16)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
