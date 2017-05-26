@@ -74,3 +74,11 @@ def test_lru_cache(db):
     assert len(table._query_cache) == 1
     table.clear_cache()
     assert len(table._query_cache) == 0
+
+
+def test_table_is_iterable(db):
+    table = db.table('table1')
+
+    table.insert_multiple({'int': i} for i in range(3))
+
+    assert [r for r in table] == table.all()

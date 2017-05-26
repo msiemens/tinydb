@@ -472,3 +472,7 @@ def test_query_cache():
     results.extend([1])
 
     assert db.search(query) == [{'name': 'foo', 'value': 42}]
+
+
+def test_tinydb_is_iterable(db):
+    assert [r for r in db] == db.all()
