@@ -405,11 +405,13 @@ def test_insert_invalid_dict(tmpdir):
 def test_gc(tmpdir):
     # See https://github.com/msiemens/tinydb/issues/92
     path = str(tmpdir.join('db.json'))
-    table = TinyDB(path).table('foo')
+    db = TinyDB(path)
+    table = db.table('foo')
     table.insert({'something': 'else'})
     table.insert({'int': 13})
     assert len(table.search(where('int') == 13)) == 1
     assert table.all() == [{'something': 'else'}, {'int': 13}]
+    db.close()
 
 
 def test_non_default_table():
@@ -446,13 +448,13 @@ def test_purge_table():
 
 def test_empty_write(tmpdir):
     path = str(tmpdir.join('db.json'))
-    
+
     class ReadOnlyMiddleware(Middleware):
         def write(self, data):
             raise AssertionError('No write for unchanged db')
-    
-    TinyDB(path)
-    TinyDB(path, storage=ReadOnlyMiddleware())
+
+    TinyDB(path).close()
+    TinyDB(path, storage=ReadOnlyMiddleware()).close()
 
 
 def test_query_cache():

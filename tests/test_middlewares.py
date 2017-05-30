@@ -79,11 +79,8 @@ def test_nested():
 def test_caching_json_write(tmpdir):
     path = str(tmpdir.join('test.db'))
 
-    db = TinyDB(path, storage=CachingMiddleware(JSONStorage))
-
-    db.insert({'key': 'value'})
-
-    db.close()
+    with TinyDB(path, storage=CachingMiddleware(JSONStorage)) as db:
+        db.insert({'key': 'value'})
 
     # Verify database filesize
     statinfo = os.stat(path)
@@ -95,5 +92,5 @@ def test_caching_json_write(tmpdir):
     del db
 
     # Repoen database
-    db = TinyDB(path, storage=CachingMiddleware(JSONStorage))
-    assert db.all() == [{'key': 'value'}]
+    with TinyDB(path, storage=CachingMiddleware(JSONStorage)) as db:
+        assert db.all() == [{'key': 'value'}]

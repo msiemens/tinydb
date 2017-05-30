@@ -24,6 +24,7 @@ def test_json(tmpdir):
 
     # Verify contents
     assert element == storage.read()
+    storage.close()
 
 
 def test_json_kwargs(tmpdir):
@@ -44,6 +45,7 @@ def test_json_kwargs(tmpdir):
         }
     }
 }'''
+    db.close()
 
 
 def test_json_readwrite(tmpdir):
@@ -71,6 +73,8 @@ def test_json_readwrite(tmpdir):
 
     db.remove(where('name') == 'A short one')
     assert get('A short one') is None
+
+    db.close()
 
 
 def test_create_dirs():
