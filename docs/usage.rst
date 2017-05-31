@@ -339,6 +339,9 @@ the ``TinyDB`` class. To create and use a table, use ``db.table(name)``.
 >>> table.insert({'value': True})
 >>> table.all()
 [{'value': True}]
+>>> for row in table:
+>>>     print(row)
+{'value': True}
 
 To remove a table from a database, use:
 

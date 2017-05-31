@@ -110,7 +110,7 @@ class TinyDB(object):
         table = self.table_class(StorageProxy(self._storage, name), **options)
 
         self._table_cache[name] = table
-        
+
         # table._read will create an empty table in the storage, if necessary
         table._read()
 
@@ -180,6 +180,12 @@ class TinyDB(object):
         0
         """
         return len(self._table)
+
+    def __iter__(self):
+        """
+        Iter over all elements from default table.
+        """
+        return self._table.__iter__()
 
 
 class Table(object):
@@ -302,6 +308,17 @@ class Table(object):
         """
 
         return list(itervalues(self._read()))
+
+    def __iter__(self):
+        """
+        Iter over all elements stored in the table.
+
+        :returns: an iterator over all elements.
+        :rtype: listiterator[Element]
+        """
+
+        for value in itervalues(self._read()):
+            yield value
 
     def insert(self, element):
         """
