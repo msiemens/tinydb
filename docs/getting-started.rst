@@ -40,6 +40,13 @@ Now you can get all elements stored in the database by running:
 >>> db.all()
 [{'count': 7, 'type': 'apple'}, {'count': 3, 'type': 'peach'}]
 
+You can also iter over stored elements:
+
+>>> for item in db:
+>>>     print(item)
+{'count': 7, 'type': 'apple'}
+{'count': 3, 'type': 'peach'}
+
 Of course you'll also want to search for specific elements. Let's try:
 
 >>> Fruit = Query()
@@ -82,6 +89,8 @@ Before we dive deeper, let's recapitulate the basics:
 | **Getting data**                                                                              |
 +-------------------------------+---------------------------------------------------------------+
 | ``db.all()``                  | Get all elements                                              |
++-------------------------------+---------------------------------------------------------------+
+| ``iter(db)``                  | Iter over all elements                                        |
 +-------------------------------+---------------------------------------------------------------+
 | ``db.search(query)``          | Get a list of elements matching the query                     |
 +-------------------------------+---------------------------------------------------------------+
