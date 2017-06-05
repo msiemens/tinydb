@@ -5,6 +5,7 @@ implementations.
 
 from abc import ABCMeta, abstractmethod
 import os
+import pickletools
 
 from tinydb.utils import with_metaclass
 
@@ -13,6 +14,11 @@ try:
     import ujson as json
 except ImportError:
     import json
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 
 def touch(fname, times=None, create_dirs=False):
@@ -130,3 +136,46 @@ class MemoryStorage(Storage):
 
     def write(self, data):
         self.memory = data
+
+
+class PickleStorage(Storage):
+    """
+    Store the data in a pickle file.
+    """
+
+    def __init__(self, path, **kwargs):
+        """
+        Create a new instance.
+
+        Also creates the storage file, if it doesn't exist.
+
+        :param path: Where to store the pickle data.
+        :type path: str
+        """
+
+        super(PickleStorage, self).__init__()
+        touch(path)  # Create file if not exists
+        self.kwargs = kwargs
+        self._handle = open(path, 'rb+')
+
+    def close(self):
+        self._handle.close()
+
+    def read(self):
+        # Get the file size
+        self._handle.seek(0, 2)
+        size = self._handle.tell()
+
+        if not size:
+            # File is empty
+            return None
+        else:
+            self._handle.seek(0)
+            return pickle.load(self._handle)
+
+    def write(self, data):
+        self._handle.seek(0)
+        pickle_data = pickletools.optimize(pickle.dumps(data))
+        self._handle.write(pickle_data, **self.kwargs)
+        self._handle.flush()
+        self._handle.truncate()
