@@ -90,7 +90,8 @@ class JSONStorage(Storage):
         self._handle = open(path, 'r+')
 
     def close(self):
-        self._handle.close()
+        if hasattr(self, '_handle'):
+            self._handle.close()
 
     def read(self):
         # Get the file size
