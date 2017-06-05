@@ -163,6 +163,12 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v3.3.0** (2017-06-05)
+=======================
+
+- Allow iterating over a database or table yielding all elements
+  (see `pull request #139 <https://github.com/msiemens/tinydb/pull/139>`_).
+
 **v3.2.3** (2017-04-22)
 =======================
 
