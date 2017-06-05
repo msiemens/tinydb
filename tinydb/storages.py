@@ -5,6 +5,7 @@ implementations.
 
 from abc import ABCMeta, abstractmethod
 import os
+import contextlib
 
 from tinydb.utils import with_metaclass
 
@@ -14,6 +15,10 @@ try:
 except ImportError:
     import json
 
+try:
+    import gzip
+except ImportError:
+    gzip = None
 
 def touch(fname, times=None, create_dirs=False):
     if create_dirs:
@@ -130,3 +135,53 @@ class MemoryStorage(Storage):
 
     def write(self, data):
         self.memory = data
+
+class GzipJSONStorage(Storage):
+    """
+    Store the data in a gzipped JSON file.
+
+    Because gzip does not support read and write simultaneously, this will
+    require repeatedly re-obtaining the file handle.
+    """
+
+    def __init__(self, path, **kwargs):
+        """
+        Create a new instance.
+
+        Also creates the storage file, if it doesn't exist.
+
+        :param path: Where to store the JSON data.
+        :type path: str
+        """
+
+        if gzip is None:
+            raise ImportError("gzip")
+        super(GzipJSONStorage, self).__init__()
+        touch(path)  # Create file if not exists
+        self.kwargs = kwargs
+        self.path = path
+
+    @contextlib.contextmanager
+    def _handle(self, mode):
+        yield gzip.open(self.path, mode)
+
+    def close(self):
+        pass
+
+    def read(self):
+        # Get the file size
+        with self._handle('r') as f:
+            f.myfileobj.seek(0, 2)
+            size = f.myfileobj.tell()
+
+        if size <= 66: # General header size
+            # File is empty
+            return None
+
+        with self._handle('r') as f:
+            return json.load(f)
+
+    def write(self, data):
+        with self._handle('w') as f:
+            json.dump(data, f, **self.kwargs)
+            f.flush()
