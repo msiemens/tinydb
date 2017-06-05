@@ -8,7 +8,7 @@ import pytest
 random.seed()
 
 from tinydb import TinyDB, where
-from tinydb.storages import JSONStorage, MemoryStorage, Storage
+from tinydb.storages import PickleStorage, JSONStorage, MemoryStorage, Storage
 
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
            'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
@@ -132,3 +132,66 @@ def test_custom():
 
     with pytest.raises(TypeError):
         MyStorage()
+
+
+def test_pickle(tmpdir):
+    # Write contents
+    path = str(tmpdir.join('test.pkl'))
+    storage = PickleStorage(path)
+    storage.write(element)
+
+    # Verify contents
+    assert element == storage.read()
+
+
+def test_pickle_kwargs(tmpdir):
+    db_file = tmpdir.join('test.pkl')
+    db = TinyDB(str(db_file), sort_keys=True, indent=4, separators=(',', ': '))
+
+    # Write contents
+    db.insert({'b': 1})
+    db.insert({'a': 1})
+
+    assert db_file.read() == '''{
+    "_default": {
+        "1": {
+            "b": 1
+        },
+        "2": {
+            "a": 1
+        }
+    }
+}'''
+
+
+def test_pickle_readwrite(tmpdir):
+    """
+    Regression test for issue #1
+    """
+    path = str(tmpdir.join('test.pkl'))
+
+    # Create TinyDB instance
+    db = TinyDB(path, storage=PickleStorage)
+
+    item = {'name': 'A very long entry'}
+    item2 = {'name': 'A short one'}
+
+    get = lambda s: db.get(where('name') == s)
+
+    db.insert(item)
+    assert get('A very long entry') == item
+
+    db.remove(where('name') == 'A very long entry')
+    assert get('A very long entry') is None
+
+    db.insert(item2)
+    assert get('A short one') == item2
+
+    db.remove(where('name') == 'A short one')
+    assert get('A short one') is None
+
+
+def test_pickle_invalid_directory():
+    with pytest.raises(IOError):
+        with TinyDB('/this/is/an/invalid/path/db.pkl', storage=PickleStorage):
+            pass
