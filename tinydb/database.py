@@ -2,8 +2,8 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
-from tinydb import JSONStorage
-from tinydb.utils import LRUCache, iteritems, itervalues
+from . import JSONStorage
+from .utils import LRUCache, iteritems, itervalues
 
 
 class Element(dict):
