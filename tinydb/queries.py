@@ -19,7 +19,7 @@ False
 import re
 import sys
 
-from tinydb.utils import catch_warning, freeze
+from .utils import catch_warning, freeze
 
 __all__ = ('Query', 'where')
 

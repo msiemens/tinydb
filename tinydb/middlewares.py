@@ -2,7 +2,7 @@
 Contains the :class:`base class <tinydb.middlewares.Middleware>` for
 middlewares and implementations.
 """
-from tinydb import TinyDB
+from . import TinyDB
 
 
 class Middleware(object):

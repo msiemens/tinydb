@@ -6,7 +6,7 @@ implementations.
 from abc import ABCMeta, abstractmethod
 import os
 
-from tinydb.utils import with_metaclass
+from .utils import with_metaclass
 
 
 try:
