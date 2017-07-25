@@ -20,7 +20,7 @@ Why Use TinyDB?
   fun to use by providing a simple and clean API.
 
 - **written in pure Python:** TinyDB neither needs an external server (as
-  e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any dependencies
+  e.g. `PyMongo <https://api.mongodb.org/python/current/>`_) nor any dependencies
   from PyPI.
 
 - **works on Python 2.6 + 2.7 and 3.3 – 3.6 and PyPy:** TinyDB works on all
@@ -42,14 +42,17 @@ Why **Not** Use TinyDB?
     - access from multiple processes or threads,
     - creating indexes for tables,
     - a HTTP server,
-    - managing relationships between tables or similar.
+    - managing relationships between tables or similar,
+    - `ACID guarantees <https://en.wikipedia.org/wiki/ACID>`_.
 - You are really concerned about **performance** and need a high speed
   database.
 
 To put it plainly: If you need advanced features or high performance, TinyDB
-is the wrong database for you – consider using databases like Buzhug_, CodernityDB_ or MongoDB_.
+is the wrong database for you – consider using databases like SQLite_, Buzhug_,
+CodernityDB_ or MongoDB_.
 
 .. References
-.. _Buzhug: http://buzhug.sourceforge.net/
+.. _Buzhug: https://buzhug.sourceforge.net/
 .. _CodernityDB: http://labs.codernity.com/codernitydb/
-.. _MongoDB: http://mongodb.org/
+.. _MongoDB: https://mongodb.org/
+.. _SQLite: https://www.sqlite.org/
