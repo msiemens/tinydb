@@ -193,6 +193,9 @@ with these operations:
 - ``delete(key)``: delete a key from the element
 - ``increment(key)``: increment the value of a key
 - ``decrement(key)``: decrement the value of a key
+- ``add(key, value)``: add ``value`` to the value of a key (also works for strings)
+- ``subtract(key, value)``: subtract ``value`` from the value of a key
+- ``set(key, value)``: set ``key`` to ``value``
 
 Of course you also can write your own operations:
 
