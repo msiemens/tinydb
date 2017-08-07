@@ -7,6 +7,32 @@ def delete(field):
 
     return transform
 
+def add(field, n):
+    """
+    Add n to a given field in the element.
+    """
+    def transform(element):
+        element[field] += n
+
+    return transform
+
+def subtract(field, n):
+    """
+    Subtract n from a given field in the element.
+    """
+    def transform(element):
+        element[field] -= n
+
+    return transform
+
+def set(field, val):
+    """
+    Set a given field to val.
+    """
+    def transform(element):
+        element[field] = val
+
+    return transform
 
 def increment(field):
     """
