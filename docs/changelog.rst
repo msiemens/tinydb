@@ -7,6 +7,13 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v3.4.0** (2017-08-08)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Add new update operations: ``add(key, value)``, ``substract(key, value)``,
+  and ``set(key, value)``
+  (see `pull request #145 <https://github.com/msiemens/tinydb/pull/145>`_).
+
 **v3.3.1** (2017-06-27)
 ^^^^^^^^^^^^^^^^^^^^^^^
 

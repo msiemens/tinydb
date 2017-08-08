@@ -163,6 +163,13 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v3.4.0** (2017-08-08)
+=======================
+
+- Add new update operations: ``add(key, value)``, ``substract(key, value)``,
+  and ``set(key, value)``
+  (see `pull request #145 <https://github.com/msiemens/tinydb/pull/145>`_).
+
 **v3.3.1** (2017-06-27)
 =======================
 
