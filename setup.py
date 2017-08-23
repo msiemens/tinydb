@@ -1,4 +1,5 @@
 # coding=utf-8
+from distutils.util import convert_path
 from setuptools import setup, find_packages
 from codecs import open
 import os
@@ -8,10 +9,13 @@ def read(fname):
     path = os.path.join(os.path.dirname(__file__), fname)
     return open(path, encoding='utf-8').read()
 
+# This will set the version string to __version__
+exec(read('tinydb/version.py'))
+
 
 setup(
     name="tinydb",
-    version="3.4.0",
+    version=__version__,
     packages=find_packages(),
 
     # development metadata
