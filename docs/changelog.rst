@@ -7,6 +7,12 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+**v3.4.1** (2017-08-23)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+- Expose TinyDB version via ``import tinyb; tinydb.__version__`` (see
+  `issue #148 <https://github.com/msiemens/tinydb/issues/148>`_).
+
 **v3.4.0** (2017-08-08)
 ^^^^^^^^^^^^^^^^^^^^^^^
 

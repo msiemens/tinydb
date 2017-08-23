@@ -163,6 +163,12 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v3.4.1** (2017-08-23)
+=======================
+
+- Expose TinyDB version via ``import tinyb; tinydb.__version__`` (see
+  `issue #148 <https://github.com/msiemens/tinydb/issues/148>`_).
+
 **v3.4.0** (2017-08-08)
 =======================
 
