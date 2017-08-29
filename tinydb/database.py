@@ -76,8 +76,8 @@ class TinyDB(object):
                         with ``args`` and ``kwargs``.
         """
 
-        storage = kwargs.pop('storage', TinyDB.DEFAULT_STORAGE)
-        table = kwargs.pop('default_table', TinyDB.DEFAULT_TABLE)
+        storage = kwargs.pop('storage', self.DEFAULT_STORAGE)
+        table = kwargs.pop('default_table', self.DEFAULT_TABLE)
 
         # Prepare the storage
         self._opened = False
