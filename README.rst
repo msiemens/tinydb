@@ -163,6 +163,14 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**v3.5.0** (2017-08-30)
+=======================
+
+- Expose the table name via ``table.name`` (see
+  `issue #148 <https://github.com/msiemens/tinydb/issues/147>`_).
+- Allow better subclassing of the ``TinyDB`` class
+  (see `pull request #150 <https://github.com/msiemens/tinydb/pull/150>`_).
+
 **v3.4.1** (2017-08-23)
 =======================
 
