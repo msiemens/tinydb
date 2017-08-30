@@ -107,7 +107,7 @@ class TinyDB(object):
         if name in self._table_cache:
             return self._table_cache[name]
 
-        table = self.table_class(StorageProxy(self._storage, name), **options)
+        table = self.table_class(StorageProxy(self._storage, name), name, **options)
 
         self._table_cache[name] = table
 
@@ -193,16 +193,18 @@ class Table(object):
     Represents a single TinyDB Table.
     """
 
-    def __init__(self, storage, cache_size=10):
+    def __init__(self, storage, name, cache_size=10):
         """
         Get access to a table.
 
         :param storage: Access to the storage
-        :type storage: StorageProxyus
+        :type storage: StorageProxy
+        :param name: The table name
         :param cache_size: Maximum size of query cache.
         """
 
         self._storage = storage
+        self._name = name
         self._query_cache = LRUCache(capacity=cache_size)
 
         data = self._read()
@@ -210,6 +212,13 @@ class Table(object):
             self._last_id = max(i for i in data)
         else:
             self._last_id = 0
+
+    @property
+    def name(self):
+        """
+        Get the table name.
+        """
+        return self._name
 
     def process_elements(self, func, cond=None, eids=None):
         """
