@@ -1,11 +1,13 @@
 # coding=utf-8
 import sys
 
+import pip
 import pytest
 
 from tinydb import TinyDB, where
 from tinydb.storages import MemoryStorage
 from tinydb.middlewares import Middleware
+
 
 def test_purge(db):
     db.purge()
@@ -387,6 +389,8 @@ def test_insert_string(tmpdir):
         _db.insert({'int': 3})  # Does not fail
 
 
+@pytest.mark.skipif('ujson' in [pkg.key for pkg in pip.get_installed_distributions()],
+                    reason="set() is serializable in ujson")
 def test_insert_invalid_dict(tmpdir):
     path = str(tmpdir.join('db.json'))
 
