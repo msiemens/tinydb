@@ -48,4 +48,5 @@ setup(
     ],
 
     long_description=read('README.rst'),
+    install_requires=['msgpack-python']
 )

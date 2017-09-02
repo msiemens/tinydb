@@ -13,6 +13,7 @@ try:
     import ujson as json
 except ImportError:
     import json
+import msgpack
 
 
 def touch(fname, times=None, create_dirs=False):
@@ -107,6 +108,49 @@ class JSONStorage(Storage):
     def write(self, data):
         self._handle.seek(0)
         serialized = json.dumps(data, **self.kwargs)
+        self._handle.write(serialized)
+        self._handle.flush()
+        self._handle.truncate()
+
+
+class MessagePackStorage(Storage):
+    """
+    Store the data in a MessagePack format.
+    """
+
+    def __init__(self, path, create_dirs=False, **kwargs):
+        """
+        Create a new instance.
+
+        Also creates the storage file, if it doesn't exist.
+
+        :param path: Where to store the MessagePack data.
+        :type path: str
+        """
+
+        super(MessagePackStorage, self).__init__()
+        touch(path, create_dirs=create_dirs)  # Create file if not exists
+        self.kwargs = kwargs
+        self._handle = open(path, 'rb+')
+
+    def close(self):
+        self._handle.close()
+
+    def read(self):
+        # Get the file size
+        self._handle.seek(0, os.SEEK_END)
+        size = self._handle.tell()
+
+        if not size:
+            # File is empty
+            return None
+        else:
+            self._handle.seek(0)
+            return msgpack.unpack(self._handle, encoding='utf-8')
+
+    def write(self, data):
+        self._handle.seek(0)
+        serialized = msgpack.packb(data, use_bin_type=True, **self.kwargs)
         self._handle.write(serialized)
         self._handle.flush()
         self._handle.truncate()

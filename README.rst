@@ -163,6 +163,13 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+**Unreleased** (2017-09-02)
+===========================
+
+- Added MessagePack support.
+- Added skipIf on tests that fails when using ujson.
+
+
 **v3.5.0** (2017-08-30)
 =======================
 

@@ -2,13 +2,14 @@ import os
 import random
 import tempfile
 
+import pip
 import pytest
 
 
 random.seed()
 
 from tinydb import TinyDB, where
-from tinydb.storages import JSONStorage, MemoryStorage, Storage
+from tinydb.storages import JSONStorage, MemoryStorage, Storage, MessagePackStorage
 
 element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
            'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
@@ -27,6 +28,8 @@ def test_json(tmpdir):
     storage.close()
 
 
+@pytest.mark.skipif('ujson' in [pkg.key for pkg in pip.get_installed_distributions()],
+                    reason="'separators' keyword failing in ujson")
 def test_json_kwargs(tmpdir):
     db_file = tmpdir.join('test.db')
     db = TinyDB(str(db_file), sort_keys=True, indent=4, separators=(',', ': '))
@@ -56,6 +59,46 @@ def test_json_readwrite(tmpdir):
 
     # Create TinyDB instance
     db = TinyDB(path, storage=JSONStorage)
+
+    item = {'name': 'A very long entry'}
+    item2 = {'name': 'A short one'}
+
+    get = lambda s: db.get(where('name') == s)
+
+    db.insert(item)
+    assert get('A very long entry') == item
+
+    db.remove(where('name') == 'A very long entry')
+    assert get('A very long entry') is None
+
+    db.insert(item2)
+    assert get('A short one') == item2
+
+    db.remove(where('name') == 'A short one')
+    assert get('A short one') is None
+
+    db.close()
+
+
+def test_msgpack(tmpdir):
+    # Write contents
+    path = str(tmpdir.join('test.db'))
+    storage = MessagePackStorage(path)
+    storage.write(element)
+
+    # Verify contents
+    assert element == storage.read()
+    storage.close()
+
+
+def test_msgpack_readwrite(tmpdir):
+    """
+    Regression test for issue #1
+    """
+    path = str(tmpdir.join('test.db'))
+
+    # Create TinyDB instance
+    db = TinyDB(path, storage=MessagePackStorage)
 
     item = {'name': 'A very long entry'}
     item2 = {'name': 'A short one'}
