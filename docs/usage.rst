@@ -65,6 +65,11 @@ Using ``where('field')`` is a shorthand for the following code:
 
 >>> db.search(Query()['field'] == 'value')
 
+Accessing nested fields with this syntax can be achieved like this:
+
+>>> db.search(where('birthday').year == 1900)
+>>> db.search(where('birthday')['year'] == 1900)
+
 Advanced queries
 ................
 
