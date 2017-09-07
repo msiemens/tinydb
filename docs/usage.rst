@@ -76,7 +76,9 @@ queries:
 >>> db.search(User.name.exists())
 
 >>> # Regex:
+>>> # Full item has to match the regex:
 >>> db.search(User.name.matches('[aZ]*'))
+>>> # Any part of the item has to match the regex:
 >>> db.search(User.name.search('b+'))
 
 >>> # Custom test:
@@ -133,10 +135,11 @@ Let's review the query operations we've learned:
 +-------------------------------------+-----------------------------------------------------------+
 | ``Query().field.exists()``          | Match any element where a field called ``field`` exists   |
 +-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.matches(regex)``    | Match any element matching the regular expression         |
+| ``Query().field.matches(regex)``    | Match any element with the whole field matching the       |
+|                                     | regular expression                                        |
 +-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.search(regex)``     | Match any element with substring matching the regular     |
-|                                     | expression                                                |
+| ``Query().field.search(regex)``     | Match any element with a substring of the field matching  |
+|                                     | the regular expression                                    |
 +-------------------------------------+-----------------------------------------------------------+
 | ``Query().field.test(func, *args)`` | Matches any element for which the function returns        |
 |                                     | ``True``                                                  |
