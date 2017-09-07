@@ -96,19 +96,36 @@ queries:
 >>> db.search(User.age.test(test_func, 0, 21))
 >>> db.search(User.age.test(test_func, 21, 99))
 
-When a field contains a list, you also can use the following methods:
+When a field contains a list, you also can use the ``any`` and ``all`` methods.
+Let's assume we have a user object with a groups list like this:
+
+>>> db.insert({'name': 'user', 'groups': [{'name': 'admin'}, {'name': 'user'}]})
+
+Now we can use the following queries:
 
 >>> # Using a query:
->>> # User is member of at least one admin group
+>>> # User has at least one group named 'admin'
 >>> db.search(User.groups.any(Group.name == 'admin'))
->>> # User is only member of admin groups
+[{'name': 'user', 'groups': [{'name': 'admin'}, {'name': 'user'}]}]
+
+>>> # User has only a group named 'admin'
 >>> db.search(User.groups.all(Group.name == 'admin'))
+[]
+
+As you can see, ``any`` tests if there is *at least one* element matching
+the query while ``all`` ensures *all* elements match the query. In addition,
+we also can pass lists of values to check for. Let's change the user object
+like this:
+
+>>> db.insert({'name': 'user', 'groups': ['user']})
 
 >>> # Using a list of values:
->>> # User is member of at least one group which is 'admin' or 'user'
+>>> # User's groups include at least one value from ['admin', 'user']
 >>> db.search(User.groups.any(['admin', 'user']))
->>> # User's groups are all either 'admin' or 'user'
+{'name': 'user', 'groups': ['user']}
+>>> # User's groups include all values from ['admin', 'user'] list
 >>> db.search(User.groups.all(['admin', 'user']))
+[]
 
 Query modifiers
 ...............
