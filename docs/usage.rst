@@ -97,35 +97,49 @@ queries:
 >>> db.search(User.age.test(test_func, 21, 99))
 
 When a field contains a list, you also can use the ``any`` and ``all`` methods.
-Let's assume we have a user object with a groups list like this:
+There are two ways to use them: with lists of values and with nested queries.
+Let's start with the first one. Assuming we have a user object with a groups list
+like this:
 
->>> db.insert({'name': 'user', 'groups': [{'name': 'admin'}, {'name': 'user'}]})
+>>> db.insert({'name': 'user1', 'groups': ['user']})
+>>> db.insert({'name': 'user2', 'groups': ['admin', 'user']})
+>>> db.insert({'name': 'user3', 'groups': ['sudo', 'user']})
 
 Now we can use the following queries:
 
->>> # Using a query:
->>> # User has at least one group named 'admin'
->>> db.search(User.groups.any(Group.name == 'admin'))
-[{'name': 'user', 'groups': [{'name': 'admin'}, {'name': 'user'}]}]
+>>> # User's groups include at least one value from ['admin', 'sudo']
+>>> db.search(User.groups.any(['admin', 'sudo']))
+[{'name': 'user2', 'groups': ['admin', 'user']},
+ {'name': 'user3', 'groups': ['sudo', 'user']}]
+>>>
+>>> # User's groups include all values from ['admin', 'user']
+>>> db.search(User.groups.all(['admin', 'user']))
+[{'name': 'user2', 'groups': ['admin', 'user']}]
 
->>> # User has only a group named 'admin'
->>> db.search(User.groups.all(Group.name == 'admin'))
-[]
+In some cases you may want to have more complex ``any``/``all`` queries.
+This is where nested queries come in as helpful. Let's set up a table like this:
+
+>>> Group = Query()
+>>> Permission = Query()
+>>> groups = db.table('groups')
+>>> groups.insert({'name': 'user', 'permissions': [{'type': 'read'}]})
+>>> groups.insert({'name': 'sudo', 'permissions': [{'type': 'read'}, {'type': 'sudo'}]})
+>>> groups.insert({'name': 'admin', 'permissions': [{'type': 'read'}, {'type': 'write'}, {'type': 'sudo'}]})
+
+Now let's search this table using nested ``any``/``all`` queries:
+
+>>> # Group has a permission with type 'read'
+>>> groups.search(Group.permissions.any(Permission.type == 'read'))
+[{'name': 'user', 'permissions': [{'type': 'read'}]},
+ {'name': 'sudo', 'permissions': [{'type': 'read'}, {'type': 'sudo'}]},
+ {'name': 'admin', 'permissions': [{'type': 'read'}, {'type': 'write'}, {'type': 'sudo'}]}]
+>>> # Group has ONLY permission 'read'
+>>> groups.search(Group.permissions.all(Permission.type == 'read'))
+[{'name': 'user', 'permissions': [{'type': 'read'}]}]
+
 
 As you can see, ``any`` tests if there is *at least one* element matching
-the query while ``all`` ensures *all* elements match the query. In addition,
-we also can pass lists of values to check for. Let's change the user object
-like this:
-
->>> db.insert({'name': 'user', 'groups': ['user']})
-
->>> # Using a list of values:
->>> # User's groups include at least one value from ['admin', 'user']
->>> db.search(User.groups.any(['admin', 'user']))
-{'name': 'user', 'groups': ['user']}
->>> # User's groups include all values from ['admin', 'user'] list
->>> db.search(User.groups.all(['admin', 'user']))
-[]
+the query while ``all`` ensures *all* elements match the query.
 
 Query modifiers
 ...............
