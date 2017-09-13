@@ -79,8 +79,6 @@ def test_json_readwrite(tmpdir):
 
 def test_create_dirs():
     temp_dir = tempfile.gettempdir()
-    db_dir = ''
-    db_file = ''
 
     while True:
         dname = os.path.join(temp_dir, str(random.getrandbits(20)))
@@ -89,15 +87,15 @@ def test_create_dirs():
             db_file = os.path.join(db_dir, 'db.json')
             break
 
-    db_conn = JSONStorage(db_file, create_dirs=True)
-    db_conn.close()
+    JSONStorage(db_file, create_dirs=True).close()
+    assert os.path.exists(db_file)
 
-    db_exists = os.path.exists(db_file)
+    # Use create_dirs with already existing directory
+    JSONStorage(db_file, create_dirs=True).close()
+    assert os.path.exists(db_file)
 
     os.remove(db_file)
     os.rmdir(db_dir)
-
-    assert db_exists
 
 
 def test_json_invalid_directory():

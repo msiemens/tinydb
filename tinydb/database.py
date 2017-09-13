@@ -13,12 +13,11 @@ class Element(dict):
     This is a transparent proxy for database elements. It exists
     to provide a way to access an element's id via ``el.eid``.
     """
-    def __init__(self, value=None, eid=None, **kwargs):
+    def __init__(self, value, eid, **kwargs):
         super(Element, self).__init__(**kwargs)
 
-        if value is not None:
-            self.update(value)
-            self.eid = eid
+        self.update(value)
+        self.eid = eid
 
 
 class StorageProxy(object):
