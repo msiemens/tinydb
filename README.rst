@@ -138,7 +138,7 @@ Extensions
 | **Status:**      *stable*
 | **Description:** ``tinydb-smartcache`` provides a smart query cache for
                    TinyDB. It updates the query cache when
-                   inserting/removing/updating elements so the cache doesn't
+                   inserting/removing/updating documents so the cache doesn't
                    get invalidated. It's useful if you perform lots of queries
                    while the data changes only little.
 
@@ -199,7 +199,7 @@ v3.3.1 (2017-06-27)
 v3.3.0 (2017-06-05)
 ===================
 
-- Allow iterating over a database or table yielding all elements
+- Allow iterating over a database or table yielding all documents
   (see `pull request #139 <https://github.com/msiemens/tinydb/pull/139>`_).
 
 v3.2.3 (2017-04-22)
@@ -217,7 +217,7 @@ v3.2.2 (2017-01-16)
 v3.2.1 (2016-06-29)
 ===================
 
-- Fix a bug with queries on elements that have a ``path`` key
+- Fix a bug with queries on documents that have a ``path`` key
   (see `pull request #107 <https://github.com/msiemens/tinydb/pull/107>`_).
 - Don't write to the database file needlessly when opening the database
   (see `pull request #104 <https://github.com/msiemens/tinydb/pull/104>`_).
@@ -243,7 +243,7 @@ v3.1.3 (2016-02-14)
 v3.1.2 (2016-01-30)
 ===================
 
-- Fix a bug when using unhashable elements (lists, dicts) with
+- Fix a bug when using unhashable documents (lists, dicts) with
   ``Query.any`` or ``Query.all`` queries
   (see `a forum post by karibul <https://forum.m-siemens.de/d/4-error-with-any-and-all-queries>`_).
 
@@ -258,9 +258,9 @@ v3.1.1 (2016-01-23)
 v3.1.0 (2015-12-31)
 ===================
 
-- ``db.update(...)`` and ``db.remove(...)`` now return affected element IDs
+- ``db.update(...)`` and ``db.remove(...)`` now return affected document IDs
   (see `issue #83 <https://github.com/msiemens/tinydb/issues/83>`_).
-- Inserting an invalid element (i.e. not a ``dict``) now raises an error
+- Inserting an invalid document (i.e. not a ``dict``) now raises an error
   instead of corrupting the database (see
   `issue #74 <https://github.com/msiemens/tinydb/issues/74>`_).
 

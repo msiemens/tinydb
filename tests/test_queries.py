@@ -210,9 +210,12 @@ def test_all():
     assert not query({})
     assert hash(query)
 
-    query = Query().followers.all([{'name': 'john'}, {'age': 17}])
-    assert query({'followers': [{'name': 'john'}, {'age': 17}]})
-    assert not query({'followers': [{'name': 'john'}, {'age': 18}]})
+    query = Query().followers.all([{'name': 'jane'}, {'name': 'john'}])
+    assert query({'followers': [{'name': 'john'}, {'name': 'jane'}]})
+    assert query({'followers': [{'name': 'john'},
+                                {'name': 'jane'},
+                                {'name': 'bob'}]})
+    assert not query({'followers': [{'name': 'john'}, {'name': 'bob'}]})
     assert hash(query)
 
 

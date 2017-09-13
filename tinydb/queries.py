@@ -99,8 +99,8 @@ class Query(object):
     >>> db.search(where('field1').exists() | where('field2') == 5)  # Binary OR
 
     Queries are executed by calling the resulting object. They expect to get the
-    element to test as the first argument and return ``True`` or ``False``
-    depending on whether the elements matches the query or not.
+    document to test as the first argument and return ``True`` or ``False``
+    depending on whether the documents matches the query or not.
     """
 
     def __init__(self):
@@ -273,7 +273,7 @@ class Query(object):
 
     def any(self, cond):
         """
-        Checks if a condition is met by any element in a list,
+        Checks if a condition is met by any document in a list,
         where a condition can also be a sequence (e.g. list).
 
         >>> Query().f1.any(Query().f2 == 1)
@@ -283,16 +283,15 @@ class Query(object):
             {'f1': [{'f2': 1}, {'f2': 0}]}
 
         >>> Query().f1.any([1, 2, 3])
-        # Match f1 that contains any element from [1, 2, 3]
 
         Matches::
 
             {'f1': [1, 2]}
             {'f1': [3, 4, 5]}
 
-        :param cond: Either a query that at least one element has to match or
-                     a list of which at least one element has to be contained
-                     in the tested element.
+        :param cond: Either a query that at least one document has to match or
+                     a list of which at least one document has to be contained
+                     in the tested document.
 -       """
         if callable(cond):
             def _cmp(value):
@@ -307,7 +306,7 @@ class Query(object):
 
     def all(self, cond):
         """
-        Checks if a condition is met by any element in a list,
+        Checks if a condition is met by any document in a list,
         where a condition can also be a sequence (e.g. list).
 
         >>> Query().f1.all(Query().f2 == 1)
@@ -317,14 +316,13 @@ class Query(object):
             {'f1': [{'f2': 1}, {'f2': 1}]}
 
         >>> Query().f1.all([1, 2, 3])
-        # Match f1 that contains any element from [1, 2, 3]
 
         Matches::
 
             {'f1': [1, 2, 3, 4, 5]}
 
-        :param cond: Either a query that all elements have to match or a list
-                     which has to be contained in the tested element.
+        :param cond: Either a query that all documents have to match or a list
+                     which has to be contained in the tested document.
         """
         if callable(cond):
             def _cmp(value):

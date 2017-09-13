@@ -26,7 +26,7 @@ API Documentation
 
     .. py:attribute:: eid
 
-        The element's id
+        The document's id
 
 ``tinydb.queries``
 ------------------

@@ -10,7 +10,7 @@ random.seed()
 from tinydb import TinyDB, where
 from tinydb.storages import JSONStorage, MemoryStorage, Storage
 
-element = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
+doc = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
            'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
            'dict': {'hp': 13, 'sp': 5},
            'bool': [True, False, True, False]}
@@ -20,10 +20,10 @@ def test_json(tmpdir):
     # Write contents
     path = str(tmpdir.join('test.db'))
     storage = JSONStorage(path)
-    storage.write(element)
+    storage.write(doc)
 
     # Verify contents
-    assert element == storage.read()
+    assert doc == storage.read()
     storage.close()
 
 
@@ -110,10 +110,10 @@ def test_json_invalid_directory():
 def test_in_memory():
     # Write contents
     storage = MemoryStorage()
-    storage.write(element)
+    storage.write(doc)
 
     # Verify contents
-    assert element == storage.read()
+    assert doc == storage.read()
 
     # Test case for #21
     other = MemoryStorage()

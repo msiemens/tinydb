@@ -8,10 +8,10 @@ from .utils import LRUCache, iteritems, itervalues
 
 class Element(dict):
     """
-    Represents an element stored in the database.
+    Represents a document stored in the database.
 
-    This is a transparent proxy for database elements. It exists
-    to provide a way to access an element's id via ``el.eid``.
+    This is a transparent proxy for database records. It exists
+    to provide a way to access an record's id via ``el.eid``.
     """
     def __init__(self, value, eid, **kwargs):
         super(Element, self).__init__(**kwargs)
@@ -170,7 +170,7 @@ class TinyDB(object):
 
     def __len__(self):
         """
-        Get the total number of elements in the default table.
+        Get the total number of documents in the default table.
 
         >>> db = TinyDB('db.json')
         >>> len(db)
@@ -180,7 +180,7 @@ class TinyDB(object):
 
     def __iter__(self):
         """
-        Iter over all elements from default table.
+        Iter over all documents from default table.
         """
         return self._table.__iter__()
 
@@ -219,30 +219,30 @@ class Table(object):
 
     def process_elements(self, func, cond=None, eids=None):
         """
-        Helper function for processing all elements specified by condition
+        Helper function for processing all documents specified by condition
         or IDs.
 
-        A repeating pattern in TinyDB is to run some code on all elements
+        A repeating pattern in TinyDB is to run some code on all documents
         that match a condition or are specified by their ID. This is
         implemented in this function.
         The function passed as ``func`` has to be a callable. It's first
         argument will be the data currently in the database. It's second
-        argument is the element ID of the currently processed element.
+        argument is the document ID of the currently processed document.
 
         See: :meth:`~.update`, :meth:`.remove`
 
-        :param func: the function to execute on every included element.
+        :param func: the function to execute on every included document.
                      first argument: all data
                      second argument: the current eid
-        :param cond: elements to use, or
-        :param eids: elements to use
-        :returns: the element IDs that were affected during processed
+        :param cond: query that matches documents to use, or
+        :param eids: list of document IDs to use
+        :returns: the document IDs that were affected during processed
         """
 
         data = self._read()
 
         if eids is not None:
-            # Processed element specified by id
+            # Processed document specified by id
             for eid in eids:
                 func(data, eid)
 
@@ -250,13 +250,13 @@ class Table(object):
             # Collect affected eids
             eids = []
 
-            # Processed elements specified by condition
+            # Processed documents specified by condition
             for eid in list(data):
                 if cond(data[eid]):
                     func(data, eid)
                     eids.append(eid)
         else:
-            # Processed elements
+            # Processed documents
             eids = list(data)
 
             for eid in eids:
@@ -307,15 +307,15 @@ class Table(object):
 
     def __len__(self):
         """
-        Get the total number of elements in the table.
+        Get the total number of documents in the table.
         """
         return len(self._read())
 
     def all(self):
         """
-        Get all elements stored in the table.
+        Get all documents stored in the table.
 
-        :returns: a list with all elements.
+        :returns: a list with all documents.
         :rtype: list[Element]
         """
 
@@ -323,50 +323,50 @@ class Table(object):
 
     def __iter__(self):
         """
-        Iter over all elements stored in the table.
+        Iter over all documents stored in the table.
 
-        :returns: an iterator over all elements.
+        :returns: an iterator over all documents.
         :rtype: listiterator[Element]
         """
 
         for value in itervalues(self._read()):
             yield value
 
-    def insert(self, element):
+    def insert(self, document):
         """
-        Insert a new element into the table.
+        Insert a new document into the table.
 
-        :param element: the element to insert
-        :returns: the inserted element's ID
+        :param document: the document to insert
+        :returns: the inserted document's ID
         """
 
         eid = self._get_next_id()
 
-        if not isinstance(element, dict):
-            raise ValueError('Element is not a dictionary')
+        if not isinstance(document, dict):
+            raise ValueError('Document is not a dictionary')
 
         data = self._read()
-        data[eid] = element
+        data[eid] = document
         self._write(data)
 
         return eid
 
-    def insert_multiple(self, elements):
+    def insert_multiple(self, documents):
         """
-        Insert multiple elements into the table.
+        Insert multiple documents into the table.
 
-        :param elements: a list of elements to insert
-        :returns: a list containing the inserted elements' IDs
+        :param documents: a list of documents to insert
+        :returns: a list containing the inserted documents' IDs
         """
 
         eids = []
         data = self._read()
 
-        for element in elements:
+        for doc in documents:
             eid = self._get_next_id()
             eids.append(eid)
 
-            data[eid] = element
+            data[eid] = doc
 
         self._write(data)
 
@@ -374,16 +374,16 @@ class Table(object):
 
     def remove(self, cond=None, eids=None):
         """
-        Remove all matching elements.
+        Remove all matching documents.
 
         :param cond: the condition to check against
         :type cond: query
-        :param eids: a list of element IDs
+        :param eids: a list of document IDs
         :type eids: list
-        :returns: a list containing the removed element's ID
+        :returns: a list containing the removed document's ID
         """
         if cond is None and eids is None:
-            raise RuntimeError('Use purge() to remove all elements')
+            raise RuntimeError('Use purge() to remove all documents')
 
         return self.process_elements(
             lambda data, eid: data.pop(eid),
@@ -392,16 +392,16 @@ class Table(object):
 
     def update(self, fields, cond=None, eids=None):
         """
-        Update all matching elements to have a given set of fields.
+        Update all matching documents to have a given set of fields.
 
-        :param fields: the fields that the matching elements will have
-                       or a method that will update the elements
+        :param fields: the fields that the matching documents will have
+                       or a method that will update the documents
         :type fields: dict | dict -> None
-        :param cond: which elements to update
+        :param cond: which documents to update
         :type cond: query
-        :param eids: a list of element IDs
+        :param eids: a list of document IDs
         :type eids: list
-        :returns: a list containing the updated element's ID
+        :returns: a list containing the updated document's ID
         """
 
         if callable(fields):
@@ -417,7 +417,7 @@ class Table(object):
 
     def purge(self):
         """
-        Purge the table by removing all elements.
+        Purge the table by removing all documents.
         """
 
         self._write({})
@@ -425,53 +425,53 @@ class Table(object):
 
     def search(self, cond):
         """
-        Search for all elements matching a 'where' cond.
+        Search for all documents matching a 'where' cond.
 
         :param cond: the condition to check against
         :type cond: Query
 
-        :returns: list of matching elements
+        :returns: list of matching documents
         :rtype: list[Element]
         """
 
         if cond in self._query_cache:
             return self._query_cache[cond][:]
 
-        elements = [element for element in self.all() if cond(element)]
-        self._query_cache[cond] = elements
+        docs = [doc for doc in self.all() if cond(doc)]
+        self._query_cache[cond] = docs
 
-        return elements[:]
+        return docs[:]
 
     def get(self, cond=None, eid=None):
         """
-        Get exactly one element specified by a query or and ID.
+        Get exactly one document specified by a query or and ID.
 
-        Returns ``None`` if the element doesn't exist
+        Returns ``None`` if the document doesn't exist
 
         :param cond: the condition to check against
         :type cond: Query
 
-        :param eid: the element's ID
+        :param eid: the document's ID
 
-        :returns: the element or None
+        :returns: the document or None
         :rtype: Element | None
         """
 
         # Cannot use process_elements here because we want to return a
-        # specific element
+        # specific document
 
         if eid is not None:
-            # Element specified by ID
+            # Document specified by ID
             return self._read().get(eid, None)
 
-        # Element specified by condition
-        for element in self.all():
-            if cond(element):
-                return element
+        # Document specified by condition
+        for doc in self.all():
+            if cond(doc):
+                return doc
 
     def count(self, cond):
         """
-        Count the elements matching a condition.
+        Count the documents matching a condition.
 
         :param cond: the condition use
         :type cond: Query
@@ -481,22 +481,22 @@ class Table(object):
 
     def contains(self, cond=None, eids=None):
         """
-        Check wether the database contains an element matching a condition or
+        Check wether the database contains a document matching a condition or
         an ID.
 
-        If ``eids`` is set, it checks if the db contains an element with one
+        If ``eids`` is set, it checks if the db contains a document with one
         of the specified.
 
         :param cond: the condition use
         :type cond: Query
-        :param eids: the element IDs to look for
+        :param eids: the document IDs to look for
         """
 
         if eids is not None:
-            # Elements specified by ID
+            # Documents specified by ID
             return any(self.get(eid=eid) for eid in eids)
 
-        # Element specified by condition
+        # Document specified by condition
         return self.get(cond) is not None
 
 # Set the default table class

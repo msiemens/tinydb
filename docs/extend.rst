@@ -114,11 +114,11 @@ Now let's implement that:
             for table_name in data:
                 table = data[table_name]
 
-                for element_id in table:
-                    item = table[element_id]
+                for doc_id in table:
+                    item = table[doc_id]
 
                     if item == {}:
-                        del table[element_id]
+                        del table[doc_id]
 
             return data
 
@@ -126,11 +126,11 @@ Now let's implement that:
             for table_name in data:
                 table = data[table_name]
 
-                for element_id in table:
-                    item = table[element_id]
+                for doc_id in table:
+                    item = table[doc_id]
 
                     if item == {}:
-                        del table[element_id]
+                        del table[doc_id]
 
             self.storage.write(data)
 

@@ -138,8 +138,8 @@ Now let's search this table using nested ``any``/``all`` queries:
 [{'name': 'user', 'permissions': [{'type': 'read'}]}]
 
 
-As you can see, ``any`` tests if there is *at least one* element matching
-the query while ``all`` ensures *all* elements match the query.
+As you can see, ``any`` tests if there is *at least one* document matching
+the query while ``all`` ensures *all* documents match the query.
 
 Query modifiers
 ...............
@@ -166,39 +166,39 @@ Recap
 
 Let's review the query operations we've learned:
 
-+-------------------------------------+-----------------------------------------------------------+
-| **Queries**                                                                                     |
-+-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.exists()``          | Match any element where a field called ``field`` exists   |
-+-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.matches(regex)``    | Match any element with the whole field matching the       |
-|                                     | regular expression                                        |
-+-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.search(regex)``     | Match any element with a substring of the field matching  |
-|                                     | the regular expression                                    |
-+-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.test(func, *args)`` | Matches any element for which the function returns        |
-|                                     | ``True``                                                  |
-+-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.all(query | list)`` | If given a query, matches all elements where all elements |
-|                                     | in the list ``field`` match the query.                    |
-|                                     | If given a list, matches all elements where all elements  |
-|                                     | in the list ``field`` are a member of the given list      |
-+-------------------------------------+-----------------------------------------------------------+
-| ``Query().field.any(query | list)`` | If given a query, matches all elements where at least one |
-|                                     | element in the list ``field`` match the query.            |
-|                                     | If given a list, matches all elements where at least one  |
-|                                     | elements in the list ``field`` are a member of the given  |
-|                                     | list                                                      |
-+-------------------------------------+-----------------------------------------------------------+
-| **Logical operations on queries**                                                               |
-+-------------------------------------+-----------------------------------------------------------+
-| ``~ query``                         | Match elements that don't match the query                 |
-+-------------------------------------+-----------------------------------------------------------+
-| ``(query1) & (query2)``             | Match elements that match both queries                    |
-+-------------------------------------+-----------------------------------------------------------+
-| ``(query1) | (query2)``             | Match elements that match at least one of the queries     |
-+-------------------------------------+-----------------------------------------------------------+
++-------------------------------------+-------------------------------------------------------------+
+| **Queries**                                                                                       |
++-------------------------------------+-------------------------------------------------------------+
+| ``Query().field.exists()``          | Match any document where a field called ``field`` exists    |
++-------------------------------------+-------------------------------------------------------------+
+| ``Query().field.matches(regex)``    | Match any document with the whole field matching the        |
+|                                     | regular expression                                          |
++-------------------------------------+-------------------------------------------------------------+
+| ``Query().field.search(regex)``     | Match any document with a substring of the field matching   |
+|                                     | the regular expression                                      |
++-------------------------------------+-------------------------------------------------------------+
+| ``Query().field.test(func, *args)`` | Matches any document for which the function returns         |
+|                                     | ``True``                                                    |
++-------------------------------------+-------------------------------------------------------------+
+| ``Query().field.all(query | list)`` | If given a query, matches all documents where all documents |
+|                                     | in the list ``field`` match the query.                      |
+|                                     | If given a list, matches all documents where all documents  |
+|                                     | in the list ``field`` are a member of the given list        |
++-------------------------------------+-------------------------------------------------------------+
+| ``Query().field.any(query | list)`` | If given a query, matches all documents where at least one  |
+|                                     | document in the list ``field`` match the query.             |
+|                                     | If given a list, matches all documents where at least one   |
+|                                     | documents in the list ``field`` are a member of the given   |
+|                                     | list                                                        |
++-------------------------------------+-------------------------------------------------------------+
+| **Logical operations on queries**                                                                 |
++-------------------------------------+-------------------------------------------------------------+
+| ``~ query``                         | Match documents that don't match the query                  |
++-------------------------------------+-------------------------------------------------------------+
+| ``(query1) & (query2)``             | Match documents that match both queries                     |
++-------------------------------------+-------------------------------------------------------------+
+| ``(query1) | (query2)``             | Match documents that match at least one of the queries      |
++-------------------------------------+-------------------------------------------------------------+
 
 Handling Data
 -------------
@@ -209,8 +209,8 @@ your database.
 Inserting data
 ..............
 
-As already described you can insert an element using ``db.insert(...)``.
-In case you want to insert multiple elements, you can use ``db.insert_multiple(...)``:
+As already described you can insert an document using ``db.insert(...)``.
+In case you want to insert multiple documents, you can use ``db.insert_multiple(...)``:
 
 >>> db.insert_multiple([{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}])
 >>> db.insert_multiple({'int': 1, 'value': i} for i in range(2))
@@ -218,23 +218,23 @@ In case you want to insert multiple elements, you can use ``db.insert_multiple(.
 Updating data
 .............
 
-Sometimes you want to update all elements in your database. In this case, you
+Sometimes you want to update all documents in your database. In this case, you
 can leave out the ``query`` argument:
 
 >>> db.update({'foo': 'bar'})
 
 When passing a dict to ``db.update(fields, query)``, it only allows you to
-update an element by adding or overwriting its values. But sometimes you may
+update an document by adding or overwriting its values. But sometimes you may
 need to e.g. remove one field or increment its value. In that case you can
 pass a function instead of ``fields``:
 
 >>> from tinydb.operations import delete
 >>> db.update(delete('key1'), User.name == 'John')
 
-This will remove the key ``key1`` from all matching elements. TinyDB comes
+This will remove the key ``key1`` from all matching documents. TinyDB comes
 with these operations:
 
-- ``delete(key)``: delete a key from the element
+- ``delete(key)``: delete a key from the document
 - ``increment(key)``: increment the value of a key
 - ``decrement(key)``: decrement the value of a key
 - ``add(key, value)``: add ``value`` to the value of a key (also works for strings)
@@ -243,9 +243,9 @@ with these operations:
 
 Of course you also can write your own operations:
 
->>> def your_operation(your_arguments):
-...     def transform(element):
-...         # do something with the element
+>>> def your_operation(yodocumentur_arguments):
+...     def transform(doc):
+...         # do something with the document
 ...         # ...
 ...     return transform
 ...
@@ -255,13 +255,13 @@ Retrieving data
 ...............
 
 There are several ways to retrieve data from your database. For instance you
-can get the number of stored elements:
+can get the number of stored documents:
 
 >>> len(db)
 3
 
 Then of course you can use ``db.search(...)`` as described in the :doc:`getting-started`
-section. But sometimes you want to get only one matching element. Instead of using
+section. But sometimes you want to get only one matching document. Instead of using
 
 >>> try:
 ...     result = db.search(User.name == 'John')[0]
@@ -278,15 +278,15 @@ None
 
 .. caution::
 
-    If multiple elements match the query, probably a random one of them will
+    If multiple documents match the query, probably a random one of them will
     be returned!
 
-Often you don't want to search for elements but only know whether they are
+Often you don't want to search for documents but only know whether they are
 stored in the database. In this case ``db.contains(...)`` is your friend:
 
 >>> db.contains(User.name == 'John')
 
-In a similar manner you can look up the number of elements matching a query:
+In a similar manner you can look up the number of documents matching a query:
 
 >>> db.count(User.name == 'John')
 2
@@ -299,39 +299,39 @@ Let's summarize the ways to handle data:
 +-------------------------------+---------------------------------------------------------------+
 | **Inserting data**                                                                            |
 +-------------------------------+---------------------------------------------------------------+
-| ``db.insert_multiple(...)``   | Insert multiple elements                                      |
+| ``db.insert_multiple(...)``   | Insert multiple documents                                     |
 +-------------------------------+---------------------------------------------------------------+
 | **Updating data**                                                                             |
 +-------------------------------+---------------------------------------------------------------+
-| ``db.update(operation, ...)`` | Update all matching elements with a special operation         |
+| ``db.update(operation, ...)`` | Update all matching documents with a special operation        |
 +-------------------------------+---------------------------------------------------------------+
 | **Retrieving data**                                                                           |
 +-------------------------------+---------------------------------------------------------------+
-| ``len(db)``                   | Get the number of elements in the database                    |
+| ``len(db)``                   | Get the number of documents in the database                   |
 +-------------------------------+---------------------------------------------------------------+
-| ``db.get(query)``             | Get one element matching the query                            |
+| ``db.get(query)``             | Get one document matching the query                           |
 +-------------------------------+---------------------------------------------------------------+
-| ``db.contains(query)``        | Check if the database contains a matching element             |
+| ``db.contains(query)``        | Check if the database contains a matching document            |
 +-------------------------------+---------------------------------------------------------------+
-| ``db.count(query)``           | Get the number of matching elements                           |
+| ``db.count(query)``           | Get the number of matching documents                          |
 +-------------------------------+---------------------------------------------------------------+
 
 
-.. _element_ids:
+.. _document_ids:
 
-Using Element IDs
------------------
+Using Document IDs
+------------------
 
-Internally TinyDB associates an ID with every element you insert. It's returned
-after inserting an element:
+Internally TinyDB associates an ID with every document you insert. It's returned
+after inserting an document:
 
 >>> db.insert({'name': 'John', 'age': 22})
 3
 >>> db.insert_multiple([{...}, {...}, {...}])
 [4, 5, 6]
 
-In addition you can get the ID of already inserted elements using
-``element.eid``. This works both with ``get`` and ``all``:
+In addition you can get the ID of already inserted documents using
+``document.eid``. This works both with ``get`` and ``all``:
 
 >>> el = db.get(User.name == 'John')
 >>> el.eid
@@ -356,23 +356,23 @@ Recap
 Let's sum up the way TinyDB supports working with IDs:
 
 +----------------------------------+---------------------------------------------------------------+
-| **Getting an element's ID**                                                                      |
+| **Getting an document's ID**                                                                     |
 +----------------------------------+---------------------------------------------------------------+
-| ``db.insert(...)``               | Returns the inserted element's ID                             |
+| ``db.insert(...)``               | Returns the inserted document's ID                            |
 +----------------------------------+---------------------------------------------------------------+
-| ``db.insert_multiple(...)``      | Returns the inserted elements' ID                             |
+| ``db.insert_multiple(...)``      | Returns the inserted documents' ID                            |
 +----------------------------------+---------------------------------------------------------------+
-| ``element.eid``                  | Get the ID of an element fetched from the db                  |
+| ``document.eid``                  | Get the ID of an document fetched from the db                |
 +----------------------------------+---------------------------------------------------------------+
 | **Working with IDs**                                                                             |
 +----------------------------------+---------------------------------------------------------------+
-| ``db.get(eid=...)``              | Get the element with the given ID                             |
+| ``db.get(eid=...)``              | Get the document with the given ID                            |
 +----------------------------------+---------------------------------------------------------------+
-| ``db.contains(eids=[...])``      | Check if the db contains elements with one of the given IDs   |
+| ``db.contains(eids=[...])``      | Check if the db contains documents with one of the given IDs  |
 +----------------------------------+---------------------------------------------------------------+
-| ``db.update({...}, eids=[...])`` | Update all elements with the given IDs                        |
+| ``db.update({...}, eids=[...])`` | Update all documents with the given IDs                       |
 +----------------------------------+---------------------------------------------------------------+
-| ``db.remove(eids=[...])``        | Remove all elements with the given IDs                        |
+| ``db.remove(eids=[...])``        | Remove all documents with the given IDs                       |
 +----------------------------------+---------------------------------------------------------------+
 
 
