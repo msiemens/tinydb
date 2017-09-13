@@ -249,7 +249,7 @@ class Table(object):
             for eid in eids:
                 func(data, eid)
 
-        else:
+        elif cond is not None:
             # Collect affected eids
             eids = []
 
@@ -258,6 +258,12 @@ class Table(object):
                 if cond(data[eid]):
                     func(data, eid)
                     eids.append(eid)
+        else:
+            # Processed elements
+            eids = list(data)
+
+            for eid in eids:
+                func(data, eid)
 
         self._write(data)
 
@@ -379,9 +385,13 @@ class Table(object):
         :type eids: list
         :returns: a list containing the removed element's ID
         """
+        if cond is None and eids is None:
+            raise RuntimeError('Use purge() to remove all elements')
 
-        return self.process_elements(lambda data, eid: data.pop(eid),
-                                     cond, eids)
+        return self.process_elements(
+            lambda data, eid: data.pop(eid),
+            cond, eids
+        )
 
     def update(self, fields, cond=None, eids=None):
         """

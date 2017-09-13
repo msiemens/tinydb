@@ -97,6 +97,11 @@ def test_remove(db):
     assert db.count(where('int') == 1) == 2
 
 
+def test_remove_all_fails(db):
+    with pytest.raises(RuntimeError):
+        db.remove()
+
+
 def test_remove_multiple(db):
     db.remove(where('int') == 1)
 
@@ -114,12 +119,20 @@ def test_remove_returns_ids(db):
 
 
 def test_update(db):
-    assert db.count(where('int') == 1) == 3
+    assert len(db) == 3
 
     db.update({'int': 2}, where('char') == 'a')
 
     assert db.count(where('int') == 2) == 1
     assert db.count(where('int') == 1) == 2
+
+
+def test_update_all(db):
+    assert db.count(where('int') == 1) == 3
+
+    db.update({'newField': True})
+
+    assert db.count(where('newField') == True) == 3
 
 
 def test_update_returns_ids(db):

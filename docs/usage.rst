@@ -218,10 +218,15 @@ In case you want to insert multiple elements, you can use ``db.insert_multiple(.
 Updating data
 .............
 
-``db.update(fields, query)`` only allows you to update an element by adding
-or overwriting its values. But sometimes you may need to e.g. remove one field
-or increment its value. In that case you can pass a function instead of
-``fields``:
+Sometimes you want to update all elements in your database. In this case, you
+can leave out the ``query`` argument:
+
+>>> db.update({'foo': 'bar'})
+
+When passing a dict to ``db.update(fields, query)``, it only allows you to
+update an element by adding or overwriting its values. But sometimes you may
+need to e.g. remove one field or increment its value. In that case you can
+pass a function instead of ``fields``:
 
 >>> from tinydb.operations import delete
 >>> db.update(delete('key1'), User.name == 'John')
