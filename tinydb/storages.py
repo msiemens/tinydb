@@ -15,13 +15,14 @@ except ImportError:
     import json
 
 
-def touch(fname, times=None, create_dirs=False):
+def touch(fname, create_dirs):
     if create_dirs:
         base_dir = os.path.dirname(fname)
         if not os.path.exists(base_dir):
             os.makedirs(base_dir)
+
     with open(fname, 'a'):
-        os.utime(fname, times)
+        os.utime(fname, None)
 
 
 class Storage(with_metaclass(ABCMeta, object)):

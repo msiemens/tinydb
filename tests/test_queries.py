@@ -21,6 +21,7 @@ def test_eq():
 
 def test_ne():
     query = Query().value != 1
+    assert query({'value': 0})
     assert query({'value': 2})
     assert not query({'value': 1})
     assert hash(query)
@@ -35,6 +36,7 @@ def test_lt():
     query = Query().value < 1
     assert query({'value': 0})
     assert not query({'value': 1})
+    assert not query({'value': 2})
     assert hash(query)
 
 

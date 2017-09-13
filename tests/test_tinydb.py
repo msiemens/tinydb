@@ -435,9 +435,13 @@ def test_non_default_table():
     assert set(['non-default']) == db.tables()
 
     db.purge_tables()
+    default_table = TinyDB.DEFAULT_TABLE
+
     TinyDB.DEFAULT_TABLE = 'non-default'
     db = TinyDB(storage=MemoryStorage)
     assert set(['non-default']) == db.tables()
+
+    TinyDB.DEFAULT_TABLE = default_table
 
 
 def test_purge_table():
@@ -454,6 +458,7 @@ def test_purge_table():
 
     db.purge_table(table_name)
     assert set([TinyDB.DEFAULT_TABLE]) == db.tables()
+    assert table_name not in db._table_cache
 
     db.purge_table('non-existent-table-name')
     assert set([TinyDB.DEFAULT_TABLE]) == db.tables()
@@ -481,9 +486,13 @@ def test_query_cache():
 
     results = db.search(query)
     assert len(results) == 1
-    # Now, modify the result ist
-    results.extend([1])
 
+    # Modify the db instance to not return any results when
+    # bypassing the query cache
+    db._table_cache[TinyDB.DEFAULT_TABLE]._read = lambda: {}
+
+    # Make sure we got an independent copy of the result list
+    results.extend([1])
     assert db.search(query) == [{'name': 'foo', 'value': 42}]
 
 

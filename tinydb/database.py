@@ -79,8 +79,6 @@ class TinyDB(object):
         table = kwargs.pop('default_table', self.DEFAULT_TABLE)
 
         # Prepare the storage
-        self._opened = False
-
         #: :type: Storage
         self._storage = storage(*args, **kwargs)
 
@@ -157,7 +155,7 @@ class TinyDB(object):
         return self
 
     def __exit__(self, *args):
-        if self._opened is True:
+        if self._opened:
             self.close()
 
     def __getattr__(self, name):

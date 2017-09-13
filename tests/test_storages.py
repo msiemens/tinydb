@@ -87,6 +87,9 @@ def test_create_dirs():
             db_file = os.path.join(db_dir, 'db.json')
             break
 
+    with pytest.raises(OSError):
+        JSONStorage(db_file)
+
     JSONStorage(db_file, create_dirs=True).close()
     assert os.path.exists(db_file)
 
@@ -130,3 +133,22 @@ def test_custom():
 
     with pytest.raises(TypeError):
         MyStorage()
+
+
+def test_custom_with_exception():
+    class MyStorage(Storage):
+        def read(self):
+            pass
+
+        def write(self, data):
+            pass
+
+        def __init__(self):
+            raise ValueError()
+
+        def close(self):
+            raise RuntimeError()
+
+    with pytest.raises(ValueError):
+        with TinyDB(storage=MyStorage) as db:
+            pass

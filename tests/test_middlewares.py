@@ -47,6 +47,20 @@ def test_caching_write_many(storage):
 
 def test_caching_flush(storage):
     # Write contents
+    for _ in range(CachingMiddleware.WRITE_CACHE_SIZE - 1):
+        storage.write(element)
+
+    # Not yet flushed...
+    assert storage.memory is None
+
+    storage.write(element)
+
+    # Verify contents: Cache should be emptied and written to storage
+    assert storage.memory
+
+
+def test_caching_flush_manually(storage):
+    # Write contents
     storage.write(element)
 
     storage.flush()
