@@ -86,7 +86,7 @@ def test_create_dirs():
             db_file = os.path.join(db_dir, 'db.json')
             break
 
-    with pytest.raises(OSError):
+    with pytest.raises(IOError):
         JSONStorage(db_file)
 
     JSONStorage(db_file, create_dirs=True).close()
