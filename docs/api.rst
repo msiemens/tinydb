@@ -24,9 +24,9 @@ API Documentation
     :exclude-members: __dict__, __weakref__
     :member-order: bysource
 
-    .. py:attribute:: eid
+    .. py:attribute:: doc_id
 
-        The element's id
+        The document's id
 
 ``tinydb.queries``
 ------------------

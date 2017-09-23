@@ -7,6 +7,7 @@ from tinydb import TinyDB, where
 from tinydb.storages import MemoryStorage
 from tinydb.middlewares import Middleware
 
+
 def test_purge(db):
     db.purge()
 
@@ -109,7 +110,7 @@ def test_remove_multiple(db):
 
 
 def test_remove_ids(db):
-    db.remove(eids=[1, 2])
+    db.remove(doc_ids=[1, 2])
 
     assert len(db) == 1
 
@@ -167,7 +168,7 @@ def test_update_transform(db):
 
 
 def test_update_ids(db):
-    db.update({'int': 2}, eids=[1, 2])
+    db.update({'int': 2}, doc_ids=[1, 2])
 
     assert db.count(where('int') == 2) == 2
 
@@ -187,8 +188,8 @@ def test_get(db):
 
 def test_get_ids(db):
     el = db.all()[0]
-    assert db.get(eid=el.eid) == el
-    assert db.get(eid=float('NaN')) is None
+    assert db.get(doc_id=el.doc_id) == el
+    assert db.get(doc_id=float('NaN')) is None
 
 
 def test_count(db):
@@ -202,8 +203,8 @@ def test_contains(db):
 
 
 def test_contains_ids(db):
-    assert db.contains(eids=[1, 2])
-    assert not db.contains(eids=[88])
+    assert db.contains(doc_ids=[1, 2])
+    assert not db.contains(doc_ids=[88])
 
 
 def test_get_idempotent(db):
@@ -268,7 +269,7 @@ def test_unique_ids(tmpdir):
     with TinyDB(path) as _db:
         data = _db.all()
 
-        assert data[0].eid != data[1].eid
+        assert data[0].doc_id != data[1].doc_id
 
     # Verify ids stay unique when inserting/removing
     with TinyDB(path) as _db:
@@ -278,7 +279,7 @@ def test_unique_ids(tmpdir):
 
         assert len(_db) == 4
 
-        ids = [e.eid for e in _db.all()]
+        ids = [e.doc_id for e in _db.all()]
         assert len(ids) == len(set(ids))
 
 
@@ -351,7 +352,7 @@ def test_unicode_json(tmpdir):
         assert _db.contains(where('value') == unic_str2)
 
 
-def test_eids_json(tmpdir):
+def test_doc_ids_json(tmpdir):
     """
     Regression test for issue #45
     """
@@ -368,17 +369,17 @@ def test_eids_json(tmpdir):
                                     {'int': 1, 'char': 'b'},
                                     {'int': 1, 'char': 'c'}]) == [1, 2, 3]
 
-        assert _db.contains(eids=[1, 2])
-        assert not _db.contains(eids=[88])
+        assert _db.contains(doc_ids=[1, 2])
+        assert not _db.contains(doc_ids=[88])
 
-        _db.update({'int': 2}, eids=[1, 2])
+        _db.update({'int': 2}, doc_ids=[1, 2])
         assert _db.count(where('int') == 2) == 2
 
         el = _db.all()[0]
-        assert _db.get(eid=el.eid) == el
-        assert _db.get(eid=float('NaN')) is None
+        assert _db.get(doc_id=el.doc_id) == el
+        assert _db.get(doc_id=float('NaN')) is None
 
-        _db.remove(eids=[1, 2])
+        _db.remove(doc_ids=[1, 2])
         assert len(_db) == 1
 
 
@@ -498,3 +499,28 @@ def test_query_cache():
 
 def test_tinydb_is_iterable(db):
     assert [r for r in db] == db.all()
+
+
+def test_eids(db):
+    with pytest.warns(DeprecationWarning):
+        assert db.contains(eids=[1]) is True
+
+    with pytest.warns(DeprecationWarning):
+        db.update({'field': 'value'}, eids=[1])
+        assert db.contains(where('field') == 'value')
+
+    with pytest.warns(DeprecationWarning):
+        doc = db.get(eid=1)
+
+    with pytest.warns(DeprecationWarning):
+        assert doc.eid == 1
+
+    with pytest.warns(DeprecationWarning):
+        db.remove(eids=[1])
+        assert not db.contains(where('field') == 'value')
+
+    with pytest.raises(TypeError):
+        db.remove(eids=[1], doc_ids=[1])
+
+    with pytest.raises(TypeError):
+        db.get(eid=[1], doc_id=[1])
