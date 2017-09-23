@@ -518,3 +518,9 @@ def test_eids(db):
     with pytest.warns(DeprecationWarning):
         db.remove(eids=[1])
         assert not db.contains(where('field') == 'value')
+
+    with pytest.raises(TypeError):
+        db.remove(eids=[1], doc_ids=[1])
+
+    with pytest.raises(TypeError):
+        db.get(eid=[1], doc_id=[1])
