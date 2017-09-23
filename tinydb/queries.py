@@ -95,12 +95,12 @@ class Query(object):
     Besides the methods documented here you can combine queries using the
     binary AND and OR operators:
 
-    >>> db.search(where('field1').exists() & where('field2') == 5)  # Binary AND
-    >>> db.search(where('field1').exists() | where('field2') == 5)  # Binary OR
+    >>> db.search(where('field1').exists() & where('field2') == 5) # Binary AND
+    >>> db.search(where('field1').exists() | where('field2') == 5) # Binary OR
 
-    Queries are executed by calling the resulting object. They expect to get the
-    document to test as the first argument and return ``True`` or ``False``
-    depending on whether the documents matches the query or not.
+    Queries are executed by calling the resulting object. They expect to get
+    the document to test as the first argument and return ``True`` or
+    ``False`` depending on whether the documents matches the query or not.
     """
 
     def __init__(self):

@@ -4,16 +4,15 @@ import tempfile
 
 import pytest
 
-
-random.seed()
-
 from tinydb import TinyDB, where
 from tinydb.storages import JSONStorage, MemoryStorage, Storage
 
+random.seed()
+
 doc = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
-           'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
-           'dict': {'hp': 13, 'sp': 5},
-           'bool': [True, False, True, False]}
+       'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
+       'dict': {'hp': 13, 'sp': 5},
+       'bool': [True, False, True, False]}
 
 
 def test_json(tmpdir):

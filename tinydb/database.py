@@ -136,7 +136,8 @@ class TinyDB(object):
         if name in self._table_cache:
             return self._table_cache[name]
 
-        table = self.table_class(StorageProxy(self._storage, name), name, **options)
+        table = self.table_class(StorageProxy(self._storage, name), name,
+                                 **options)
 
         self._table_cache[name] = table
 

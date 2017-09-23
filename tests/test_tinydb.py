@@ -7,6 +7,7 @@ from tinydb import TinyDB, where
 from tinydb.storages import MemoryStorage
 from tinydb.middlewares import Middleware
 
+
 def test_purge(db):
     db.purge()
 
