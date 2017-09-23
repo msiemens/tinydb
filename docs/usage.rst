@@ -331,23 +331,23 @@ after inserting an document:
 [4, 5, 6]
 
 In addition you can get the ID of already inserted documents using
-``document.eid``. This works both with ``get`` and ``all``:
+``document.doc_id``. This works both with ``get`` and ``all``:
 
 >>> el = db.get(User.name == 'John')
->>> el.eid
+>>> el.doc_id
 3
 >>> el = db.all()[0]
->>> el.eid
+>>> el.doc_id
 12
 
 Different TinyDB methods also work with IDs, namely: ``update``, ``remove``,
 ``contains`` and ``get``. The first two also return a list of affected IDs.
 
->>> db.update({'value': 2}, eids=[1, 2])
->>> db.contains(eids=[1])
+>>> db.update({'value': 2}, doc_ids=[1, 2])
+>>> db.contains(doc_ids=[1])
 True
->>> db.remove(eids=[1, 2])
->>> db.get(eid=3)
+>>> db.remove(doc_ids=[1, 2])
+>>> db.get(doc_id=3)
 {...}
 
 Recap
@@ -355,25 +355,26 @@ Recap
 
 Let's sum up the way TinyDB supports working with IDs:
 
-+----------------------------------+---------------------------------------------------------------+
++-------------------------------------+------------------------------------------------------------+
 | **Getting an document's ID**                                                                     |
-+----------------------------------+---------------------------------------------------------------+
-| ``db.insert(...)``               | Returns the inserted document's ID                            |
-+----------------------------------+---------------------------------------------------------------+
-| ``db.insert_multiple(...)``      | Returns the inserted documents' ID                            |
-+----------------------------------+---------------------------------------------------------------+
-| ``document.eid``                  | Get the ID of an document fetched from the db                |
-+----------------------------------+---------------------------------------------------------------+
++-------------------------------------+------------------------------------------------------------+
+| ``db.insert(...)``                  | Returns the inserted document's ID                         |
++-------------------------------------+------------------------------------------------------------+
+| ``db.insert_multiple(...)``         | Returns the inserted documents' ID                         |
++-------------------------------------+------------------------------------------------------------+
+| ``document.doc_id``                 | Get the ID of an document fetched from the db              |
++-------------------------------------+------------------------------------------------------------+
 | **Working with IDs**                                                                             |
-+----------------------------------+---------------------------------------------------------------+
-| ``db.get(eid=...)``              | Get the document with the given ID                            |
-+----------------------------------+---------------------------------------------------------------+
-| ``db.contains(eids=[...])``      | Check if the db contains documents with one of the given IDs  |
-+----------------------------------+---------------------------------------------------------------+
-| ``db.update({...}, eids=[...])`` | Update all documents with the given IDs                       |
-+----------------------------------+---------------------------------------------------------------+
-| ``db.remove(eids=[...])``        | Remove all documents with the given IDs                       |
-+----------------------------------+---------------------------------------------------------------+
++-------------------------------------+------------------------------------------------------------+
+| ``db.get(doc_id=...)``              | Get the document with the given ID                         |
++-------------------------------------+------------------------------------------------------------+
+| ``db.contains(doc_ids=[...])``      | Check if the db contains documents with one of the given   |
+|                                     | IDs                                                        |
++-------------------------------------+------------------------------------------------------------+
+| ``db.update({...}, doc_ids=[...])`` | Update all documents with the given IDs                    |
++-------------------------------------+------------------------------------------------------------+
+| ``db.remove(doc_ids=[...])``        | Remove all documents with the given IDs                    |
++-------------------------------------+------------------------------------------------------------+
 
 
 Tables

@@ -2,22 +2,54 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
+import warnings
+
 from . import JSONStorage
 from .utils import LRUCache, iteritems, itervalues
 
 
-class Element(dict):
+class Document(dict):
     """
     Represents a document stored in the database.
 
     This is a transparent proxy for database records. It exists
-    to provide a way to access an record's id via ``el.eid``.
+    to provide a way to access an record's id via ``el.doc_id``.
     """
-    def __init__(self, value, eid, **kwargs):
-        super(Element, self).__init__(**kwargs)
+    def __init__(self, value, doc_id, **kwargs):
+        super(Document, self).__init__(**kwargs)
 
         self.update(value)
-        self.eid = eid
+        self.doc_id = doc_id
+
+    @property
+    def eid(self):
+        warnings.warn('eid has been renamed to doc_id', DeprecationWarning)
+        return self.doc_id
+
+
+Element = Document
+
+
+def _get_doc_id(doc_id, eid):
+    if eid is not None:
+        if doc_id is not None:
+            raise TypeError('cannot pass both eid and doc_id')
+
+        warnings.warn('eid has been renamed to doc_ids', DeprecationWarning)
+        return eid
+    else:
+        return doc_id
+
+
+def _get_doc_ids(doc_ids, eids):
+    if eids is not None:
+        if doc_ids is not None:
+            raise TypeError('cannot pass both eids and doc_ids')
+
+        warnings.warn('eids has been renamed to doc_ids', DeprecationWarning)
+        return eids
+    else:
+        return doc_ids
 
 
 class StorageProxy(object):
@@ -34,8 +66,8 @@ class StorageProxy(object):
 
         data = {}
         for key, val in iteritems(raw_data):
-            eid = int(key)
-            data[eid] = Element(val, eid)
+            doc_id = int(key)
+            data[doc_id] = Element(val, doc_id)
 
         return data
 
@@ -217,7 +249,7 @@ class Table(object):
         """
         return self._name
 
-    def process_elements(self, func, cond=None, eids=None):
+    def process_elements(self, func, cond=None, doc_ids=None, eids=None):
         """
         Helper function for processing all documents specified by condition
         or IDs.
@@ -235,36 +267,38 @@ class Table(object):
                      first argument: all data
                      second argument: the current eid
         :param cond: query that matches documents to use, or
-        :param eids: list of document IDs to use
+        :param doc_ids: list of document IDs to use
+        :param doc_ids: list of document IDs to use (deprecated)
         :returns: the document IDs that were affected during processed
         """
 
+        doc_ids = _get_doc_ids(doc_ids, eids)
         data = self._read()
 
-        if eids is not None:
+        if doc_ids is not None:
             # Processed document specified by id
-            for eid in eids:
-                func(data, eid)
+            for doc_id in doc_ids:
+                func(data, doc_id)
 
         elif cond is not None:
-            # Collect affected eids
-            eids = []
+            # Collect affected doc_ids
+            doc_ids = []
 
             # Processed documents specified by condition
-            for eid in list(data):
-                if cond(data[eid]):
-                    func(data, eid)
-                    eids.append(eid)
+            for doc_id in list(data):
+                if cond(data[doc_id]):
+                    func(data, doc_id)
+                    doc_ids.append(doc_id)
         else:
             # Processed documents
-            eids = list(data)
+            doc_ids = list(data)
 
-            for eid in eids:
-                func(data, eid)
+            for doc_id in doc_ids:
+                func(data, doc_id)
 
         self._write(data)
 
-        return eids
+        return doc_ids
 
     def clear_cache(self):
         """
@@ -340,16 +374,16 @@ class Table(object):
         :returns: the inserted document's ID
         """
 
-        eid = self._get_next_id()
+        doc_id = self._get_next_id()
 
         if not isinstance(document, dict):
             raise ValueError('Document is not a dictionary')
 
         data = self._read()
-        data[eid] = document
+        data[doc_id] = document
         self._write(data)
 
-        return eid
+        return doc_id
 
     def insert_multiple(self, documents):
         """
@@ -359,38 +393,40 @@ class Table(object):
         :returns: a list containing the inserted documents' IDs
         """
 
-        eids = []
+        doc_ids = []
         data = self._read()
 
         for doc in documents:
-            eid = self._get_next_id()
-            eids.append(eid)
+            doc_id = self._get_next_id()
+            doc_ids.append(doc_id)
 
-            data[eid] = doc
+            data[doc_id] = doc
 
         self._write(data)
 
-        return eids
+        return doc_ids
 
-    def remove(self, cond=None, eids=None):
+    def remove(self, cond=None, doc_ids=None, eids=None):
         """
         Remove all matching documents.
 
         :param cond: the condition to check against
         :type cond: query
-        :param eids: a list of document IDs
-        :type eids: list
+        :param doc_ids: a list of document IDs
+        :type doc_ids: list
         :returns: a list containing the removed document's ID
         """
-        if cond is None and eids is None:
+        doc_ids = _get_doc_ids(doc_ids, eids)
+
+        if cond is None and doc_ids is None:
             raise RuntimeError('Use purge() to remove all documents')
 
         return self.process_elements(
-            lambda data, eid: data.pop(eid),
-            cond, eids
+            lambda data, doc_id: data.pop(doc_id),
+            cond, doc_ids
         )
 
-    def update(self, fields, cond=None, eids=None):
+    def update(self, fields, cond=None, doc_ids=None, eids=None):
         """
         Update all matching documents to have a given set of fields.
 
@@ -399,20 +435,21 @@ class Table(object):
         :type fields: dict | dict -> None
         :param cond: which documents to update
         :type cond: query
-        :param eids: a list of document IDs
-        :type eids: list
+        :param doc_ids: a list of document IDs
+        :type doc_ids: list
         :returns: a list containing the updated document's ID
         """
+        doc_ids = _get_doc_ids(doc_ids, eids)
 
         if callable(fields):
             return self.process_elements(
-                lambda data, eid: fields(data[eid]),
-                cond, eids
+                lambda data, doc_id: fields(data[doc_id]),
+                cond, doc_ids
             )
         else:
             return self.process_elements(
-                lambda data, eid: data[eid].update(fields),
-                cond, eids
+                lambda data, doc_id: data[doc_id].update(fields),
+                cond, doc_ids
             )
 
     def purge(self):
@@ -442,7 +479,7 @@ class Table(object):
 
         return docs[:]
 
-    def get(self, cond=None, eid=None):
+    def get(self, cond=None, doc_id=None, eid=None):
         """
         Get exactly one document specified by a query or and ID.
 
@@ -451,18 +488,19 @@ class Table(object):
         :param cond: the condition to check against
         :type cond: Query
 
-        :param eid: the document's ID
+        :param doc_id: the document's ID
 
         :returns: the document or None
         :rtype: Element | None
         """
+        doc_id = _get_doc_id(doc_id, eid)
 
         # Cannot use process_elements here because we want to return a
         # specific document
 
-        if eid is not None:
+        if doc_id is not None:
             # Document specified by ID
-            return self._read().get(eid, None)
+            return self._read().get(doc_id, None)
 
         # Document specified by condition
         for doc in self.all():
@@ -479,7 +517,7 @@ class Table(object):
 
         return len(self.search(cond))
 
-    def contains(self, cond=None, eids=None):
+    def contains(self, cond=None, doc_ids=None, eids=None):
         """
         Check wether the database contains a document matching a condition or
         an ID.
@@ -489,12 +527,13 @@ class Table(object):
 
         :param cond: the condition use
         :type cond: Query
-        :param eids: the document IDs to look for
+        :param doc_ids: the document IDs to look for
         """
+        doc_ids = _get_doc_ids(doc_ids, eids)
 
-        if eids is not None:
+        if doc_ids is not None:
             # Documents specified by ID
-            return any(self.get(eid=eid) for eid in eids)
+            return any(self.get(doc_id=doc_id) for doc_id in doc_ids)
 
         # Document specified by condition
         return self.get(cond) is not None
