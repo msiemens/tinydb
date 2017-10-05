@@ -7,11 +7,14 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
-*unreleased*
-^^^^^^^^^^^^
+v3.6.0 (2017-10-05)
+^^^^^^^^^^^^^^^^^^^
 
 - Allow updating all documents using ``db.update(fields)`` (see
   `issue #157 <https://github.com/msiemens/tinydb/issues/157>`_).
+- Rename elements to documents. Document IDs now available with ``doc.doc_id``,
+  using ``doc.eid`` is now deprecated
+  (see `pull request #158 <https://github.com/msiemens/tinydb/pull/158>`_)
 
 v3.5.0 (2017-08-30)
 ^^^^^^^^^^^^^^^^^^^
