@@ -7,6 +7,12 @@ Version Numbering
 TinyDB follows the SemVer versioning guidelines. For more information,
 see `semver.org <http://semver.org/>`_
 
+unreleased
+^^^^^^^^^^
+
+- Internal change: don't read from storage twice during initialization
+  (see https://forum.m-siemens.de/d/28-reads-the-whole-data-file-twice)
+
 v3.6.0 (2017-10-05)
 ^^^^^^^^^^^^^^^^^^^
 

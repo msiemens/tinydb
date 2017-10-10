@@ -58,18 +58,21 @@ class StorageProxy(object):
         self._table_name = table_name
 
     def read(self):
+        raw_data = self._storage.read() or {}
+
         try:
-            raw_data = (self._storage.read() or {})[self._table_name]
+            table = raw_data[self._table_name]
         except KeyError:
-            self.write({})
+            raw_data.update({self._table_name: {}})
+            self._storage.write(raw_data)
             return {}
 
-        data = {}
-        for key, val in iteritems(raw_data):
+        docs = {}
+        for key, val in iteritems(table):
             doc_id = int(key)
-            data[doc_id] = Element(val, doc_id)
+            docs[doc_id] = Element(val, doc_id)
 
-        return data
+        return docs
 
     def write(self, values):
         data = self._storage.read() or {}
@@ -140,9 +143,6 @@ class TinyDB(object):
                                  **options)
 
         self._table_cache[name] = table
-
-        # table._read will create an empty table in the storage, if necessary
-        table._read()
 
         return table
 

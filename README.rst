@@ -163,6 +163,12 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 Changelog
 *********
 
+unreleased
+==========
+
+- Internal change: don't read from storage twice during initialization
+  (see https://forum.m-siemens.de/d/28-reads-the-whole-data-file-twice)
+
 v3.6.0 (2017-10-05)
 ===================
 
