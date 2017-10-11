@@ -35,7 +35,7 @@ Let's look how you could add a `YAML <http://yaml.org/>`_ storage using
 
         def write(self, data):
             with open(self.filename, 'w') as handle:
-                yaml.dump(data, handle)
+                yaml.dump(yaml.safe_load(str(data)), handle)
 
         def close(self):  # (4)
             pass
