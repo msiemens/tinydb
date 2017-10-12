@@ -187,6 +187,10 @@ def test_custom_with_exception():
 
 
 def test_yaml(tmpdir):
+    """
+    :type tmpdir: py._path.local.LocalPath
+    """
+
     try:
         import yaml
     except ImportError:
@@ -195,7 +199,7 @@ def test_yaml(tmpdir):
     def represent_doc(dumper, data):
         # Represent `Document` objects as their dict's string representation
         # which PyYAML understands
-        return dumper.represent_mapping('', str(data))
+        return dumper.represent_data(dict(data))
 
     yaml.add_representer(Document, represent_doc)
 
@@ -211,10 +215,7 @@ def test_yaml(tmpdir):
 
         def write(self, data):
             with open(self.filename, 'w') as handle:
-                yaml.dump(dict(
-                    (table, dict((id, dict(doc))
-                                 for (id, doc) in docs.items()))
-                    for (table, docs) in data.items()), handle)
+                yaml.dump(data, handle)
 
         def close(self):
             pass
@@ -226,5 +227,8 @@ def test_yaml(tmpdir):
     assert db.all() == [doc]
 
     db.update({'name': 'foo'})
+
+    assert '!' not in tmpdir.join('test.db').read()
+
     assert db.contains(where('name') == 'foo')
     assert len(db) == 1
