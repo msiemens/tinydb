@@ -5,7 +5,8 @@ import tempfile
 import pytest
 
 from tinydb import TinyDB, where
-from tinydb.storages import JSONStorage, MemoryStorage, Storage
+from tinydb.database import Document
+from tinydb.storages import JSONStorage, MemoryStorage, Storage, touch
 
 random.seed()
 
@@ -183,3 +184,47 @@ def test_custom_with_exception():
     with pytest.raises(ValueError):
         with TinyDB(storage=MyStorage) as db:
             pass
+
+
+def test_yaml(tmpdir):
+    try:
+        import yaml
+    except ImportError:
+        return pytest.skip('PyYAML not installed')
+
+    def represent_doc(dumper, data):
+        # Represent `Document` objects as their dict's string representation
+        # which PyYAML understands
+        return dumper.represent_mapping('', str(data))
+
+    yaml.add_representer(Document, represent_doc)
+
+    class YAMLStorage(Storage):
+        def __init__(self, filename):
+            self.filename = filename
+            touch(filename, False)
+
+        def read(self):
+            with open(self.filename) as handle:
+                data = yaml.safe_load(handle.read())
+                return data
+
+        def write(self, data):
+            with open(self.filename, 'w') as handle:
+                yaml.dump(dict(
+                    (table, dict((id, dict(doc))
+                                 for (id, doc) in docs.items()))
+                    for (table, docs) in data.items()), handle)
+
+        def close(self):
+            pass
+
+    # Write contents
+    path = str(tmpdir.join('test.db'))
+    db = TinyDB(path, storage=YAMLStorage)
+    db.insert(doc)
+    assert db.all() == [doc]
+
+    db.update({'name': 'foo'})
+    assert db.contains(where('name') == 'foo')
+    assert len(db) == 1

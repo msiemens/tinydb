@@ -21,6 +21,13 @@ Let's look how you could add a `YAML <http://yaml.org/>`_ storage using
 
     import yaml
 
+    def represent_doc(dumper, data):
+        # Represent `Document` objects as their dict's string representation
+        # which PyYAML understands
+        return dumper.represent_mapping('', str(data))
+
+    yaml.add_representer(Document, represent_doc)
+
     class YAMLStorage(Storage):
         def __init__(self, filename):  # (1)
             self.filename = filename
