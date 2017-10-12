@@ -52,7 +52,24 @@ def _get_doc_ids(doc_ids, eids):
         return doc_ids
 
 
+class DataProxy(dict):
+    """
+    A proxy to a table's data that remembers the storage's
+    data dictionary.
+    """
+
+    def __init__(self, table, raw_data, **kwargs):
+        super(DataProxy, self).__init__(**kwargs)
+        self.update(table)
+        self.raw_data = raw_data
+
+
 class StorageProxy(object):
+    """
+    A proxy that only allows to read a single table from a
+    storage.
+    """
+
     def __init__(self, storage, table_name):
         self._storage = storage
         self._table_name = table_name
@@ -65,19 +82,26 @@ class StorageProxy(object):
         except KeyError:
             raw_data.update({self._table_name: {}})
             self._storage.write(raw_data)
-            return {}
+
+            return DataProxy({}, raw_data)
 
         docs = {}
         for key, val in iteritems(table):
             doc_id = int(key)
-            docs[doc_id] = Element(val, doc_id)
+            docs[doc_id] = Document(val, doc_id)
 
-        return docs
+        return DataProxy(docs, raw_data)
 
-    def write(self, values):
-        data = self._storage.read() or {}
-        data[self._table_name] = values
-        self._storage.write(data)
+    def write(self, data):
+        try:
+            # Try accessing the full data dict from the data proxy
+            raw_data = data.raw_data
+        except AttributeError:
+            # Not a data proxy, fall back to regular reading
+            raw_data = self._storage.read()
+
+        raw_data[self._table_name] = dict(data)
+        self._storage.write(raw_data)
 
     def purge_table(self):
         try:
@@ -324,7 +348,7 @@ class Table(object):
         Reading access to the DB.
 
         :returns: all values
-        :rtype: dict
+        :rtype: DataProxy
         """
 
         return self._storage.read()
@@ -334,7 +358,7 @@ class Table(object):
         Writing access to the DB.
 
         :param values: the new values to write
-        :type values: dict
+        :type values: DataProxy | dict
         """
 
         self._query_cache.clear()
@@ -538,6 +562,7 @@ class Table(object):
 
         # Document specified by condition
         return self.get(cond) is not None
+
 
 # Set the default table class
 TinyDB.table_class = Table

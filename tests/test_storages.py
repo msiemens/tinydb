@@ -135,24 +135,35 @@ def test_custom():
 
 
 def test_read_once():
+    count = [0]
+
     # noinspection PyAbstractClass
     class MyStorage(Storage):
         def __init__(self):
-            self.count = 0
+            self.memory = None
 
         def read(self):
-            self.count += 1
-
-            if self.count > 1:
-                raise RuntimeError('MyStorage.read called more than once')
-
-            return {}
+            count[0] += 1
+            return self.memory
 
         def write(self, data):
-            pass
+            self.memory = data
+
+    def reset_counter(expected=1):
+        assert count[0] == expected
+        count[0] = 0
 
     with TinyDB(storage=MyStorage) as db:
-        pass
+        reset_counter()
+
+        db.all()
+        reset_counter()
+
+        db.insert({'foo': 'bar'})
+        reset_counter()
+
+        db.all()
+        reset_counter()
 
 
 def test_custom_with_exception():
