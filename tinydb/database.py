@@ -485,6 +485,40 @@ class Table(object):
         self._write({})
         self._last_id = 0
 
+
+    def sort(self, cond,sortkeys):
+        """
+        Search for all documents matching a 'where' condition, and order them by sortkeys
+
+        :param cond: the condition to check against
+        :type cond: Query
+        :param sortkeys: sort keys
+        :type sortkeys: Element
+
+        :returns: list of ordered,matching documents
+        :rtype: list[Element]
+        """
+
+	def _multikeysort(items, sortkeys):
+		from operator import itemgetter
+		comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in sortkeys]
+		def comparer(left, right):
+			for fn, mult in comparers:
+				result = cmp(fn(left), fn(right))
+				if result:
+					return mult *result
+			else:
+				return 0
+		return sorted(items, cmp=comparer)
+
+        if cond in self._query_cache:
+            return _multikeysort(self._query_cache[cond][:],sortkeys)
+
+        docs = _multikeysort([doc for doc in self.all() if cond(doc)],sortkeys)
+        self._query_cache[cond] = docs
+
+        return docs[:]
+
     def search(self, cond):
         """
         Search for all documents matching a 'where' cond.
@@ -503,7 +537,6 @@ class Table(object):
         self._query_cache[cond] = docs
 
         return docs[:]
-
     def get(self, cond=None, doc_id=None, eid=None):
         """
         Get exactly one document specified by a query or and ID.
