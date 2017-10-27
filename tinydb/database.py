@@ -493,7 +493,7 @@ class Table(object):
         :param cond: the condition to check against
         :type cond: Query
         :param sortkeys: sort keys
-        :type sortkeys: Element
+        :type sortkeys: Dict
 
         :returns: list of ordered,matching documents
         :rtype: list[Element]
