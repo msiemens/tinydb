@@ -509,7 +509,7 @@ class Table(object):
                        return mult *result
                     else:
                        return 0
-                return sorted(items, cmp=comparer)
+            return sorted(items, cmp=comparer)
 
         if cond in self._query_cache:
             return _multikeysort(self._query_cache[cond][:],sortkeys)
