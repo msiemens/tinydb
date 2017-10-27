@@ -499,7 +499,7 @@ class Table(object):
         :rtype: list[Element]
         """
 
-        def _cmp(x, y):
+        def cmpre(x, y):
             """
             Replacement for built-in function cmp that was removed in Python 3
 
@@ -515,7 +515,7 @@ class Table(object):
             comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in sortkeys]
             def comparer(left, right):
                 for fn, mult in comparers:
-                    result = _cmp(fn(left), fn(right))
+                    result = cmpre(fn(left), fn(right))
                     if result:
                        return mult *result
                     else:
