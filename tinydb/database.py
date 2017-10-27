@@ -499,17 +499,17 @@ class Table(object):
         :rtype: list[Element]
         """
 
-	def _multikeysort(items, sortkeys):
-		from operator import itemgetter
-		comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in sortkeys]
-		def comparer(left, right):
-			for fn, mult in comparers:
-				result = cmp(fn(left), fn(right))
-				if result:
-					return mult *result
-			else:
-				return 0
-		return sorted(items, cmp=comparer)
+        def _multikeysort(items, sortkeys):
+            from operator import itemgetter
+            comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in sortkeys]
+            def comparer(left, right):
+                for fn, mult in comparers:
+                    result = cmp(fn(left), fn(right))
+                    if result:
+                       return mult *result
+                    else:
+                       return 0
+                return sorted(items, cmp=comparer)
 
         if cond in self._query_cache:
             return _multikeysort(self._query_cache[cond][:],sortkeys)
