@@ -3,7 +3,7 @@ import sys
 
 import pytest
 
-from tinydb import TinyDB, where
+from tinydb import TinyDB, where, Query
 from tinydb.storages import MemoryStorage
 from tinydb.middlewares import Middleware
 
@@ -179,6 +179,37 @@ def test_search(db):
 
     assert len(db._query_cache) == 1
     assert len(db.search(where('int') == 1)) == 3  # Query result from cache
+
+def test_sort(db):
+    assert not db._query_cache
+
+    # insert multiple documents to set up the sort tests
+
+    db.insert_multiple([
+        {'name': 'andrew', 'age': 49, 'gender': 'M'},
+        {'name': 'andrea', 'age': 19, 'gender': 'F'},
+        {'name': 'angela', 'age': 59, 'gender': 'F'}
+    ])
+    Test_Query = Query()
+
+    # simple sort by age ascending
+
+    assert db.sort(Test_Query.name.search('an+'),['age']) == [{'name': 'andrea', 'age': 19, 'gender': 'F'}, 
+                                                              {'name': 'andrew', 'age': 49, 'gender': 'M'},
+                                                              {'name': 'angela', 'age': 59, 'gender': 'F'} ]
+
+
+    # simple sort by age descending
+   
+    assert db.sort(Test_Query.name.search('an+'),['-age']) == [{'name': 'angela', 'age': 59, 'gender': 'F'}, 
+                                                               {'name': 'andrew', 'age': 49, 'gender': 'M'},
+                                                               {'name': 'andrea', 'age': 19, 'gender': 'F'} ]
+
+    # complex sort by gender then age both ascending
+
+    assert db.sort(Test_Query.name.search('an+'),['gender','age']) == [{'name': 'andrea', 'age': 19, 'gender': 'F'}, 
+                                                                       {'name': 'angela', 'age': 59, 'gender': 'F'},
+                                                                       {'name': 'andrew', 'age': 49, 'gender': 'M'}]
 
 
 def test_get(db):
