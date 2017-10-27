@@ -499,12 +499,23 @@ class Table(object):
         :rtype: list[Element]
         """
 
+        def _cmp(x, y):
+            """
+            Replacement for built-in function cmp that was removed in Python 3
+
+            Compare the two objects x and y and return an integer according to
+            the outcome. The return value is negative if x < y, zero if x == y
+            and strictly positive if x > y.
+            """
+    
+            return (x > y) - (x < y)
+
         def _multikeysort(items, sortkeys):
             from operator import itemgetter
             comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in sortkeys]
             def comparer(left, right):
                 for fn, mult in comparers:
-                    result = cmp(fn(left), fn(right))
+                    result = _cmp(fn(left), fn(right))
                     if result:
                        return mult *result
                     else:
