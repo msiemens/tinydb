@@ -523,10 +523,15 @@ class Table(object):
                        return mult * result
                     else:
                        return 0
+
+            return sorted(items, cmp=comparer) if sys.version_info[0] < 3 else sorted(items, key=functools.cmp_to_key(comparer))
+
+            """
             if sys.version_info[0] < 3:
                 return sorted(items, cmp=comparer)
             else:
                 return sorted(items, key=functools.cmp_to_key(comparer))
+            """
 
         if cond in self._query_cache:
             return _multikeysort(self._query_cache[cond][:],sortkeys)
