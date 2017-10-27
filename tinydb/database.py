@@ -2,7 +2,10 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
+
 import warnings
+import functools
+import sys
 
 from . import JSONStorage
 from .utils import LRUCache, iteritems, itervalues
@@ -517,10 +520,13 @@ class Table(object):
                 for fn, mult in comparers:
                     result = cmpre(fn(left), fn(right))
                     if result:
-                       return mult *result
+                       return mult * result
                     else:
                        return 0
-            return sorted(items, cmp=comparer)
+            if sys.version_info[0] < 3:
+                return sorted(items, cmp=comparer)
+            else:
+                return sorted(items, key=cmp_to_key(comparer))
 
         if cond in self._query_cache:
             return _multikeysort(self._query_cache[cond][:],sortkeys)
