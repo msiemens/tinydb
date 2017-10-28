@@ -4,8 +4,6 @@ Contains the :class:`database <tinydb.database.TinyDB>` and
 """
 
 import warnings
-import functools
-import sys
 
 from . import JSONStorage
 from .utils import LRUCache, iteritems, itervalues
@@ -225,7 +223,7 @@ class TinyDB(object):
         return getattr(self._table, name)
 
     # Methods that are executed on the default table
-    # Because magic methods are not handlet by __getattr__ we need to forward
+    # Because magic methods are not handled by __getattr__ we need to forward
     # them manually here
 
     def __len__(self):
@@ -503,6 +501,7 @@ class Table(object):
         """
 
         def cmpre(x, y):
+
             """
             Replacement for built-in function cmp that was removed in Python 3
 
@@ -515,7 +514,11 @@ class Table(object):
 
         def _multikeysort(items, sortkeys):
             from operator import itemgetter
+            import functools
+            import sys
+
             comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in sortkeys]
+
             def comparer(left, right):
                 for fn, mult in comparers:
                     result = cmpre(fn(left), fn(right))
@@ -524,14 +527,10 @@ class Table(object):
                     else:
                        return 0
 
+            # Use the correct sorter for Python 2.x or 3.x
+
             return sorted(items, cmp=comparer) if sys.version_info[0] < 3 else sorted(items, key=functools.cmp_to_key(comparer))
 
-            """
-            if sys.version_info[0] < 3:
-                return sorted(items, cmp=comparer)
-            else:
-                return sorted(items, key=functools.cmp_to_key(comparer))
-            """
 
         if cond in self._query_cache:
             return _multikeysort(self._query_cache[cond][:],sortkeys)
