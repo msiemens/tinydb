@@ -266,7 +266,7 @@ document into the table:
 >>> db.upsert({'name': 'John', 'logged-in': True}, User.name == 'John')
 
 This will update all users with the name John to have ``logged-in`` set to ``True``.
-If no matching user is found, a new document is insert with both the name set
+If no matching user is found, a new document is inserted with both the name set
 and the ``logged-in`` flag.
 
 Retrieving data
