@@ -477,6 +477,23 @@ class Table(object):
                 cond, doc_ids
             )
 
+    def upsert(self, document, cond):
+        """
+        Update a document, if it exist - insert it otherwise.
+
+        Note: this will update *all* documents matching the query.
+
+        :param document: the document to insert or the fields to update
+        :param cond: which document to look for
+        :returns: a list containing the updated document's ID
+        """
+        updated_docs = self.update(document, cond)
+
+        if updated_docs:
+            return updated_docs
+        else:
+            return self.insert(document)
+
     def purge(self):
         """
         Purge the table by removing all documents.

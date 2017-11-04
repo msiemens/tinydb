@@ -243,13 +243,31 @@ with these operations:
 
 Of course you also can write your own operations:
 
->>> def your_operation(yodocumentur_arguments):
+>>> def your_operation(your_arguments):
 ...     def transform(doc):
 ...         # do something with the document
 ...         # ...
 ...     return transform
 ...
 >>> db.update(your_operation(arguments), query)
+
+Upserting data
+..............
+
+Data access and modification
+----------------------------
+
+In some cases you'll need a mix of both ``update`` and ``insert``: ``upsert``.
+This operation is provided a document and a query. If it finds any documents
+matching the query, they will be updated with the data from the provided document.
+On the other hand, if no matching document is found, it inserts the provided
+document into the table:
+
+>>> db.upsert({'name': 'John', 'logged-in': True}, User.name == 'John')
+
+This will update all users with the name John to have ``logged-in`` set to ``True``.
+If no matching user is found, a new document is inserted with both the name set
+and the ``logged-in`` flag.
 
 Retrieving data
 ...............

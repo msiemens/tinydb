@@ -173,6 +173,18 @@ def test_update_ids(db):
     assert db.count(where('int') == 2) == 2
 
 
+def test_upsert(db):
+    assert len(db) == 3
+
+    # Document existing
+    db.upsert({'int': 5}, where('char') == 'a')
+    assert db.count(where('int') == 5) == 1
+
+    # Document missing
+    db.upsert({'int': 9, 'char': 'x'}, where('char') == 'x')
+    assert db.count(where('int') == 9) == 1
+
+
 def test_search(db):
     assert not db._query_cache
     assert len(db.search(where('int') == 1)) == 3
