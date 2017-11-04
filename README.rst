@@ -166,6 +166,8 @@ Changelog
 unreleased
 ==========
 
+- Feature: Upsert (insert if document doesn't exist, otherwise update;
+  see https://forum.m-siemens.de/d/30-primary-key-well-sort-of)
 - Internal change: don't read from storage twice during initialization
   (see https://forum.m-siemens.de/d/28-reads-the-whole-data-file-twice)
 
