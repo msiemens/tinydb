@@ -2,6 +2,7 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
+
 import warnings
 
 from . import JSONStorage
@@ -222,7 +223,7 @@ class TinyDB(object):
         return getattr(self._table, name)
 
     # Methods that are executed on the default table
-    # Because magic methods are not handlet by __getattr__ we need to forward
+    # Because magic methods are not handled by __getattr__ we need to forward
     # them manually here
 
     def __len__(self):
@@ -502,6 +503,60 @@ class Table(object):
         self._write({})
         self._last_id = 0
 
+
+    def sort(self, cond,sortkeys):
+        """
+        Search for all documents matching a 'where' condition, and order them by sortkeys
+
+        :param cond: the condition to check against
+        :type cond: Query
+        :param sortkeys: sort keys
+        :type sortkeys: Dict
+
+        :returns: list of ordered,matching documents
+        :rtype: list[Element]
+        """
+
+        def cmpre(x, y):
+
+            """
+            Replacement for built-in function cmp that was removed in Python 3
+
+            Compare the two objects x and y and return an integer according to
+            the outcome. The return value is negative if x < y, zero if x == y
+            and strictly positive if x > y.
+            """
+    
+            return (x > y) - (x < y)
+
+        def _multikeysort(items, sortkeys):
+            from operator import itemgetter
+            import functools
+            import sys
+
+            comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in sortkeys]
+
+            def comparer(left, right):
+                for fn, mult in comparers:
+                    result = cmpre(fn(left), fn(right))
+                    if result:
+                       return mult * result
+                    else:
+                       return 0
+
+            # Use the correct sorter for Python 2.x or 3.x
+
+            return sorted(items, cmp=comparer) if sys.version_info[0] < 3 else sorted(items, key=functools.cmp_to_key(comparer))
+
+
+        if cond in self._query_cache:
+            return _multikeysort(self._query_cache[cond][:],sortkeys)
+
+        docs = _multikeysort([doc for doc in self.all() if cond(doc)],sortkeys)
+        self._query_cache[cond] = docs
+
+        return docs[:]
+
     def search(self, cond):
         """
         Search for all documents matching a 'where' cond.
@@ -520,7 +575,6 @@ class Table(object):
         self._query_cache[cond] = docs
 
         return docs[:]
-
     def get(self, cond=None, doc_id=None, eid=None):
         """
         Get exactly one document specified by a query or and ID.
