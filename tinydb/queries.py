@@ -273,7 +273,7 @@ class Query(object):
 
     def any(self, cond):
         """
-        Checks if a condition is met by any document in a list,
+        Check if a condition is met by any document in a list,
         where a condition can also be a sequence (e.g. list).
 
         >>> Query().f1.any(Query().f2 == 1)
@@ -306,7 +306,7 @@ class Query(object):
 
     def all(self, cond):
         """
-        Checks if a condition is met by any document in a list,
+        Check if a condition is met by any document in a list,
         where a condition can also be a sequence (e.g. list).
 
         >>> Query().f1.all(Query().f2 == 1)
@@ -334,6 +334,17 @@ class Query(object):
 
         return self._generate_test(lambda value: _cmp(value),
                                    ('all', tuple(self._path), freeze(cond)))
+
+    def one_of(self, items):
+        """
+        Check if the value is contained in a list or generator.
+
+        >>> Query().f1.one_of(['value 1', 'value 2'])
+
+        :param items: The list of items to check with
+        """
+        return self._generate_test(lambda value: value in items,
+                                   ('one_of', tuple(self._path), freeze(items)))
 
 
 def where(key):

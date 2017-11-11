@@ -141,6 +141,11 @@ Now let's search this table using nested ``any``/``all`` queries:
 As you can see, ``any`` tests if there is *at least one* document matching
 the query while ``all`` ensures *all* documents match the query.
 
+The opposite operation, checking if a single item is contained in a list,
+is also possible using ``one_of``:
+
+>>> db.search(User.name.one_of(['jane', 'john']))
+
 Query modifiers
 ...............
 
@@ -190,6 +195,8 @@ Let's review the query operations we've learned:
 |                                     | If given a list, matches all documents where at least one   |
 |                                     | documents in the list ``field`` are a member of the given   |
 |                                     | list                                                        |
++-------------------------------------+-------------------------------------------------------------+
+| ``Query().field.one_of(list)``      | Match if the field is contained in the list                 |
 +-------------------------------------+-------------------------------------------------------------+
 | **Logical operations on queries**                                                                 |
 +-------------------------------------+-------------------------------------------------------------+

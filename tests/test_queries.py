@@ -287,6 +287,13 @@ def test_has():
     assert hash(query)
 
 
+def test_one_of():
+    query = Query().key1.one_of(['value 1', 'value 2'])
+    assert query({'key1': 'value 1'})
+    assert query({'key1': 'value 2'})
+    assert not query({'key1': 'value 3'})
+
+
 def test_hash():
     d = {
         Query().key1 == 2: True,
