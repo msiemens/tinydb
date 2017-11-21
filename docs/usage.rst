@@ -344,6 +344,10 @@ Let's summarize the ways to handle data:
 
 .. _document_ids:
 
+.. note::
+
+    This was a new feature in v3.6.0
+
 Using Document IDs
 ------------------
 
@@ -374,6 +378,8 @@ True
 >>> db.remove(doc_ids=[1, 2])
 >>> db.get(doc_id=3)
 {...}
+
+Using ``doc_id`` instead of ``Query()`` again is slightly faster in operation.
 
 Recap
 .....
