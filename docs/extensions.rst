@@ -20,6 +20,14 @@ Here are some extensions that might be useful to you:
 | **Description:** A simple wrapper that allows to use TinyDB as a flat file
                    drop-in replacement for MongoDB.
 
+``TinyMP``
+*************
+
+| **Repo:**        https://github.com/schapman1974/tinymongo
+| **Status:**      *experimental*
+| **Description:** A MessagePack-based storage extension to tinydb using
+                   http://msgpack.org
+
 .. _tinyrecord:
 
 ``tinyrecord``

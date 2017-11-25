@@ -116,6 +116,14 @@ Extensions
 
 |
 
+| **Name:**        ``TinyMP``
+| **Repo:**        https://github.com/alshapton/TinyMP
+| **Status:**      *stable*
+| **Description:** A MessagePack-based storage extension to tinydb using
+                   http://msgpack.org
+
+|
+
 | **Name:**        ``tinyrecord``
 | **Repo:**        https://github.com/eugene-eeo/tinyrecord
 | **Status:**      *stable*
