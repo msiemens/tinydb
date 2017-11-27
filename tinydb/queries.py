@@ -292,7 +292,7 @@ class Query(object):
         :param cond: Either a query that at least one document has to match or
                      a list of which at least one document has to be contained
                      in the tested document.
--       """
+        """
         if callable(cond):
             def _cmp(value):
                 return is_sequence(value) and any(cond(e) for e in value)

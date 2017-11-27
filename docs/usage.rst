@@ -342,11 +342,11 @@ Let's summarize the ways to handle data:
 +-------------------------------+---------------------------------------------------------------+
 
 
-.. _document_ids:
-
 .. note::
 
     This was a new feature in v3.6.0
+
+.. _document_ids:
 
 Using Document IDs
 ------------------
