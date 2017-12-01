@@ -12,6 +12,13 @@ def read(fname):
 # This will set the version string to __version__
 exec(read('tinydb/version.py'))
 
+setup_requirements = [
+    'pytest-runner',
+]
+
+test_requirements = [
+    'pytest',
+]
 
 setup(
     name="tinydb",
@@ -46,6 +53,8 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Operating System :: OS Independent"
     ],
+    tests_require=test_requirements,
+    setup_requires=setup_requirements,
 
     long_description=read('README.rst'),
 )
