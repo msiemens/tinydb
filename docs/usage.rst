@@ -122,9 +122,15 @@ This is where nested queries come in as helpful. Let's set up a table like this:
 >>> Group = Query()
 >>> Permission = Query()
 >>> groups = db.table('groups')
->>> groups.insert({'name': 'user', 'permissions': [{'type': 'read'}]})
->>> groups.insert({'name': 'sudo', 'permissions': [{'type': 'read'}, {'type': 'sudo'}]})
->>> groups.insert({'name': 'admin', 'permissions': [{'type': 'read'}, {'type': 'write'}, {'type': 'sudo'}]})
+>>> groups.insert({
+        'name': 'user',
+        'permissions': [{'type': 'read'}]})
+>>> groups.insert({
+        'name': 'sudo',
+        'permissions': [{'type': 'read'}, {'type': 'sudo'}]})
+>>> groups.insert({
+        'name': 'admin',
+        'permissions': [{'type': 'read'}, {'type': 'write'}, {'type': 'sudo'}]})
 
 Now let's search this table using nested ``any``/``all`` queries:
 
@@ -132,7 +138,8 @@ Now let's search this table using nested ``any``/``all`` queries:
 >>> groups.search(Group.permissions.any(Permission.type == 'read'))
 [{'name': 'user', 'permissions': [{'type': 'read'}]},
  {'name': 'sudo', 'permissions': [{'type': 'read'}, {'type': 'sudo'}]},
- {'name': 'admin', 'permissions': [{'type': 'read'}, {'type': 'write'}, {'type': 'sudo'}]}]
+ {'name': 'admin', 'permissions':
+        [{'type': 'read'}, {'type': 'write'}, {'type': 'sudo'}]}]
 >>> # Group has ONLY permission 'read'
 >>> groups.search(Group.permissions.all(Permission.type == 'read'))
 [{'name': 'user', 'permissions': [{'type': 'read'}]}]
@@ -219,7 +226,9 @@ Inserting data
 As already described you can insert an document using ``db.insert(...)``.
 In case you want to insert multiple documents, you can use ``db.insert_multiple(...)``:
 
->>> db.insert_multiple([{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}])
+>>> db.insert_multiple([
+        {'name': 'John', 'age': 22},
+        {'name': 'John', 'age': 37}])
 >>> db.insert_multiple({'int': 1, 'value': i} for i in range(2))
 
 Updating data
@@ -508,7 +517,8 @@ behaviour.
 
     You can nest middleware:
 
-    >>> db = TinyDB('/path/to/db.json', storage=FirstMiddleware(SecondMiddleware(JSONStorage)))
+    >>> db = TinyDB('/path/to/db.json',
+                    storage=FirstMiddleware(SecondMiddleware(JSONStorage)))
 
 CachingMiddleware
 ^^^^^^^^^^^^^^^^^
