@@ -15,7 +15,7 @@ unreleased
 v3.7.0 (2017-11-11)
 ^^^^^^^^^^^^^^^^^^^
 
-- Feature: one_of for checking if a value is contained in a list
+- Feature: ``one_of`` for checking if a value is contained in a list
   (see `issue 164 <https://github.com/msiemens/tinydb/issues/164>`_)
 - Feature: Upsert (insert if document doesn't exist, otherwise update;
   see https://forum.m-siemens.de/d/30-primary-key-well-sort-of)
