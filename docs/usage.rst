@@ -21,8 +21,8 @@ Unicode strings upon reading
 
 If that causes problems, you can write
 :doc:`your own storage <extend>`, that uses a more powerful (but also slower)
-library like `pickle  <http://docs.python.org/library/pickle.html>`_ or
-`PyYAML  <http://pyyaml.org/>`_.
+library like `pickle <http://docs.python.org/library/pickle.html>`_ or
+`PyYAML <http://pyyaml.org/>`_.
 
 Alternative JSON library
 ........................
