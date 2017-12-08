@@ -13,7 +13,7 @@ class Document(dict):
     Represents a document stored in the database.
 
     This is a transparent proxy for database records. It exists
-    to provide a way to access an record's id via ``el.doc_id``.
+    to provide a way to access a record's id via ``el.doc_id``.
     """
     def __init__(self, value, doc_id, **kwargs):
         super(Document, self).__init__(**kwargs)
