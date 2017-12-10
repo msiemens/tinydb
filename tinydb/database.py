@@ -134,6 +134,7 @@ class TinyDB(object):
 
         :param storage: The class of the storage to use. Will be initialized
                         with ``args`` and ``kwargs``.
+        :param default_table: The name of the default table to populate.
         """
 
         storage = kwargs.pop('storage', self.DEFAULT_STORAGE)
@@ -224,7 +225,7 @@ class TinyDB(object):
         return getattr(self._table, name)
 
     # Methods that are executed on the default table
-    # Because magic methods are not handlet by __getattr__ we need to forward
+    # Because magic methods are not handled by __getattr__ we need to forward
     # them manually here
 
     def __len__(self):
@@ -284,8 +285,8 @@ class Table(object):
         A repeating pattern in TinyDB is to run some code on all documents
         that match a condition or are specified by their ID. This is
         implemented in this function.
-        The function passed as ``func`` has to be a callable. It's first
-        argument will be the data currently in the database. It's second
+        The function passed as ``func`` has to be a callable. Its first
+        argument will be the data currently in the database. Its second
         argument is the document ID of the currently processed document.
 
         See: :meth:`~.update`, :meth:`.remove`
@@ -295,8 +296,8 @@ class Table(object):
                      second argument: the current eid
         :param cond: query that matches documents to use, or
         :param doc_ids: list of document IDs to use
-        :param doc_ids: list of document IDs to use (deprecated)
-        :returns: the document IDs that were affected during processed
+        :param eids: list of document IDs to use (deprecated)
+        :returns: the document IDs that were affected during processing
         """
 
         doc_ids = _get_doc_ids(doc_ids, eids)
