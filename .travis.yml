@@ -14,11 +14,8 @@ matrix:
   allow_failures:
     - python: nightly
 install:
-  - pip install -U pytest
-  - pip install coverage
   - pip install coveralls
-  - pip install pytest-cov
 script:
-  py.test -v --cov tinydb
+  python setup.py test
 after_success:
   coveralls
