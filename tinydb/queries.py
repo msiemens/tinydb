@@ -57,13 +57,13 @@ class QueryImpl(object):
 
     def __and__(self, other):
         # We use a frozenset for the hash as the AND operation is commutative
-        # (a | b == b | a)
+        # (a & b == b & a)
         return QueryImpl(lambda value: self(value) and other(value),
                          ('and', frozenset([self.hashval, other.hashval])))
 
     def __or__(self, other):
         # We use a frozenset for the hash as the OR operation is commutative
-        # (a & b == b & a)
+        # (a | b == b | a)
         return QueryImpl(lambda value: self(value) or other(value),
                          ('or', frozenset([self.hashval, other.hashval])))
 
