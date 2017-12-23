@@ -147,7 +147,7 @@ class Query(object):
         """
         if sys.version_info <= (3, 0):  # pragma: no cover
             # Special UTF-8 handling on Python 2
-            def test(value):
+            def _unicode_test(value):
                 with catch_warning(UnicodeWarning):
                     try:
                         return value == rhs
@@ -159,9 +159,22 @@ class Query(object):
                         elif isinstance(rhs, str):
                             return value == rhs.decode('utf-8')
 
+            def test(value):
+                if isinstance(value, list):
+                    for val in value:
+                        if _unicode_test(val):
+                            return True
+                else:
+                    return _unicode_test(value)
+
         else:  # pragma: no cover
             def test(value):
-                return value == rhs
+                if isinstance(value, list):
+                    for val in value:
+                        if val == rhs:
+                            return True
+                else:
+                    return value == rhs
 
         return self._generate_test(lambda value: test(value),
                                    ('==', tuple(self._path), freeze(rhs)))
