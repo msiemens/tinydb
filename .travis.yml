@@ -20,3 +20,4 @@ matrix:
 install: pip install coveralls tox tox-travis
 script: tox
 after_success: coveralls
+cache: pip
