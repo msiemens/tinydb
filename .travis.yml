@@ -13,9 +13,10 @@ python:
 matrix:
   allow_failures:
     - python: nightly
-install:
-  - pip install coveralls
-script:
-  python setup.py test
-after_success:
-  coveralls
+  include:
+    - python: "3.6"
+      env: TOXENV=check
+
+install: pip install coveralls tox tox-travis
+script: tox
+after_success: coveralls
