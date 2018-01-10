@@ -1,8 +1,9 @@
 language: python
 sudo: false
 python:
-  - "pypy-5.4"
-  - "pypy3.3-5.2-alpha1"
+  - "pypy2.7-5.8.0"
+  - "pypy3.5-5.9.0"
+  - "pypy3.3-5.5-alpha"
   - "nightly"
   - "3.6"
   - "3.5"
@@ -13,9 +14,11 @@ python:
 matrix:
   allow_failures:
     - python: nightly
-install:
-  - pip install coveralls
-script:
-  python setup.py test
-after_success:
-  coveralls
+  include:
+    - python: "3.6"
+      env: TOXENV=check
+
+install: pip install coveralls tox tox-travis
+script: tox
+after_success: coveralls
+cache: pip
