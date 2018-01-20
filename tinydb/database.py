@@ -490,11 +490,14 @@ class Table(object):
         """
         doc_ids = _get_doc_ids(doc_ids, eids)
 
-        data = self._read()
-
-        if not len(documents) == len(doc_ids):
+        if doc_ids is not None and not len(documents) == len(doc_ids):
             raise ValueError(
                 'The length of documents and doc_ids is not match.')
+
+        if doc_ids is None:
+            doc_ids = [doc.doc_id for doc in documents]
+
+        data = self._read()
 
         # Document specified by ID
         documents.reverse()
