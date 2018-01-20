@@ -201,6 +201,11 @@ def test_replace_returns_ids(db):
     assert db.replace([{'word': 'hello'}, {'word': 'world'}], [1, 2]) == [1, 2]
 
 
+def test_replace_fails(db):
+    with pytest.raises(ValueError):
+        db.replace([{'get': 'error'}], [1, 2])
+
+
 def test_upsert(db):
     assert len(db) == 3
 
