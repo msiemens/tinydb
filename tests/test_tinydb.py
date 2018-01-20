@@ -194,6 +194,13 @@ def test_replace_whole_doc(db):
     assert db.count(where('newField') == 2) == 1
 
 
+def test_replace_returns_ids(db):
+    db.purge()
+    assert db.insert({'int': 1, 'char': 'a'}) == 1
+    assert db.insert({'int': 1, 'char': 'a'}) == 2
+    assert db.replace([{'word': 'hello'}, {'word': 'world'}], [1, 2]) == [1, 2]
+
+
 def test_upsert(db):
     assert len(db) == 3
 
