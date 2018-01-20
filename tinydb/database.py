@@ -480,6 +480,31 @@ class Table(object):
                 cond, doc_ids
             )
 
+    def replace(self, documents, doc_ids=None, eids=None):
+        """
+        Replace documents by doc_id
+
+        :param documents: a list of document to replace
+        :param doc_ids: a list of documents' ID which needs to be replaced
+        :returns: a list of replaced documents' ID
+        """
+        doc_ids = _get_doc_ids(doc_ids, eids)
+
+        data = self._read()
+
+        if not len(documents) == len(doc_ids):
+            raise ValueError(
+                'The length of documents and doc_ids is not match.')
+
+        # Document specified by ID
+        documents.reverse()
+        for doc_id in doc_ids:
+            data[doc_id] = documents.pop()
+
+        self._write(data)
+
+        return doc_ids
+
     def upsert(self, document, cond):
         """
         Update a document, if it exist - insert it otherwise.
