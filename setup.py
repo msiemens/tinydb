@@ -2,6 +2,7 @@
 from distutils.util import convert_path
 from setuptools import setup, find_packages
 from codecs import open
+import sys
 import os
 
 
@@ -46,7 +47,9 @@ setup(
         "Operating System :: OS Independent"
     ],
     tests_require=['pytest-cov'],
-    setup_requires=['pytest-runner'],
+    # a temporary workaround for pytest-runner keep failing
+    # to find package in python 2.6
+    setup_requires=[] if sys.version < '2.7' else ['pytest-runner'],
 
     long_description=read('README.rst'),
 )
