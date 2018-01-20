@@ -189,9 +189,9 @@ def test_replace_whole_doc(db):
         docs[i] = {'newField': i}
 
     db.replace(docs, doc_ids)
+    assert db.count(where('newField') == 0) == 1
     assert db.count(where('newField') == 1) == 1
     assert db.count(where('newField') == 2) == 1
-    assert db.count(where('newField') == 3) == 1
 
 
 def test_upsert(db):
