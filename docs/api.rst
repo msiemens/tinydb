@@ -18,7 +18,7 @@ API Documentation
     :exclude-members: __dict__, __weakref__
     :member-order: bysource
 
-.. autoclass:: tinydb.database.Element
+.. autoclass:: tinydb.database.Document
     :members:
     :special-members:
     :exclude-members: __dict__, __weakref__
@@ -27,6 +27,8 @@ API Documentation
     .. py:attribute:: doc_id
 
         The document's id
+
+.. autoclass:: tinydb.database.Element
 
 ``tinydb.queries``
 ------------------
