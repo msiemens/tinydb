@@ -206,6 +206,13 @@ def test_replace_fails(db):
         db.replace([{'get': 'error'}], [1, 2])
 
 
+def test_replace_id_exceed(db):
+    db.purge()
+    db.insert({'int': 1})
+    with pytest.raises(IndexError):
+        db.replace([{'get': 'error'}], [2])
+
+
 def test_upsert(db):
     assert len(db) == 3
 
