@@ -497,6 +497,13 @@ class Table(object):
         if doc_ids is None:
             doc_ids = [doc.doc_id for doc in documents]
 
+        # Since this function will write docs back like inserting, to ensure
+        # here only process existing or removed instead of inserting new,
+        # raise error if doc_id exceeded the last.
+        if sorted(doc_ids)[-1] > self._last_id:
+            raise IndexError(
+                'Id exceed table length, use existing or removed doc_id.')
+
         data = self._read()
 
         # Document specified by ID
