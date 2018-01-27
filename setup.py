@@ -1,5 +1,4 @@
 # coding=utf-8
-from distutils.util import convert_path
 from setuptools import setup, find_packages
 from codecs import open
 import os
@@ -36,12 +35,14 @@ setup(
         "Topic :: Database",
         "Topic :: Database :: Database Engines/Servers",
         "Topic :: Utilities",
-        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Operating System :: OS Independent"
     ],
