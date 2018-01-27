@@ -45,6 +45,17 @@ def test_caching(db):
 
     assert table1 is table2
 
+def test_zero_cache_size(db):
+    table = db.table('table3', cache_size=0)
+    query = where('int') == 1
+
+    table.insert({'int': 1})
+    table.insert({'int': 1})
+
+    assert table.count(query) == 2
+    assert table.count(where('int') == 2) == 0
+    assert len(table._query_cache) == 0
+
 
 def test_query_cache_size(db):
     table = db.table('table3', cache_size=1)
