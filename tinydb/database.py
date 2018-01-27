@@ -480,13 +480,13 @@ class Table(object):
                 cond, doc_ids
             )
 
-    def replace(self, documents, doc_ids=None, eids=None):
+    def write_back(self, documents, doc_ids=None, eids=None):
         """
-        Replace documents by doc_id
+        Write back documents by doc_id
 
-        :param documents: a list of document to replace
-        :param doc_ids: a list of documents' ID which needs to be replaced
-        :returns: a list of replaced documents' ID
+        :param documents: a list of document to write back
+        :param doc_ids: a list of documents' ID which needs to be wrote back
+        :returns: a list of documents' ID taht has been wrote back
         """
         doc_ids = _get_doc_ids(doc_ids, eids)
 
