@@ -406,7 +406,7 @@ def test_insert_string(tmpdir):
             _db.insert([1, 2, 3])  # Fails
 
         with pytest.raises(ValueError):
-            _db.insert(set(['bark']))  # Fails
+            _db.insert({'bark'})  # Fails
 
         assert data == _db.all()
 
@@ -421,7 +421,7 @@ def test_insert_invalid_dict(tmpdir):
         _db.insert_multiple(data)
 
         with pytest.raises(TypeError):
-            _db.insert({'int': set(['bark'])})  # Fails
+            _db.insert({'int': {'bark'}})  # Fails
 
         assert data == _db.all()
 
@@ -445,14 +445,14 @@ def test_non_default_table():
     assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
 
     db = TinyDB(storage=MemoryStorage, default_table='non-default')
-    assert set(['non-default']) == db.tables()
+    assert {'non-default'} == db.tables()
 
     db.purge_tables()
     default_table = TinyDB.DEFAULT_TABLE
 
     TinyDB.DEFAULT_TABLE = 'non-default'
     db = TinyDB(storage=MemoryStorage)
-    assert set(['non-default']) == db.tables()
+    assert {'non-default'} == db.tables()
 
     TinyDB.DEFAULT_TABLE = default_table
 
@@ -467,14 +467,14 @@ def test_purge_table():
     table_name = 'some-other-table'
     db = TinyDB(storage=MemoryStorage)
     db.table(table_name)
-    assert set([TinyDB.DEFAULT_TABLE, table_name]) == db.tables()
+    assert {TinyDB.DEFAULT_TABLE, table_name} == db.tables()
 
     db.purge_table(table_name)
-    assert set([TinyDB.DEFAULT_TABLE]) == db.tables()
+    assert {TinyDB.DEFAULT_TABLE} == db.tables()
     assert table_name not in db._table_cache
 
     db.purge_table('non-existent-table-name')
-    assert set([TinyDB.DEFAULT_TABLE]) == db.tables()
+    assert {TinyDB.DEFAULT_TABLE} == db.tables()
 
 
 def test_empty_write(tmpdir):
