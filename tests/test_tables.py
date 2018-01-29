@@ -7,7 +7,7 @@ def test_tables_list(db):
     db.table('table1')
     db.table('table2')
 
-    assert db.tables() == set(['_default', 'table1', 'table2'])
+    assert db.tables() == {'_default', 'table1', 'table2'}
 
 
 def test_one_table(db):
@@ -44,6 +44,17 @@ def test_caching(db):
     table2 = db.table('table1')
 
     assert table1 is table2
+
+def test_zero_cache_size(db):
+    table = db.table('table3', cache_size=0)
+    query = where('int') == 1
+
+    table.insert({'int': 1})
+    table.insert({'int': 1})
+
+    assert table.count(query) == 2
+    assert table.count(where('int') == 2) == 0
+    assert len(table._query_cache) == 0
 
 
 def test_query_cache_size(db):

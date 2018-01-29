@@ -48,7 +48,7 @@ class QueryImpl(object):
         return hash(self.hashval)
 
     def __repr__(self):
-        return 'QueryImpl{0}'.format(self.hashval)
+        return 'QueryImpl{}'.format(self.hashval)
 
     def __eq__(self, other):
         return self.hashval == other.hashval
