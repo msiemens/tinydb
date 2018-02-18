@@ -173,6 +173,46 @@ def test_update_ids(db):
     assert db.count(where('int') == 2) == 2
 
 
+def test_write_back(db):
+    docs = db.search(where('int') == 1)
+    for doc in docs:
+        doc['int'] = [1, 2, 3]
+
+    db.write_back(docs)
+    assert db.count(where('int') == [1, 2, 3]) == 3
+
+
+def test_write_back_whole_doc(db):
+    docs = db.search(where('int') == 1)
+    doc_ids = [doc.doc_id for doc in docs]
+    for i, doc in enumerate(docs):
+        docs[i] = {'newField': i}
+
+    db.write_back(docs, doc_ids)
+    assert db.count(where('newField') == 0) == 1
+    assert db.count(where('newField') == 1) == 1
+    assert db.count(where('newField') == 2) == 1
+
+
+def test_write_back_returns_ids(db):
+    db.purge()
+    assert db.insert({'int': 1, 'char': 'a'}) == 1
+    assert db.insert({'int': 1, 'char': 'a'}) == 2
+    assert db.write_back([{'word': 'hello'}, {'word': 'world'}], [1, 2]) == [1, 2]
+
+
+def test_write_back_fails(db):
+    with pytest.raises(ValueError):
+        db.write_back([{'get': 'error'}], [1, 2])
+
+
+def test_write_back_id_exceed(db):
+    db.purge()
+    db.insert({'int': 1})
+    with pytest.raises(IndexError):
+        db.write_back([{'get': 'error'}], [2])
+
+
 def test_upsert(db):
     assert len(db) == 3
 

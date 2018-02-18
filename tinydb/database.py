@@ -480,6 +480,41 @@ class Table(object):
                 cond, doc_ids
             )
 
+    def write_back(self, documents, doc_ids=None, eids=None):
+        """
+        Write back documents by doc_id
+
+        :param documents: a list of document to write back
+        :param doc_ids: a list of documents' ID which needs to be wrote back
+        :returns: a list of documents' ID taht has been wrote back
+        """
+        doc_ids = _get_doc_ids(doc_ids, eids)
+
+        if doc_ids is not None and not len(documents) == len(doc_ids):
+            raise ValueError(
+                'The length of documents and doc_ids is not match.')
+
+        if doc_ids is None:
+            doc_ids = [doc.doc_id for doc in documents]
+
+        # Since this function will write docs back like inserting, to ensure
+        # here only process existing or removed instead of inserting new,
+        # raise error if doc_id exceeded the last.
+        if sorted(doc_ids)[-1] > self._last_id:
+            raise IndexError(
+                'Id exceed table length, use existing or removed doc_id.')
+
+        data = self._read()
+
+        # Document specified by ID
+        documents.reverse()
+        for doc_id in doc_ids:
+            data[doc_id] = documents.pop()
+
+        self._write(data)
+
+        return doc_ids
+
     def upsert(self, document, cond):
         """
         Update a document, if it exist - insert it otherwise.
