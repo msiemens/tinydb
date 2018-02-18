@@ -174,7 +174,10 @@ Changelog
 unreleased
 ==========
 
-- *nothing yet*
+- Allow disabling the query cache with ``db.table(name, cache_size=0)``
+  (see `pull request #187 <https://github.com/msiemens/tinydb/pull/187>`_)
+- Add ``db.write_back(docs)`` for replacing documents
+  (see `pull request #184 <https://github.com/msiemens/tinydb/pull/184>`_)
 
 v3.7.0 (2017-11-11)
 ===================
