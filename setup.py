@@ -14,7 +14,7 @@ exec(read('tinydb/version.py'))
 setup(
     name="tinydb",
     version=__version__,
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
 
     # development metadata
     zip_safe=True,
