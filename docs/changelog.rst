@@ -12,12 +12,18 @@ unreleased
 
 *Nothing yet*
 
+v3.8.1 (2018-03-26)
+^^^^^^^^^^^^^^^^^^^
+
+- Bugfix: Don't install tests as a package anymore
+  (see `pull request #195 <https://github.com/msiemens/tinydb/pull/195>`_)
+
 v3.8.0 (2018-03-01)
 ^^^^^^^^^^^^^^^^^^^
 
-- Allow disabling the query cache with ``db.table(name, cache_size=0)``
+- Feature: Allow disabling the query cache with ``db.table(name, cache_size=0)``
   (see `pull request #187 <https://github.com/msiemens/tinydb/pull/187>`_)
-- Add ``db.write_back(docs)`` for replacing documents
+- Feature: Add ``db.write_back(docs)`` for replacing documents
   (see `pull request #184 <https://github.com/msiemens/tinydb/pull/184>`_)
 
 v3.7.0 (2017-11-11)
