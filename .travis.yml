@@ -17,7 +17,7 @@ matrix:
     - python: "3.6"
       env: TOXENV=check
 
-install: pip install coveralls tox tox-travis
+install: pip install coveralls tox tox-travis setuptools_scm
 script: tox
 after_success: coveralls
 cache: pip
