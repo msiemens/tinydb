@@ -500,7 +500,7 @@ class Table(object):
         # Since this function will write docs back like inserting, to ensure
         # here only process existing or removed instead of inserting new,
         # raise error if doc_id exceeded the last.
-        if sorted(doc_ids)[-1] > self._last_id:
+        if len(doc_ids) > 0 and max(doc_ids) > self._last_id:
             raise IndexError(
                 'Id exceed table length, use existing or removed doc_id.')
 
