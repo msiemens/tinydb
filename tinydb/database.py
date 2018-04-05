@@ -485,8 +485,8 @@ class Table(object):
         Write back documents by doc_id
 
         :param documents: a list of document to write back
-        :param doc_ids: a list of documents' ID which needs to be wrote back
-        :returns: a list of documents' ID taht has been wrote back
+        :param doc_ids: a list of documents' ID which need to be wrote back
+        :returns: a list of documents' ID that have been written
         """
         doc_ids = _get_doc_ids(doc_ids, eids)
 
@@ -502,7 +502,7 @@ class Table(object):
         # raise error if doc_id exceeded the last.
         if len(doc_ids) > 0 and max(doc_ids) > self._last_id:
             raise IndexError(
-                'Id exceed table length, use existing or removed doc_id.')
+                'ID exceeds table length, use existing or removed doc_id.')
 
         data = self._read()
 
