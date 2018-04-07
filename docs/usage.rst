@@ -339,7 +339,7 @@ have a list of documents with IDs (see document_ids_), you can pass them to
 >>> docs = db.search(User.name == 'John')
 [{name: 'John', age: 12}, {name: 'John', age: 44}]
 >>> for doc in docs:
-...     doc.name = 'Jane'
+...     doc['name'] = 'Jane'
 >>> db.write_back(docs)  # Will update the documents we retrieved
 >>> docs = db.search(User.name == 'John')
 []
