@@ -225,9 +225,7 @@ class Query(object):
         """
         Test for a dict where a provided key exists.
 
-        >>> Query().f1.exists() >= 42
-
-        :param rhs: The value to compare against
+        >>> Query().f1.exists()
         """
         return self._generate_test(lambda _: True,
                                    ('exists', tuple(self._path)))
