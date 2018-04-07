@@ -213,6 +213,10 @@ def test_write_back_id_exceed(db):
         db.write_back([{'get': 'error'}], [2])
 
 
+def test_write_back_empty_ok(db):
+    db.write_back([])
+
+
 def test_upsert(db):
     assert len(db) == 3
 
