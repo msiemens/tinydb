@@ -110,6 +110,7 @@ class JSONStorage(Storage):
         serialized = json.dumps(data, **self.kwargs)
         self._handle.write(serialized)
         self._handle.flush()
+        os.fsync(self._handle.fileno())
         self._handle.truncate()
 
 
