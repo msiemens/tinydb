@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmsiemens%2Ftinydb.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmsiemens%2Ftinydb?ref=badge_shield)
+
 .. image:: artwork/logo.png
     :scale: 100%
     :height: 150px
@@ -477,3 +479,7 @@ v1.0.0 (2013-07-20)
 .. _Buzhug: http://buzhug.sourceforge.net/
 .. _CodernityDB: http://labs.codernity.com/codernitydb/
 .. _MongoDB: http://mongodb.org/
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmsiemens%2Ftinydb.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmsiemens%2Ftinydb?ref=badge_large)
