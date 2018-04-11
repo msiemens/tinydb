@@ -580,3 +580,27 @@ def test_eids(db):
 
     with pytest.raises(TypeError):
         db.get(eid=[1], doc_id=[1])
+
+
+def test_custom_table_class():
+    from tinydb.database import Table
+
+    class MyTableClass(Table):
+        pass
+
+    # Table class for single table
+    db = TinyDB(storage=MemoryStorage)
+    assert isinstance(TinyDB(storage=MemoryStorage).table(),
+                      Table)
+    assert isinstance(db.table('my_table', table_class=MyTableClass),
+                      MyTableClass)
+
+    # Table class for all tables
+    TinyDB.table_class = MyTableClass
+    assert isinstance(TinyDB(storage=MemoryStorage).table(),
+                      MyTableClass)
+    assert isinstance(TinyDB(storage=MemoryStorage).table('my_table'),
+                      MyTableClass)
+
+    # Reset default table class
+    TinyDB.table_class = Table

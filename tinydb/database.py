@@ -15,6 +15,7 @@ class Document(dict):
     This is a transparent proxy for database records. It exists
     to provide a way to access a record's id via ``el.doc_id``.
     """
+
     def __init__(self, value, doc_id, **kwargs):
         super(Document, self).__init__(**kwargs)
 
@@ -138,7 +139,7 @@ class TinyDB(object):
         """
 
         storage = kwargs.pop('storage', self.DEFAULT_STORAGE)
-        table = kwargs.pop('default_table', self.DEFAULT_TABLE)
+        default_table = kwargs.pop('default_table', self.DEFAULT_TABLE)
 
         # Prepare the storage
         #: :type: Storage
@@ -149,7 +150,7 @@ class TinyDB(object):
         # Prepare the default table
 
         self._table_cache = {}
-        self._table = self.table(table)
+        self._table = self.table(default_table)
 
     def table(self, name=DEFAULT_TABLE, **options):
         """
@@ -161,13 +162,14 @@ class TinyDB(object):
         :param name: The name of the table.
         :type name: str
         :param cache_size: How many query results to cache.
+        :param table_class: Which table class to use.
         """
 
         if name in self._table_cache:
             return self._table_cache[name]
 
-        table = self.table_class(StorageProxy(self._storage, name), name,
-                                 **options)
+        table_class = options.pop('table_class', self.table_class)
+        table = table_class(StorageProxy(self._storage, name), name, **options)
 
         self._table_cache[name] = table
 

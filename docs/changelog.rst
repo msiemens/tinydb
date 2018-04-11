@@ -10,7 +10,8 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-*Nothing yet*
+- Feature: Allow setting a table class for single table only
+  (see `issue 197 <https://github.com/msiemens/tinydb/issues/197>`_)
 
 v3.8.1 (2018-03-26)
 ^^^^^^^^^^^^^^^^^^^
