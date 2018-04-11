@@ -6,10 +6,10 @@ name = "pypi"
 [packages]
 
 [dev-packages]
-sphinx = "*"
+Sphinx = "*"
 pytest-cov = "*"
 pytest-runner = "*"
-"pep8" = "*"
+pycodestyle = "*"
 
 [requires]
 python_version = "3.6"
