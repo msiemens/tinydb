@@ -523,7 +523,10 @@ To use the in-memory storage, use:
     underlying storage. For the JSON storage you can use this to pass
     additional keyword arguments to Python's
     `json.dump(...) <https://docs.python.org/2/library/json.html#json.dump>`_
-    method.
+    method. For example, you can set it to create prettified JSON files like
+    this:
+
+    >>> db = TinyDB('db.json', sort_keys=True, indent=4, separators=(',', ': '))
 
 To modify the default storage for all ``TinyDB`` instances, set the
 ``DEFAULT_STORAGE`` class variable:
