@@ -327,7 +327,7 @@ class Query(object):
 
     def all(self, cond):
         """
-        Check if a condition is met by any document in a list,
+        Check if a condition is met by all documents in a list,
         where a condition can also be a sequence (e.g. list).
 
         >>> Query().f1.all(Query().f2 == 1)
