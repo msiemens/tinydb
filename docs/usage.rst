@@ -298,6 +298,10 @@ can get the number of stored documents:
 >>> len(db)
 3
 
+.. hint::
+    This will return the number of documents in the default table
+    (see the notes on the :ref:`default table <default_table>`).
+
 Then of course you can use ``db.search(...)`` as described in the :doc:`getting-started`
 section. But sometimes you want to get only one matching document. Instead of using
 
@@ -544,7 +548,6 @@ behaviour.
 >>> db = TinyDB('/path/to/db.json', storage=CachingMiddleware(JSONStorage))
 
 .. hint::
-
     You can nest middleware:
 
     >>> db = TinyDB('/path/to/db.json',
