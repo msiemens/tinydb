@@ -24,7 +24,7 @@ class LRUCache(dict):
         self.capacity = kwargs.pop('capacity', None)
         if self.capacity is None:
             self.capacity = float('nan')
-            
+
         self.lru = []
 
         super(LRUCache, self).__init__(*args, **kwargs)

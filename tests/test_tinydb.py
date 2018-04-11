@@ -198,7 +198,10 @@ def test_write_back_returns_ids(db):
     db.purge()
     assert db.insert({'int': 1, 'char': 'a'}) == 1
     assert db.insert({'int': 1, 'char': 'a'}) == 2
-    assert db.write_back([{'word': 'hello'}, {'word': 'world'}], [1, 2]) == [1, 2]
+
+    docs = [{'word': 'hello'}, {'word': 'world'}]
+
+    assert db.write_back(docs, [1, 2]) == [1, 2]
 
 
 def test_write_back_fails(db):

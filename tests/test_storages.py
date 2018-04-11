@@ -60,7 +60,8 @@ def test_json_readwrite(tmpdir):
     item = {'name': 'A very long entry'}
     item2 = {'name': 'A short one'}
 
-    get = lambda s: db.get(where('name') == s)
+    def get(s):
+        return db.get(where('name') == s)
 
     db.insert(item)
     assert get('A very long entry') == item
