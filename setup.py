@@ -50,5 +50,4 @@ setup(
     setup_requires=['pytest-runner'],
 
     long_description=read('README.rst'),
-    data_files=[('', ['LICENSE'])]
 )
