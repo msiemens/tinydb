@@ -10,8 +10,15 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
+*Nothing yet*
+
+v3.9.0 (2018-04-24)
+^^^^^^^^^^^^^^^^^^^
+
 - Feature: Allow setting a table class for single table only
   (see `issue 197 <https://github.com/msiemens/tinydb/issues/197>`_)
+- Internal change: call fsync after flushing ``JSONStorage``
+  (see `issue 208 <https://github.com/msiemens/tinydb/issues/208>`_)
 
 v3.8.1 (2018-03-26)
 ^^^^^^^^^^^^^^^^^^^
