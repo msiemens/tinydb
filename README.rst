@@ -1,4 +1,4 @@
-.. image:: artwork/logo.png
+.. image:: https://raw.githubusercontent.com/msiemens/tinydb/master/artwork/logo.png
     :scale: 100%
     :height: 150px
 
