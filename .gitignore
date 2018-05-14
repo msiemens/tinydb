@@ -39,3 +39,5 @@ nosetests.xml
 .idea
 
 *.db.yml
+
+.DS_Store
