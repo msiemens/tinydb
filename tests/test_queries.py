@@ -1,4 +1,5 @@
 import pytest
+import re
 from tinydb.queries import Query
 
 
@@ -127,6 +128,13 @@ def test_regex():
     assert query({'val': 'ab3'})
     assert not query({'val': 'abc'})
     assert not query({'val': ''})
+    assert not query({'': None})
+    assert hash(query)
+
+    query = Query().val.search(r'JOHN', flags=re.IGNORECASE)
+    assert query({'val': 'john'})
+    assert query({'val': 'xJohNx'})
+    assert not query({'val': 'JOH'})
     assert not query({'': None})
     assert hash(query)
 

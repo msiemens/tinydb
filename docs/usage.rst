@@ -87,6 +87,9 @@ queries:
 >>> # Regex:
 >>> # Full item has to match the regex:
 >>> db.search(User.name.matches('[aZ]*'))
+>>> # Case insensitive search for 'John':
+>>> import re
+>>> db.search(User.name.matches('John', flags=re.IGNORECASE))
 >>> # Any part of the item has to match the regex:
 >>> db.search(User.name.search('b+'))
 

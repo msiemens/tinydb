@@ -245,7 +245,7 @@ class Query(object):
             ('exists', tuple(self._path))
         )
 
-    def matches(self, regex):
+    def matches(self, regex, flags=0):
         """
         Run a regex test against a dict value (whole string has to match).
 
@@ -254,11 +254,11 @@ class Query(object):
         :param regex: The regular expression to use for matching
         """
         return self._generate_test(
-            lambda value: re.match(regex, value),
+            lambda value: re.match(regex, value, flags),
             ('matches', tuple(self._path), regex)
         )
 
-    def search(self, regex):
+    def search(self, regex, flags=0):
         """
         Run a regex test against a dict value (only substring string has to
         match).
@@ -268,7 +268,7 @@ class Query(object):
         :param regex: The regular expression to use for matching
         """
         return self._generate_test(
-            lambda value: re.search(regex, value),
+            lambda value: re.search(regex, value, flags),
             ('search', tuple(self._path), regex)
         )
 
