@@ -3,12 +3,12 @@ sudo: false
 python:
   - "pypy2.7-5.8.0"
   - "pypy3.5-5.9.0"
-  - "pypy3.3-5.5-alpha"
+#  - "pypy3.3-5.5-alpha"
   - "nightly"
   - "3.6"
   - "3.5"
   - "3.4"
-  - "3.3"
+#  - "3.3"
   - "2.7"
 matrix:
   allow_failures:
