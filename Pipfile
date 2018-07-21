@@ -10,6 +10,3 @@ Sphinx = "*"
 pytest-cov = "*"
 pytest-runner = "*"
 pycodestyle = "*"
-
-[requires]
-python_version = "3.6"
