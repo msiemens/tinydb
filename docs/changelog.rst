@@ -12,6 +12,12 @@ unreleased
 
 *Nothing yet*
 
+v3.10.0 (2018-07-21)
+^^^^^^^^^^^^^^^^^^^^
+
+- Feature: Add support for regex flags
+  (see `pull request 216 <https://github.com/msiemens/tinydb/pull/216>`_)
+
 v3.9.0 (2018-04-24)
 ^^^^^^^^^^^^^^^^^^^
 
