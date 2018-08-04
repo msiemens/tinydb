@@ -77,6 +77,10 @@ class StorageProxy(object):
         self._storage = storage
         self._table_name = table_name
 
+    def construct_doc(self, key, val):
+        doc_id = int(key)
+        return Document(val, doc_id)
+
     def read(self):
         raw_data = self._storage.read() or {}
 
@@ -90,8 +94,8 @@ class StorageProxy(object):
 
         docs = {}
         for key, val in iteritems(table):
-            doc_id = int(key)
-            docs[doc_id] = Document(val, doc_id)
+            doc = self.construct_doc(key, val)
+            docs[doc.doc_id] = doc
 
         return DataProxy(docs, raw_data)
 
@@ -269,6 +273,9 @@ class Table(object):
         self._query_cache = LRUCache(capacity=cache_size)
 
         data = self._read()
+        self._init_last_id(data)
+
+    def _init_last_id(self, data):
         if data:
             self._last_id = max(i for i in data)
         else:
@@ -350,6 +357,11 @@ class Table(object):
 
         return current_id
 
+    def _get_doc_id(self, document):
+        if not isinstance(document, dict):
+            raise ValueError('Document is not a dictionary')
+        return self._get_next_id()
+
     def _read(self):
         """
         Reading access to the DB.
@@ -406,11 +418,7 @@ class Table(object):
         :returns: the inserted document's ID
         """
 
-        doc_id = self._get_next_id()
-
-        if not isinstance(document, dict):
-            raise ValueError('Document is not a dictionary')
-
+        doc_id = self._get_doc_id(document)
         data = self._read()
         data[doc_id] = document
         self._write(data)
@@ -429,7 +437,7 @@ class Table(object):
         data = self._read()
 
         for doc in documents:
-            doc_id = self._get_next_id()
+            doc_id = self._get_doc_id(doc)
             doc_ids.append(doc_id)
 
             data[doc_id] = doc
