@@ -140,6 +140,7 @@ class TinyDB(object):
 
         storage = kwargs.pop('storage', self.DEFAULT_STORAGE)
         default_table = kwargs.pop('default_table', self.DEFAULT_TABLE)
+        self._cls_table = kwargs.pop('table_class', self.table_class)
 
         # Prepare the storage
         #: :type: Storage
@@ -168,7 +169,7 @@ class TinyDB(object):
         if name in self._table_cache:
             return self._table_cache[name]
 
-        table_class = options.pop('table_class', self.table_class)
+        table_class = options.pop('table_class', self._cls_table)
         table = table_class(StorageProxy(self._storage, name), name, **options)
 
         self._table_cache[name] = table
