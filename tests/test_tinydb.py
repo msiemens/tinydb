@@ -640,8 +640,8 @@ def test_string_key():
     db = TinyDB(storage=MemoryStorage, table_class=Table2, storage_proxy_cls=StorageProxy2)
     table = db.table()
     table.insert({'doc_id': 'abc'})
-    assert table.all()[0].doc_id == 'abc'
+    assert table.get(doc_id='abc')['doc_id'] == 'abc'
     assert table._last_id == 0
     table.insert({'abc': 10})
-    assert table.all()[1].doc_id == '1'
+    assert table.get(doc_id='1')['abc'] == 10
     assert table._last_id == 1
