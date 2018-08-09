@@ -614,7 +614,7 @@ def test_string_key():
     from tinydb.storages import MemoryStorage
 
     class StorageProxy2(StorageProxy):
-        def construct_doc(self, key, val):
+        def _new_document(self, key, val):
             return Document(val, key)
 
     class Table2(Table):
