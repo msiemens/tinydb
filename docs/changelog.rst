@@ -10,7 +10,8 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-*Nothing yet*
+- Bugfix: Return list of document IDs for upsert when creating a new
+  document (see `issue 223 <https://github.com/msiemens/tinydb/issues/223>`_)
 
 v3.10.0 (2018-07-21)
 ^^^^^^^^^^^^^^^^^^^^

@@ -228,7 +228,7 @@ def test_upsert(db):
     assert db.count(where('int') == 5) == 1
 
     # Document missing
-    db.upsert({'int': 9, 'char': 'x'}, where('char') == 'x')
+    assert db.upsert({'int': 9, 'char': 'x'}, where('char') == 'x') == [4]
     assert db.count(where('int') == 9) == 1
 
 

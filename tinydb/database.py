@@ -532,7 +532,7 @@ class Table(object):
         if updated_docs:
             return updated_docs
         else:
-            return self.insert(document)
+            return [self.insert(document)]
 
     def purge(self):
         """
