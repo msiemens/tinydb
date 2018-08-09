@@ -10,6 +10,11 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
+- **Drop official support for Python 3.3**. Python 3.3 has reached its
+  official End Of Life as of September 29, 2017. It will probably continue
+  to work, but will not be tested against
+  (`issue 217 <https://github.com/msiemens/tinydb/issues/217>`_)
+
 - Bugfix: Return list of document IDs for upsert when creating a new
   document (see `issue 223 <https://github.com/msiemens/tinydb/issues/223>`_)
 
