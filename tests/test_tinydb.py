@@ -607,3 +607,41 @@ def test_custom_table_class():
 
     # Reset default table class
     TinyDB.table_class = Table
+
+
+def test_string_key():
+    from tinydb.database import Table, StorageProxy, Document
+    from tinydb.storages import MemoryStorage
+
+    class StorageProxy2(StorageProxy):
+        def _new_document(self, key, val):
+            return Document(val, key)
+
+    class Table2(Table):
+        def _init_last_id(self, data):
+            if data:
+                self._last_id = len(data)
+            else:
+                self._last_id = 0
+
+        def _get_next_id(self):
+            next_id = self._last_id + 1
+            data = self._read()
+            while str(next_id) in data:
+                next_id += 1
+            self._last_id = next_id
+            return str(next_id)
+
+        def _get_doc_id(self, document):
+            if not isinstance(document, dict):
+                raise ValueError('Document is not a dictionary')
+            return document.get('doc_id') or self._get_next_id()
+
+    db = TinyDB(storage=MemoryStorage, table_class=Table2, storage_proxy_cls=StorageProxy2)
+    table = db.table()
+    table.insert({'doc_id': 'abc'})
+    assert table.get(doc_id='abc')['doc_id'] == 'abc'
+    assert table._last_id == 0
+    table.insert({'abc': 10})
+    assert table.get(doc_id='1')['abc'] == 10
+    assert table._last_id == 1
