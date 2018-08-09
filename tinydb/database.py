@@ -77,7 +77,7 @@ class StorageProxy(object):
         self._storage = storage
         self._table_name = table_name
 
-    def construct_doc(self, key, val):
+    def _new_document(self, key, val):
         doc_id = int(key)
         return Document(val, doc_id)
 
@@ -94,7 +94,7 @@ class StorageProxy(object):
 
         docs = {}
         for key, val in iteritems(table):
-            doc = self.construct_doc(key, val)
+            doc = self._new_document(key, val)
             docs[doc.doc_id] = doc
 
         return DataProxy(docs, raw_data)
