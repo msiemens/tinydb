@@ -145,7 +145,8 @@ class TinyDB(object):
         storage = kwargs.pop('storage', self.DEFAULT_STORAGE)
         default_table = kwargs.pop('default_table', self.DEFAULT_TABLE)
         self._cls_table = kwargs.pop('table_class', self.table_class)
-        self._cls_storage_proxy = kwargs.pop('storage_proxy_cls', StorageProxy)
+        self._cls_storage_proxy = kwargs.pop('storage_proxy_class',
+                                             self.storage_proxy_class)
 
         # Prepare the storage
         #: :type: Storage
@@ -633,3 +634,6 @@ class Table(object):
 
 # Set the default table class
 TinyDB.table_class = Table
+
+# Set the default storage proxy class
+TinyDB.storage_proxy_class = StorageProxy

@@ -176,10 +176,53 @@ it:
 
 .. code-block:: python
 
+    from tinydb import TinyDB
     from tinydb.database import Table
 
     class YourTableClass(Table):
         pass  # Modify original methods as needed
 
+    TinyDB.table_class = YourTableClass
+
 For an more advanced example, see the source of the
 `tinydb-smartcache <https://github.com/msiemens/tinydb-smartcache>`_ extension.
+
+Creating a Custom Storage Proxy Classes
+---------------------------------------
+
+.. warning::
+    This extension requires knowledge of TinyDB internals. Use it if
+    you understand how TinyDB works in detail.
+
+Another way to modify TinyDB's behavior is to create a custom storage
+proxy class. Internally, TinyDB uses a proxy class to allow tables to
+access a storage object. The proxy makes sure the table only accesses
+its own table data and doesn't accidentally modify other table's data.
+
+In this class you can modify how a table can read and write from a
+storage instance. Also, the proxy class has a method called
+``_new_document`` which creates a new document object. If you want
+to replace it with a different document class, you can do it right
+here.
+
+.. code-block:: python
+
+    from tinydb import TinyDB
+    from tinydb.database import Table, StorageProxy, Document
+    from tinydb.storages import MemoryStorage
+
+    class YourStorageProxy(StorageProxy):
+        def _new_document(self, key, val):
+            # Modify document object creation
+            doc_id = int(key)
+            return Document(val, doc_id)
+
+        def read(self):
+            return {}  # Modify reading
+
+       def write(self, data):
+            pass  # Modify writing
+
+    TinyDB.storage_proxy_class = YourStorageProxy
+    # Or:
+    TinyDB(storage=..., storage_proxy_class=YourStorageProxy)
