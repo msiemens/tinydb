@@ -75,7 +75,7 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path, create_dirs=False, **kwargs):
+    def __init__(self, path, create_dirs=False, load_kwargs={}, dump_kwargs={}, **kwargs):
         """
         Create a new instance.
 
@@ -87,7 +87,8 @@ class JSONStorage(Storage):
 
         super(JSONStorage, self).__init__()
         touch(path, create_dirs=create_dirs)  # Create file if not exists
-        self.kwargs = kwargs
+        self.dump_kwargs = {**dump_kwargs, **kwargs}
+        self.load_kwargs = load_kwargs
         self._handle = open(path, 'r+')
 
     def close(self):
@@ -103,11 +104,11 @@ class JSONStorage(Storage):
             return None
         else:
             self._handle.seek(0)
-            return json.load(self._handle)
+            return json.load(self._handle, **self.load_kwargs)
 
     def write(self, data):
         self._handle.seek(0)
-        serialized = json.dumps(data, **self.kwargs)
+        serialized = json.dumps(data, **self.dump_kwargs)
         self._handle.write(serialized)
         self._handle.flush()
         os.fsync(self._handle.fileno())
