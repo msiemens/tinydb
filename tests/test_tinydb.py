@@ -687,3 +687,11 @@ def test_string_key2():
     table.insert({'abc': 10})
     assert table.get(doc_id='1')['abc'] == 10
     assert table._last_id == 1
+
+
+def test_repr(tmpdir):
+    path = str(tmpdir.join('db.json'))
+
+    assert repr(TinyDB(path)) ==\
+        "<TinyDB tables={'_default'}, tables_count=1, " +\
+        "default_table_documents_count=0, all_tables_documents_count=['_default=0']>"

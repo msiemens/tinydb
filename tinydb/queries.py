@@ -108,7 +108,7 @@ class Query(object):
         self._path = []
 
     def __repr__(self):
-        return str(self._path),
+        return '{}()'.format(type(self).__name__)
 
     def __getattr__(self, item):
         query = Query()

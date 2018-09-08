@@ -168,7 +168,7 @@ class TinyDB(object):
                 ['{}={}'.format(table, len(self.table(table))) for table in self.tables()]),
         ]
 
-        return '{}({})'.format(type(self).__name__, ', '.join(args))
+        return '<{} {}>'.format(type(self).__name__, ', '.join(args))
 
     def table(self, name=DEFAULT_TABLE, **options):
         """
@@ -294,7 +294,7 @@ class Table(object):
             'storage={}'.format(self._storage),
         ]
 
-        return '{}({})'.format(type(self).__name__, ', '.join(args))
+        return '<{} {}>'.format(type(self).__name__, ', '.join(args))
 
     def _init_last_id(self, data):
         if data:
