@@ -69,6 +69,10 @@ class Storage(with_metaclass(ABCMeta, object)):
 
         pass
 
+    @classmethod
+    def __repr__(cls):
+        return cls.__name__
+
 
 class JSONStorage(Storage):
     """
