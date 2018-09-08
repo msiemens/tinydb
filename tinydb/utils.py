@@ -2,71 +2,57 @@
 Utility functions.
 """
 
-from contextlib import contextmanager
 import warnings
+from collections import OrderedDict
+from contextlib import contextmanager
 
 # Python 2/3 independant dict iteration
 iteritems = getattr(dict, 'iteritems', dict.items)
 itervalues = getattr(dict, 'itervalues', dict.values)
 
 
-class LRUCache(dict):
-    """
-    A simple LRU cache.
-    """
+class LRUCache:
+    # @param capacity, an integer
+    def __init__(self, capacity=0):
+        self.capacity = capacity
+        self.length = 0
+        self.__cache = OrderedDict()
 
-    def __init__(self, *args, **kwargs):
-        """
-        :param capacity: How many items to store before cleaning up old items
-                         or ``None`` for an unlimited cache size
-        """
-
-        self.capacity = kwargs.pop('capacity', None)
-        if self.capacity is None:
-            self.capacity = float('nan')
-
-        self.lru = []
-
-        super(LRUCache, self).__init__(*args, **kwargs)
-
-    def refresh(self, key):
-        """
-        Push a key to the tail of the LRU queue
-        """
-        if key in self.lru:
-            self.lru.remove(key)
-        self.lru.append(key)
-
-    def get(self, key, default=None):
-        item = super(LRUCache, self).get(key, default)
-        self.refresh(key)
-
-        return item
-
-    def __getitem__(self, key):
-        item = super(LRUCache, self).__getitem__(key)
-        self.refresh(key)
-
-        return item
-
-    def __setitem__(self, key, value):
-        super(LRUCache, self).__setitem__(key, value)
-
-        self.refresh(key)
-
-        # Check, if the cache is full and we have to remove old items
-        # If the queue is of unlimited size, self.capacity is NaN and
-        # x > NaN is always False in Python and the cache won't be cleared.
-        if len(self) > self.capacity:
-            self.pop(self.lru.pop(0))
-
-    def __delitem__(self, key):
-        super(LRUCache, self).__delitem__(key)
-        self.lru.remove(key)
+    @property
+    def lru(self):
+        return list(self.__cache.keys())
 
     def clear(self):
-        super(LRUCache, self).clear()
-        del self.lru[:]
+        self.__cache = OrderedDict()
+        self.capacity = self.length = 0
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def __delitem__(self, key):
+        del self.__cache[key]
+
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def get(self, key, default=None):
+        value = self.__cache.get(key)
+        if value:
+            del self.__cache[key]
+            self.__cache[key] = value
+            return value
+        return default
+
+    def set(self, key, value):
+        if self.__cache.get(key):
+            del self.__cache[key]
+            self.__cache[key] = value
+        else:
+            if self.length == self.capacity and self.length > 0:
+                self.__cache.popitem(last=False)
+                self.length -= 1
+            self.__cache[key] = value
+            self.length += 1
 
 
 # Source: https://github.com/PythonCharmers/python-future/blob/466bfb2dfa36d865285dc31fe2b0c0a53ff0f181/future/utils/__init__.py#L102-L134
