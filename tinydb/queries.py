@@ -371,6 +371,9 @@ class Query(object):
             ('one_of', tuple(self._path), freeze(items))
         )
 
+    def __repr__(self):
+        return 'Query{}'.format("".join(f"['{part}']" for part in self._path))
+
 
 def where(key):
     return Query()[key]

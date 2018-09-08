@@ -253,6 +253,14 @@ class TinyDB(object):
         """
         return self._table.__iter__()
 
+    def __repr__(self):
+        return "TinyDB ({} table{}, {})".format(
+            len(self._table_cache),
+            "" if len(self._table_cache) == 1 else "s",
+            self._storage
+            #type(self._storage).__name__
+        )
+
 
 class Table(object):
     """
@@ -630,6 +638,13 @@ class Table(object):
 
         # Document specified by condition
         return self.get(cond) is not None
+
+    def __repr__(self):
+        return "{} ({} entr{})".format(
+            self.name,
+            len(self),
+            "y" if len(self) == 1 else "ies"
+        )
 
 
 # Set the default table class
