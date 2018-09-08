@@ -161,7 +161,7 @@ class TinyDB(object):
 
     def __repr__(self):
         args = [
-            'tables={}'.format(self.tables()),
+            'tables={}'.format(list(self.tables())),
             'tables_count={}'.format(len(self.tables())),
             'default_table_documents_count={}'.format(self.__len__()),
             'all_tables_documents_count={}'.format(

@@ -693,5 +693,5 @@ def test_repr(tmpdir):
     path = str(tmpdir.join('db.json'))
 
     assert repr(TinyDB(path)) ==\
-        "<TinyDB tables={'_default'}, tables_count=1, " +\
+        "<TinyDB tables=['_default'], tables_count=1, " +\
         "default_table_documents_count=0, all_tables_documents_count=['_default=0']>"
