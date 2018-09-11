@@ -112,5 +112,7 @@ def test_table_repr(db):
     name = 'table4'
     table = db.table(name)
 
-    assert bool(re.match(r"\<Table name\=\'table4\', total\=0, storage=\<tinydb\.database\.StorageProxy object at [a-z0-9]+\>\>", repr(table))) is True
-
+    assert re.match(
+        r"<Table name=\'table4\', total=0, "
+        "storage=<tinydb\.database\.StorageProxy object at [a-z0-9]+>>",
+        repr(table))

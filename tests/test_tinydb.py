@@ -693,7 +693,7 @@ def test_string_key2():
 def test_repr(tmpdir):
     path = str(tmpdir.join('db.json'))
 
-    assert bool(re.match(
-        r"\<TinyDB tables\=\[u?\'\_default\'\]\, tables\_count\=1\, " +
-        "default\_table\_documents\_count\=0\, all\_tables\_documents\_count\=\[\'\_default\=0\'\]\>",
-        repr(TinyDB(path)))) is True
+    assert re.match(
+        r"<TinyDB tables=\[u?\'_default\'\], tables_count=1, "
+        "default_table_documents_count=0, all_tables_documents_count=\[\'_default=0\'\]>",
+        repr(TinyDB(path)))
