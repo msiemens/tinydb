@@ -12,6 +12,14 @@ unreleased
 
 *Nothing yet*
 
+v3.11.1 (2018-09-13)
+^^^^^^^^^^^^^^^^^^^^
+
+- Bugfix: Make path queries (``db.search(where('key))``) work again
+  (see `issue 232 <https://github.com/msiemens/tinydb/issues/232>`_)
+- Improvement: Add custom ``repr`` representations for main classes
+  (see `pull request 229 <https://github.com/msiemens/tinydb/issues/229>`_)
+
 v3.11.0 (2018-08-20)
 ^^^^^^^^^^^^^^^^^^^^
 
