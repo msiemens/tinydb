@@ -1,11 +1,38 @@
 import pytest
 import re
-from tinydb.queries import Query
+from tinydb.queries import Query, where
 
 
 def test_no_path():
     with pytest.raises(ValueError):
-        Query() == 2
+        _ = Query() == 2
+
+
+def test_path_only():
+    query = Query()['value']
+    assert query == where('value')
+    assert query({'value': 1})
+    assert not query({'something': 1})
+    assert hash(query)
+    assert hash(query) != hash(where('asd'))
+
+    query = Query()['value']['val']
+    assert query == where('value')['val']
+    assert query({'value': {'val': 2}})
+    assert not query({'value': 1})
+    assert not query({'value': {'asd': 1}})
+    assert not query({'something': 1})
+    assert hash(query)
+    assert hash(query) != hash(where('asd'))
+
+
+def test_path_and():
+    query = Query()['value'] & (Query()['value'] == 5)
+    assert query({'value': 5})
+    assert not query({'value': 10})
+    assert not query({'something': 1})
+    assert hash(query)
+    assert hash(query) != hash(where('value'))
 
 
 def test_eq():

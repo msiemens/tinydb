@@ -39,11 +39,11 @@ class QueryImpl(object):
     """
 
     def __init__(self, test, hashval):
-        self.test = test
+        self._test = test
         self.hashval = hashval
 
     def __call__(self, value):
-        return self.test(value)
+        return self._test(value)
 
     def __hash__(self):
         return hash(self.hashval)
@@ -73,7 +73,7 @@ class QueryImpl(object):
                          ('not', self.hashval))
 
 
-class Query(object):
+class Query(QueryImpl):
     """
     TinyDB Queries.
 
@@ -106,6 +106,10 @@ class Query(object):
 
     def __init__(self):
         self._path = []
+        super(Query, self).__init__(
+            self._prepare_test(lambda _: True),
+            ('path', tuple(self._path))
+        )
 
     def __repr__(self):
         return '{}()'.format(type(self).__name__)
@@ -113,10 +117,24 @@ class Query(object):
     def __getattr__(self, item):
         query = Query()
         query._path = self._path + [item]
+        query.hashval = ('path', tuple(query._path))
 
         return query
 
     __getitem__ = __getattr__
+
+    def _prepare_test(self, test):
+        def runner(value):
+            try:
+                # Resolve the path
+                for part in self._path:
+                    value = value[part]
+            except (KeyError, TypeError):
+                return False
+            else:
+                return test(value)
+
+        return runner
 
     def _generate_test(self, test, hashval):
         """
@@ -129,17 +147,7 @@ class Query(object):
         if not self._path:
             raise ValueError('Query has no path')
 
-        def impl(value):
-            try:
-                # Resolve the path
-                for part in self._path:
-                    value = value[part]
-            except (KeyError, TypeError):
-                return False
-            else:
-                return test(value)
-
-        return QueryImpl(impl, hashval)
+        return QueryImpl(self._prepare_test(test), hashval)
 
     def __eq__(self, rhs):
         """
