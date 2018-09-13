@@ -1,4 +1,5 @@
 import pytest
+import re
 
 from tinydb import where
 
@@ -105,3 +106,13 @@ def test_table_name(db):
 
     with pytest.raises(AttributeError):
         table.name = 'foo'
+
+
+def test_table_repr(db):
+    name = 'table4'
+    table = db.table(name)
+
+    assert re.match(
+        r"<Table name=\'table4\', total=0, "
+        "storage=<tinydb\.database\.StorageProxy object at [a-z0-9]+>>",
+        repr(table))

@@ -329,3 +329,10 @@ def test_orm_usage():
     query2 = User.age.year == 2000
     assert query1(data)
     assert query2(data)
+
+
+def test_repr():
+    Fruit = Query()
+
+    assert repr(Fruit) == "Query()"
+    assert repr(Fruit.type == 'peach') == "QueryImpl('==', ('type',), 'peach')"

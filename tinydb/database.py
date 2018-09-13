@@ -159,6 +159,17 @@ class TinyDB(object):
         self._table_cache = {}
         self._table = self.table(default_table)
 
+    def __repr__(self):
+        args = [
+            'tables={}'.format(list(self.tables())),
+            'tables_count={}'.format(len(self.tables())),
+            'default_table_documents_count={}'.format(self.__len__()),
+            'all_tables_documents_count={}'.format(
+                ['{}={}'.format(table, len(self.table(table))) for table in self.tables()]),
+        ]
+
+        return '<{} {}>'.format(type(self).__name__, ', '.join(args))
+
     def table(self, name=DEFAULT_TABLE, **options):
         """
         Get access to a specific table.
@@ -275,6 +286,15 @@ class Table(object):
 
         data = self._read()
         self._init_last_id(data)
+
+    def __repr__(self):
+        args = [
+            'name={!r}'.format(self.name),
+            'total={}'.format(self.__len__()),
+            'storage={}'.format(self._storage),
+        ]
+
+        return '<{} {}>'.format(type(self).__name__, ', '.join(args))
 
     def _init_last_id(self, data):
         if data:
