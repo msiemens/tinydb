@@ -114,6 +114,9 @@ class Query(QueryImpl):
     def __repr__(self):
         return '{}()'.format(type(self).__name__)
 
+    def __hash__(self):
+        return super(Query, self).__hash__()
+
     def __getattr__(self, item):
         query = Query()
         query._path = self._path + [item]
