@@ -13,18 +13,26 @@ itervalues = getattr(dict, 'itervalues', dict.values)
 
 class LRUCache:
     # @param capacity, an integer
-    def __init__(self, capacity=0):
+    def __init__(self, capacity=None):
         self.capacity = capacity
-        self.length = 0
         self.__cache = OrderedDict()
 
     @property
     def lru(self):
         return list(self.__cache.keys())
 
+    @property
+    def length(self):
+        return len(self.__cache)
+
     def clear(self):
-        self.__cache = OrderedDict()
-        self.capacity = self.length = 0
+        self.__cache.clear()
+
+    def __len__(self):
+        return self.length
+
+    def __contains__(self, item):
+        return item in self.__cache
 
     def __setitem__(self, key, value):
         self.set(key, value)
@@ -48,11 +56,12 @@ class LRUCache:
             del self.__cache[key]
             self.__cache[key] = value
         else:
-            if self.length == self.capacity and self.length > 0:
-                self.__cache.popitem(last=False)
-                self.length -= 1
             self.__cache[key] = value
-            self.length += 1
+            # Check, if the cache is full and we have to remove old items
+            # If the queue is of unlimited size, self.capacity is NaN and
+            # x > NaN is always False in Python and the cache won't be cleared.
+            if self.capacity is not None and self.length > self.capacity:
+                self.__cache.popitem(last=False)
 
 
 # Source: https://github.com/PythonCharmers/python-future/blob/466bfb2dfa36d865285dc31fe2b0c0a53ff0f181/future/utils/__init__.py#L102-L134
