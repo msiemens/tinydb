@@ -75,7 +75,7 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path, create_dirs=False, encoding: str=None, **kwargs):
+    def __init__(self, path, create_dirs=False, encoding=None, **kwargs):
         """
         Create a new instance.
 

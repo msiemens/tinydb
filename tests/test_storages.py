@@ -243,7 +243,12 @@ def test_encoding(tmpdir):
     jap_storage = JSONStorage(path, encoding="cp936")  # cp936 is used for japanese encodings
     jap_storage.write(japanese_doc)
 
-    with pytest.raises(json.decoder.JSONDecodeError):
+    try:
+        exception = json.decoder.JSONDecodeError
+    except AttributeError:
+        exception = ValueError
+
+    with pytest.raises(exception):
         eng_storage = JSONStorage(path, encoding="cp037")  # cp037 is used for english encodings
         eng_storage.read()
 
