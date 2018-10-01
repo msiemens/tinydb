@@ -75,7 +75,7 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path, create_dirs=False, **kwargs):
+    def __init__(self, path, create_dirs=False, encoding: str=None, **kwargs):
         """
         Create a new instance.
 
@@ -88,7 +88,7 @@ class JSONStorage(Storage):
         super(JSONStorage, self).__init__()
         touch(path, create_dirs=create_dirs)  # Create file if not exists
         self.kwargs = kwargs
-        self._handle = open(path, 'r+')
+        self._handle = open(path, 'r+', encoding=encoding)
 
     def close(self):
         self._handle.close()
