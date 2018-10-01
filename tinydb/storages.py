@@ -4,6 +4,7 @@ implementations.
 """
 
 from abc import ABCMeta, abstractmethod
+import io
 import os
 
 from .utils import with_metaclass
@@ -88,7 +89,7 @@ class JSONStorage(Storage):
         super(JSONStorage, self).__init__()
         touch(path, create_dirs=create_dirs)  # Create file if not exists
         self.kwargs = kwargs
-        self._handle = open(path, 'r+', encoding=encoding)
+        self._handle = io.open(path, 'r+', encoding=encoding)
 
     def close(self):
         self._handle.close()
