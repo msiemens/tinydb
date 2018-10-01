@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import random
 import tempfile
@@ -237,7 +239,7 @@ def test_yaml(tmpdir):
 
 
 def test_encoding(tmpdir):
-    japanese_doc = {"Test": "こんにちは世界"}
+    japanese_doc = {"Test": u"こんにちは世界"}
 
     path = str(tmpdir.join('test.db'))
     jap_storage = JSONStorage(path, encoding="cp936")  # cp936 is used for japanese encodings

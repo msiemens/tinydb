@@ -6,6 +6,7 @@ implementations.
 from abc import ABCMeta, abstractmethod
 import io
 import os
+import sys
 
 from .utils import with_metaclass
 
@@ -109,6 +110,8 @@ class JSONStorage(Storage):
     def write(self, data):
         self._handle.seek(0)
         serialized = json.dumps(data, **self.kwargs)
+        if sys.version_info[0] == 2:
+            serialized = unicode(serialized)
         self._handle.write(serialized)
         self._handle.flush()
         os.fsync(self._handle.fileno())
