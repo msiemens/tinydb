@@ -37,7 +37,7 @@ def _get_doc_id(doc_id, eid):
         if doc_id is not None:
             raise TypeError('cannot pass both eid and doc_id')
 
-        warnings.warn('eid has been renamed to doc_ids', DeprecationWarning)
+        warnings.warn('eid has been renamed to doc_id', DeprecationWarning)
         return eid
     else:
         return doc_id
