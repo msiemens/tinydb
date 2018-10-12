@@ -21,8 +21,9 @@ def touch(fname, create_dirs):
         if not os.path.exists(base_dir):
             os.makedirs(base_dir)
 
-    with open(fname, 'a'):
-        os.utime(fname, None)
+    if not os.path.exists(fname):
+        with open(fname, 'a'):
+            os.utime(fname, None)
 
 
 class Storage(with_metaclass(ABCMeta, object)):
