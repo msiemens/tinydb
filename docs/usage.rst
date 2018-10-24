@@ -167,7 +167,7 @@ TinyDB also allows you to use logical operations to modify and combine
 queries:
 
 >>> # Negate a query:
->>> db.search(~ User.name == 'John')
+>>> db.search(~ (User.name == 'John'))
 
 >>> # Logical AND:
 >>> db.search((User.name == 'John') & (User.age <= 30))
