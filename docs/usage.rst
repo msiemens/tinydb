@@ -180,6 +180,17 @@ queries:
     When using ``&`` or ``|``, make sure you wrap the conditions on both sides
     with parentheses or Python will mess up the comparison.
 
+    Also, when using negation (``~``) you'll have to wrap the query you want
+    to negate in parentheses.
+
+    The reason for these requirements is that Python's binary operators that are
+    used for query modifiers have a higher operator precedence than comparison
+    operators. Simply put, ``~ User.name == 'John'`` is parsed by Python as
+    ``(~User.name) == 'John'`` instead of ``~(User.name == 'John')``. See also the
+    Python `docs on operator precedence
+    <https://docs.python.org/3/reference/expressions.html#operator-precedence>`_
+    for details.
+
 Recap
 .....
 
