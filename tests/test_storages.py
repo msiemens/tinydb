@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import os
 import random
 import tempfile
+import json
 
 import pytest
 
@@ -233,3 +236,23 @@ def test_yaml(tmpdir):
 
     assert db.contains(where('name') == 'foo')
     assert len(db) == 1
+
+
+def test_encoding(tmpdir):
+    japanese_doc = {"Test": u"こんにちは世界"}
+
+    path = str(tmpdir.join('test.db'))
+    jap_storage = JSONStorage(path, encoding="cp936")  # cp936 is used for japanese encodings
+    jap_storage.write(japanese_doc)
+
+    try:
+        exception = json.decoder.JSONDecodeError
+    except AttributeError:
+        exception = ValueError
+
+    with pytest.raises(exception):
+        eng_storage = JSONStorage(path, encoding="cp037")  # cp037 is used for english encodings
+        eng_storage.read()
+
+    jap_storage = JSONStorage(path, encoding="cp936")
+    assert japanese_doc == jap_storage.read()
