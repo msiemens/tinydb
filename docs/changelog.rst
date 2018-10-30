@@ -10,7 +10,8 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-*Nothing yet*
+- Feature: Add encoding option to ``JSONStorage``
+  (see `pull request 238 <https://github.com/msiemens/tinydb/issues/238>`_)
 
 v3.11.1 (2018-09-13)
 ^^^^^^^^^^^^^^^^^^^^
