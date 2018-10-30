@@ -2,6 +2,11 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
+# Python 2/3 independent Mapping import
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 import warnings
 
 from . import JSONStorage
@@ -379,8 +384,8 @@ class Table(object):
         return current_id
 
     def _get_doc_id(self, document):
-        if not isinstance(document, dict):
-            raise ValueError('Document is not a dictionary')
+        if not isinstance(document, Mapping):
+            raise ValueError('Document is not a Mapping')
         return self._get_next_id()
 
     def _read(self):

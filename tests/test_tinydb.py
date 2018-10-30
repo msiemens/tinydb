@@ -92,6 +92,29 @@ def test_insert_multiple_with_ids(db):
                                {'int': 1, 'char': 'c'}]) == [1, 2, 3]
 
 
+def test_insert_invalid_type_raises_error(db):
+    with pytest.raises(ValueError, message='Document is not a Mapping'):
+        db.insert(object())  # object() as an example of a non-mapping-type
+
+
+def test_insert_valid_mapping_type(db):
+    from tinydb.database import Mapping
+
+    class CustomDocument(Mapping):
+        def __init__(self, data):
+            self.data = data
+        def __getitem__(self, key):
+            return self.data[key]
+        def __iter__(self):
+            return iter(self.data)
+        def __len__(self):
+            return len(self.data)
+
+    db.purge()
+    db.insert(CustomDocument({'int': 1, 'char': 'a'}))
+    assert db.count(where('int') == 1) == 1
+
+
 def test_remove(db):
     db.remove(where('char') == 'b')
 
