@@ -10,8 +10,15 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
+- *Nothing yet*
+
+v3.12.0 (2018-11-06)
+^^^^^^^^^^^^^^^^^^^^
+
 - Feature: Add encoding option to ``JSONStorage``
-  (see `pull request 238 <https://github.com/msiemens/tinydb/issues/238>`_)
+  (see `pull request 238 <https://github.com/msiemens/tinydb/pull/238>`_)
+- Internal change: allow ``collections.abc.Mutable`` as valid document types
+  (see `pull request 245 <https://github.com/msiemens/tinydb/pull/245>`_)
 
 v3.11.1 (2018-09-13)
 ^^^^^^^^^^^^^^^^^^^^
@@ -19,7 +26,7 @@ v3.11.1 (2018-09-13)
 - Bugfix: Make path queries (``db.search(where('key))``) work again
   (see `issue 232 <https://github.com/msiemens/tinydb/issues/232>`_)
 - Improvement: Add custom ``repr`` representations for main classes
-  (see `pull request 229 <https://github.com/msiemens/tinydb/issues/229>`_)
+  (see `pull request 229 <https://github.com/msiemens/tinydb/pull/229>`_)
 
 v3.11.0 (2018-08-20)
 ^^^^^^^^^^^^^^^^^^^^
@@ -31,7 +38,6 @@ v3.11.0 (2018-08-20)
 
 - Feature: Allow extending TinyDB with a custom storage proxy class
   (see `pull request 224 <https://github.com/msiemens/tinydb/pull/224>`_)
-
 - Bugfix: Return list of document IDs for upsert when creating a new
   document (see `issue 223 <https://github.com/msiemens/tinydb/issues/223>`_)
 
