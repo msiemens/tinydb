@@ -273,6 +273,11 @@ def test_search_path(db):
     assert len(db.search(where('int'))) == 3  # Query result from cache
 
 
+def test_search_no_results_cache(db):
+    assert len(db.search(where('missing'))) == 0
+    assert len(db.search(where('missing'))) == 0
+
+
 def test_get(db):
     item = db.get(where('char') == 'b')
     assert item['char'] == 'b'
