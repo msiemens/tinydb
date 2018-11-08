@@ -162,13 +162,13 @@ def test_read_once():
         reset_counter()
 
         db.all()
-        reset_counter()
+        reset_counter(expected=0)
 
         db.insert({'foo': 'bar'})
-        reset_counter()
+        reset_counter(expected=0)
 
         db.all()
-        reset_counter()
+        reset_counter(expected=1)
 
 
 def test_custom_with_exception():

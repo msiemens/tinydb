@@ -118,11 +118,13 @@ class StorageProxy(object):
             raw_data = self._storage.read()
 
         raw_data[self._table_name] = dict(data)
+        self._data_proxy = None
         self._storage.write(raw_data)
 
     def purge_table(self):
         try:
             data = self._storage.read() or {}
+            self._data_proxy = None
             del data[self._table_name]
             self._storage.write(data)
         except KeyError:
@@ -217,8 +219,8 @@ class TinyDB(object):
         """
         Purge all tables from the database. **CANNOT BE REVERSED!**
         """
-
-        self._storage.write({})
+        for table_name in self.tables():
+            self.purge_table(table_name)
         self._table_cache.clear()
 
     def purge_table(self, name):
@@ -229,10 +231,8 @@ class TinyDB(object):
         :type name: str
         """
         if name in self._table_cache:
+            self._table_cache[name]._storage.purge_table()
             del self._table_cache[name]
-
-        proxy = StorageProxy(self._storage, name)
-        proxy.purge_table()
 
     def close(self):
         """
@@ -400,8 +400,8 @@ class Table(object):
         :returns: all values
         :rtype: DataProxy
         """
-
-        return self._storage.read()
+        res = self._storage.read()
+        return res
 
     def _write(self, values):
         """
