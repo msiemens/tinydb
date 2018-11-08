@@ -53,7 +53,7 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
         "Operating System :: OS Independent"
     ],
-    tests_require=['pytest-cov'],
+    tests_require=['pytest-cov', 'pyyaml'],
     setup_requires=['pytest-runner'],
 
     long_description=read('README.rst'),
