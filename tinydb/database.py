@@ -81,28 +81,33 @@ class StorageProxy(object):
     def __init__(self, storage, table_name):
         self._storage = storage
         self._table_name = table_name
+        self._data_proxy = None
 
     def _new_document(self, key, val):
         doc_id = int(key)
         return Document(val, doc_id)
 
     def read(self):
-        raw_data = self._storage.read() or {}
+        if self._data_proxy is None:
+            raw_data = self._storage.read() or {}
 
-        try:
-            table = raw_data[self._table_name]
-        except KeyError:
-            raw_data.update({self._table_name: {}})
-            self._storage.write(raw_data)
+            try:
+                table = raw_data[self._table_name]
+            except KeyError:
+                raw_data.update({self._table_name: {}})
+                self._storage.write(raw_data)
 
-            return DataProxy({}, raw_data)
+                self._data_proxy = DataProxy({}, raw_data)
+                return self._data_proxy
 
-        docs = {}
-        for key, val in iteritems(table):
-            doc = self._new_document(key, val)
-            docs[doc.doc_id] = doc
+            docs = {}
+            for key, val in iteritems(table):
+                doc = self._new_document(key, val)
+                docs[doc.doc_id] = doc
 
-        return DataProxy(docs, raw_data)
+            self._data_proxy = DataProxy(docs, raw_data)
+
+        return self._data_proxy
 
     def write(self, data):
         try:
