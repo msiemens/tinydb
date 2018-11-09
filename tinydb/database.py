@@ -590,7 +590,7 @@ class Table(object):
         """
 
         if cond in self._query_cache:
-            return self._query_cache[cond][:]
+            return self._query_cache.get(cond, [])[:]
 
         docs = [doc for doc in self.all() if cond(doc)]
         self._query_cache[cond] = docs
