@@ -12,6 +12,14 @@ unreleased
 
 - *Nothing yet*
 
+v3.12.1 (2018-11-09)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fix: Don't break when searching the same query multiple times
+  (see `pull request 249 <https://github.com/msiemens/tinydb/pull/249>`_)
+- Internal change: allow ``collections.abc.Mutable`` as valid document types
+  (see `pull request 245 <https://github.com/msiemens/tinydb/pull/245>`_)
+
 v3.12.0 (2018-11-06)
 ^^^^^^^^^^^^^^^^^^^^
 
