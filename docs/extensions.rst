@@ -58,3 +58,12 @@ Here are some extensions that might be useful to you:
                    inserting/removing/updating documents so the cache doesn't
                    get invalidated. It's useful if you perform lots of queries
                    while the data changes only little.
+
+``aiotinydb``
+*************
+
+| **Repo:**        https://github.com/ASMfreaK/aiotinydb
+| **Status:**      *stable*
+| **Description:** asyncio compatibility shim for TinyDB. Enables usage of
+                   TinyDB in asyncio-aware contexts without slow syncronous
+                   IO.
