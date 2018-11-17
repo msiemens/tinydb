@@ -239,12 +239,12 @@ def test_update_ids(db):
 
 
 def test_write_back(db):
-        docs = db.search(where('int') == 1)
-        for doc in docs:
-            doc['int'] = [1, 2, 3]
+    docs = db.search(where('int') == 1)
+    for doc in docs:
+        doc['int'] = [1, 2, 3]
 
-        db.write_back(docs)
-        assert db.count(where('int') == [1, 2, 3]) == 3
+    db.write_back(docs)
+    assert db.count(where('int') == [1, 2, 3]) == 3
 
 
 def test_write_back_whole_doc(db):
