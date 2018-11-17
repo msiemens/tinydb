@@ -103,16 +103,57 @@ def test_insert_valid_mapping_type(db):
     class CustomDocument(Mapping):
         def __init__(self, data):
             self.data = data
+
         def __getitem__(self, key):
             return self.data[key]
+
         def __iter__(self):
             return iter(self.data)
+
         def __len__(self):
             return len(self.data)
 
     db.purge()
     db.insert(CustomDocument({'int': 1, 'char': 'a'}))
     assert db.count(where('int') == 1) == 1
+
+
+def test_cutom_mapping_type_with_json(tmpdir):
+    from tinydb.database import Mapping
+
+    class CustomDocument(Mapping):
+        def __init__(self, data):
+            self.data = data
+
+        def __getitem__(self, key):
+            return self.data[key]
+
+        def __iter__(self):
+            return iter(self.data)
+
+        def __len__(self):
+            return len(self.data)
+
+    # Insert
+    db = TinyDB(str(tmpdir.join('test.db')))
+    db.purge()
+    db.insert(CustomDocument({'int': 1, 'char': 'a'}))
+    assert db.count(where('int') == 1) == 1
+
+    # Insert multiple
+    db.insert_multiple([
+        CustomDocument({'int': 2, 'char': 'a'}),
+        CustomDocument({'int': 3, 'char': 'a'})
+    ])
+    assert db.count(where('int') == 1) == 1
+    assert db.count(where('int') == 2) == 1
+    assert db.count(where('int') == 3) == 1
+
+    # Write back
+    doc_id = db.get(where('int') == 3).doc_id
+    db.write_back([CustomDocument({'int': 4, 'char': 'a'})], [doc_id])
+    assert db.count(where('int') == 3) == 0
+    assert db.count(where('int') == 4) == 1
 
 
 def test_remove(db):
@@ -198,12 +239,12 @@ def test_update_ids(db):
 
 
 def test_write_back(db):
-    docs = db.search(where('int') == 1)
-    for doc in docs:
-        doc['int'] = [1, 2, 3]
+        docs = db.search(where('int') == 1)
+        for doc in docs:
+            doc['int'] = [1, 2, 3]
 
-    db.write_back(docs)
-    assert db.count(where('int') == [1, 2, 3]) == 3
+        db.write_back(docs)
+        assert db.count(where('int') == [1, 2, 3]) == 3
 
 
 def test_write_back_whole_doc(db):
@@ -737,3 +778,10 @@ def test_repr(tmpdir):
         r"default_table_documents_count=0, "
         r"all_tables_documents_count=\[\'_default=0\'\]>",
         repr(TinyDB(path)))
+
+
+def test_insert_multiple_with_single_dict(db):
+    with pytest.raises(ValueError):
+        d = {'first': 'John', 'last': 'smith'}
+        db.insert_multiple(d)
+        db.close()
