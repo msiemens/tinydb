@@ -107,10 +107,10 @@ class Query(QueryImpl):
     """
 
     def __init__(self):
-        self._path = []
+        self._path = ()
         super(Query, self).__init__(
             self._prepare_test(lambda _: True),
-            ('path', tuple(self._path))
+            ('path', self._path)
         )
 
     def __repr__(self):
@@ -121,8 +121,8 @@ class Query(QueryImpl):
 
     def __getattr__(self, item):
         query = Query()
-        query._path = self._path + [item]
-        query.hashval = ('path', tuple(query._path))
+        query._path = self._path + (item, )
+        query.hashval = ('path', query._path)
 
         return query
 
@@ -182,7 +182,7 @@ class Query(QueryImpl):
 
         return self._generate_test(
             lambda value: test(value),
-            ('==', tuple(self._path), freeze(rhs))
+            ('==', self._path, freeze(rhs))
         )
 
     def __ne__(self, rhs):
@@ -195,7 +195,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: value != rhs,
-            ('!=', tuple(self._path), freeze(rhs))
+            ('!=', self._path, freeze(rhs))
         )
 
     def __lt__(self, rhs):
@@ -208,7 +208,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: value < rhs,
-            ('<', tuple(self._path), rhs)
+            ('<', self._path, rhs)
         )
 
     def __le__(self, rhs):
@@ -221,7 +221,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: value <= rhs,
-            ('<=', tuple(self._path), rhs)
+            ('<=', self._path, rhs)
         )
 
     def __gt__(self, rhs):
@@ -234,7 +234,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: value > rhs,
-            ('>', tuple(self._path), rhs)
+            ('>', self._path, rhs)
         )
 
     def __ge__(self, rhs):
@@ -247,7 +247,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: value >= rhs,
-            ('>=', tuple(self._path), rhs)
+            ('>=', self._path, rhs)
         )
 
     def exists(self):
@@ -258,7 +258,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda _: True,
-            ('exists', tuple(self._path))
+            ('exists', self._path)
         )
 
     def matches(self, regex, flags=0):
@@ -271,7 +271,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: re.match(regex, value, flags),
-            ('matches', tuple(self._path), regex)
+            ('matches', self._path, regex)
         )
 
     def search(self, regex, flags=0):
@@ -285,7 +285,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: re.search(regex, value, flags),
-            ('search', tuple(self._path), regex)
+            ('search', self._path, regex)
         )
 
     def test(self, func, *args):
@@ -303,7 +303,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: func(value, *args),
-            ('test', tuple(self._path), func, args)
+            ('test', self._path, func, args)
         )
 
     def any(self, cond):
@@ -338,7 +338,7 @@ class Query(QueryImpl):
 
         return self._generate_test(
             lambda value: _cmp(value),
-            ('any', tuple(self._path), freeze(cond))
+            ('any', self._path, freeze(cond))
         )
 
     def all(self, cond):
@@ -371,7 +371,7 @@ class Query(QueryImpl):
 
         return self._generate_test(
             lambda value: _cmp(value),
-            ('all', tuple(self._path), freeze(cond))
+            ('all', self._path, freeze(cond))
         )
 
     def one_of(self, items):
@@ -384,7 +384,7 @@ class Query(QueryImpl):
         """
         return self._generate_test(
             lambda value: value in items,
-            ('one_of', tuple(self._path), freeze(items))
+            ('one_of', self._path, freeze(items))
         )
 
 
