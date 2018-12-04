@@ -446,7 +446,7 @@ class Table(object):
 
         doc_id = self._get_doc_id(document)
         data = self._read()
-        data[doc_id] = document
+        data[doc_id] = dict(document)
         self._write(data)
 
         return doc_id
@@ -466,7 +466,7 @@ class Table(object):
             doc_id = self._get_doc_id(doc)
             doc_ids.append(doc_id)
 
-            data[doc_id] = doc
+            data[doc_id] = dict(doc)
 
         self._write(data)
 
@@ -523,8 +523,8 @@ class Table(object):
         Write back documents by doc_id
 
         :param documents: a list of document to write back
-        :param doc_ids: a list of documents' ID which need to be wrote back
-        :returns: a list of documents' ID that have been written
+        :param doc_ids: a list of document IDs which need to be written back
+        :returns: a list of document IDs that have been written
         """
         doc_ids = _get_doc_ids(doc_ids, eids)
 
@@ -547,7 +547,7 @@ class Table(object):
         # Document specified by ID
         documents.reverse()
         for doc_id in doc_ids:
-            data[doc_id] = documents.pop()
+            data[doc_id] = dict(documents.pop())
 
         self._write(data)
 
