@@ -12,6 +12,16 @@ unreleased
 
 - *Nothing yet*
 
+v3.12.2 (2018-12-12)
+^^^^^^^^^^^^^^^^^^^^
+
+- Internal change: convert documents to dicts during insertion
+  (see `pull request 256 <https://github.com/msiemens/tinydb/pull/256>`_)
+- Internal change: use tuple literals instead of tuple class/constructor
+  (see `pull request 247 <https://github.com/msiemens/tinydb/pull/247>`_)
+- Infra: ensure YAML tests are run
+  (see `pull request 252 <https://github.com/msiemens/tinydb/pull/252>`_)
+
 v3.12.1 (2018-11-09)
 ^^^^^^^^^^^^^^^^^^^^
 
