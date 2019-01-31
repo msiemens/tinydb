@@ -134,3 +134,44 @@ class MemoryStorage(Storage):
 
     def write(self, data):
         self.memory = data
+
+
+class EphemeralJSONStorage(Storage):
+    """
+    Use JSON file readonly.
+    """
+
+    def __init__(self, path, encoding=None, **kwargs):
+        """
+        Create a new instance.
+
+        :param path: Where to store the JSON data.
+        :type path: str
+        """
+
+        super(EphemeralJSONStorage, self).__init__()
+        self.kwargs = kwargs
+        self._handle = codecs.open(path, 'r', encoding=encoding)
+        self.memory = None
+
+    def close(self):
+        self._handle.close()
+
+    def read(self):
+        if self.memory is not None:
+            return self.memory
+
+        # Get the file size
+        self._handle.seek(0, os.SEEK_END)
+        size = self._handle.tell()
+
+        if not size:
+            # File is empty
+            return None
+        else:
+            self._handle.seek(0)
+            self.memory = json.load(self._handle)
+            return self.memory
+
+    def write(self, data):
+        self.memory = data

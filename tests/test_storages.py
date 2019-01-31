@@ -9,7 +9,7 @@ import pytest
 
 from tinydb import TinyDB, where
 from tinydb.database import Document
-from tinydb.storages import JSONStorage, MemoryStorage, Storage, touch
+from tinydb.storages import EphemeralJSONStorage, JSONStorage, MemoryStorage, Storage, touch
 
 random.seed()
 
@@ -256,3 +256,42 @@ def test_encoding(tmpdir):
 
     jap_storage = JSONStorage(path, encoding="cp936")
     assert japanese_doc == jap_storage.read()
+
+
+def test_ephemeral_json_readwrite(tmpdir):
+    """
+    Test Readonly JSON
+    """
+    test_file = str(tmpdir.join('test.json'))
+    # Create JSON for test
+    item1 = {'name': 'Value A'}
+    db = TinyDB(test_file, storage=JSONStorage)
+    db.insert(item1)
+    db.close()
+
+    ephemeral = TinyDB(test_file, storage=EphemeralJSONStorage)
+
+    def get(s):
+        return ephemeral.get(where('name') == s)
+
+    assert get('Value A') == item1
+    assert get('Value B') is None
+
+    ephemeral.remove(where('name') == 'Value A')
+    assert get('Value A') is None
+
+    item2 = {'name': 'Value B'}
+    ephemeral.insert(item2)
+    assert get('Value B') == item2
+
+    ephemeral.remove(where('name') == 'Value B')
+    assert get('Value B') is None
+
+    ephemeral.close()
+
+    ephemeral = TinyDB(test_file, storage=EphemeralJSONStorage)
+    assert get('Value A') == item1
+    assert get('Value B') is None
+    ephemeral.close()
+
+    os.remove(test_file)
