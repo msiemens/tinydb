@@ -295,3 +295,9 @@ def test_ephemeral_json_readwrite(tmpdir):
     ephemeral.close()
 
     os.remove(test_file)
+
+    # test empty file
+    touch(test_file, False)
+    ephemeral = TinyDB(test_file, storage=EphemeralJSONStorage)
+    assert get('Value A') is None
+    os.remove(test_file)
