@@ -43,6 +43,15 @@ Here are some extensions that might be useful to you:
 ``tinydb-serialization``
 ************************
 
+| **Repo:**        https://github.com/imalento/tinydb-appengine
+| **Status:**      *stable*
+| **Description:** ``tinydb-appengine`` provides TinyDB storage for
+                   App Engine. You can use JSON readonly.
+
+
+``tinydb-serialization``
+************************
+
 | **Repo:**        https://github.com/msiemens/tinydb-serialization
 | **Status:**      *stable*
 | **Description:** ``tinydb-serialization`` provides serialization for objects
