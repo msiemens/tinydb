@@ -40,8 +40,8 @@ Here are some extensions that might be useful to you:
                    record-first then execute architecture which allows us to
                    minimize the time that we are within a thread lock.
 
-``tinydb-serialization``
-************************
+``tinydb-appengine``
+********************
 
 | **Repo:**        https://github.com/imalento/tinydb-appengine
 | **Status:**      *stable*
