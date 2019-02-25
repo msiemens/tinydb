@@ -5,8 +5,8 @@ import re
 import pytest
 
 from tinydb import TinyDB, where
-from tinydb.storages import MemoryStorage
 from tinydb.middlewares import Middleware
+from tinydb.storages import MemoryStorage
 
 
 def test_purge(db):

@@ -170,7 +170,8 @@ class TinyDB(object):
             'tables_count={}'.format(len(self.tables())),
             'default_table_documents_count={}'.format(self.__len__()),
             'all_tables_documents_count={}'.format(
-                ['{}={}'.format(table, len(self.table(table))) for table in self.tables()]),
+                ['{}={}'.format(table, len(self.table(table)))
+                 for table in self.tables()]),
         ]
 
         return '<{} {}>'.format(type(self).__name__, ', '.join(args))
@@ -406,7 +407,7 @@ class Table(object):
         :type values: DataProxy | dict
         """
 
-        self._query_cache.clear()
+        self.clear_cache()
         self._storage.write(values)
 
     def __len__(self):
