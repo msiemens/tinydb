@@ -12,6 +12,12 @@ unreleased
 
 - *Nothing yet*
 
+v3.13.0 (2019-03-16)
+^^^^^^^^^^^^^^^^^^^^
+
+- Feature: direct access to a TinyDB instance's storage
+  (see `issue 258 <https://github.com/msiemens/tinydb/issues/258>`_)
+
 v3.12.2 (2018-12-12)
 ^^^^^^^^^^^^^^^^^^^^
 
