@@ -551,6 +551,14 @@ To modify the default storage for all ``TinyDB`` instances, set the
 
 >>> TinyDB.DEFAULT_STORAGE = MemoryStorage
 
+In case you need to access the storage instance directly, you can use the
+``storage`` property of your TinyDB instance. This may be useful to call
+method directly on the storage or middleware:
+
+>>> db = TinyDB(storage=CachingMiddleware(MemoryStorage))
+<tinydb.middlewares.CachingMiddleware at 0x10991def0>
+>>> db.storage.flush()
+
 Middleware
 ..........
 

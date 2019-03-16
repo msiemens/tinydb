@@ -230,6 +230,15 @@ class TinyDB(object):
         proxy = StorageProxy(self._storage, name)
         proxy.purge_table()
 
+    @property
+    def storage(self):
+        """
+        Access the storage used for this TinyDB instance.
+
+        :return: This instance's storage
+        """
+        return self._storage
+
     def close(self):
         """
         Close the database.

@@ -5,7 +5,7 @@ import re
 import pytest
 
 from tinydb import TinyDB, where
-from tinydb.middlewares import Middleware
+from tinydb.middlewares import Middleware, CachingMiddleware
 from tinydb.storages import MemoryStorage
 
 
@@ -785,3 +785,10 @@ def test_insert_multiple_with_single_dict(db):
         d = {'first': 'John', 'last': 'smith'}
         db.insert_multiple(d)
         db.close()
+
+
+def test_access_storage():
+    assert isinstance(TinyDB(storage=MemoryStorage).storage,
+                      MemoryStorage)
+    assert isinstance(TinyDB(storage=CachingMiddleware(MemoryStorage)).storage,
+                      CachingMiddleware)
