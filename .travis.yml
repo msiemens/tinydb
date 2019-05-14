@@ -1,7 +1,7 @@
 language: python
 sudo: false
 python:
-  - "pypy2.7-5.8.0"
+  - "pypy2.7-5.9.0"
   - "pypy3.5-5.9.0"
   - "nightly"
   - "3.7"
