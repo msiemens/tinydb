@@ -15,6 +15,10 @@ matrix:
   include:
     - python: "3.6"
       env: TOXENV=check
+    - python: "2.7"
+      before_script: pip install ujson
+    - python: "3.7"
+      before_script: pip install ujson
 
 install: pip install coveralls tox tox-travis setuptools_scm
 script: tox
