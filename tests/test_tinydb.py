@@ -4,9 +4,16 @@ import re
 
 import pytest
 
-from tinydb import TinyDB, where
+from tinydb import TinyDB, where, Query
 from tinydb.middlewares import Middleware, CachingMiddleware
 from tinydb.storages import MemoryStorage
+
+try:
+    import ujson as json
+except ImportError:
+    HAS_UJSON = False
+else:
+    HAS_UJSON = True
 
 
 def test_purge(db):
@@ -539,6 +546,7 @@ def test_insert_string(tmpdir):
         _db.insert({'int': 3})  # Does not fail
 
 
+@pytest.mark.skipif(HAS_UJSON, reason="not compatible with ujson")
 def test_insert_invalid_dict(tmpdir):
     path = str(tmpdir.join('db.json'))
 
@@ -547,7 +555,7 @@ def test_insert_invalid_dict(tmpdir):
         _db.insert_multiple(data)
 
         with pytest.raises(TypeError):
-            _db.insert({'int': {'bark'}})  # Fails
+            _db.insert({'int': _db})  # Fails
 
         assert data == _db.all()
 
@@ -778,6 +786,21 @@ def test_repr(tmpdir):
         r"default_table_documents_count=0, "
         r"all_tables_documents_count=\[\'_default=0\'\]>",
         repr(TinyDB(path)))
+
+
+def test_delete(tmpdir):
+    path = str(tmpdir.join('db.json'))
+
+    db = TinyDB(path, ensure_ascii=False)
+    q = Query()
+    db.insert({'network': {'id': '114', 'name': 'ok', 'rpc': 'dac',
+                           'ticker': 'mkay'}})
+    assert db.search(q.network.id == '114') == [
+        {'network': {'id': '114', 'name': 'ok', 'rpc': 'dac',
+                     'ticker': 'mkay'}}
+    ]
+    db.remove(q.network.id == '114')
+    assert db.search(q.network.id == '114') == []
 
 
 def test_insert_multiple_with_single_dict(db):

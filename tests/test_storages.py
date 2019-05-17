@@ -13,6 +13,13 @@ from tinydb.storages import JSONStorage, MemoryStorage, Storage, touch
 
 random.seed()
 
+try:
+    import ujson as json
+except ImportError:
+    HAS_UJSON = False
+else:
+    HAS_UJSON = True
+
 doc = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
        'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
        'dict': {'hp': 13, 'sp': 5},
@@ -30,6 +37,7 @@ def test_json(tmpdir):
     storage.close()
 
 
+@pytest.mark.skipif(HAS_UJSON, reason="not compatible with ujson")
 def test_json_kwargs(tmpdir):
     db_file = tmpdir.join('test.db')
     db = TinyDB(str(db_file), sort_keys=True, indent=4, separators=(',', ': '))
