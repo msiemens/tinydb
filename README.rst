@@ -123,8 +123,8 @@ extensions: Contributions to TinyDB are welcome! Here's how to get started:
 4. Send a pull request and bug the maintainer until it gets merged and
    published ☺
 
-.. |Build Status| image:: http://img.shields.io/travis/msiemens/tinydb.svg?style=flat-square
-   :target: https://travis-ci.org/msiemens/tinydb
+.. |Build Status| image:: https://img.shields.io/azure-devops/build/msiemens/3e5baa75-12ec-43ac-9728-89823ee8c7e2/2.svg?style=flat-square
+   :target: https://dev.azure.com/msiemens/github/_build?definitionId=2
 .. |Coverage| image:: http://img.shields.io/coveralls/msiemens/tinydb.svg?style=flat-square
    :target: https://coveralls.io/r/msiemens/tinydb
 .. |Version| image:: http://img.shields.io/pypi/v/tinydb.svg?style=flat-square
