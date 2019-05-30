@@ -34,7 +34,7 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    pip install pytest pytest-azurepipelines pytest-cov coveralls readme_renderer
+    pip install -U pytest pytest-azurepipelines pytest-cov coveralls twine
   displayName: 'Install dependencies'
 
 - script: |
