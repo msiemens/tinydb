@@ -7,9 +7,10 @@ try:
     from collections.abc import Mapping
 except ImportError:
     from collections import Mapping
+import copy
 import warnings
 
-from . import JSONStorage
+from . import JSONStorage, SnapshotStorage
 from .utils import LRUCache, iteritems, itervalues
 
 
@@ -85,6 +86,14 @@ class StorageProxy(object):
     def _new_document(self, key, val):
         doc_id = int(key)
         return Document(val, doc_id)
+
+    def snapshot(self):
+        if isinstance(self._storage, SnapshotStorage):
+            raw_data = copy.deepcopy(self._storage.read()) or {}
+        else:
+            raw_data = self._storage.read() or {}
+
+        return StorageProxy(SnapshotStorage(raw_data), self._table_name)
 
     def read(self):
         raw_data = self._storage.read() or {}
@@ -297,6 +306,7 @@ class Table(object):
 
         self._storage = storage
         self._name = name
+        self._cache_size = cache_size
         self._query_cache = LRUCache(capacity=cache_size)
 
         data = self._read()
@@ -323,6 +333,12 @@ class Table(object):
         Get the table name.
         """
         return self._name
+
+    def set_storage(self, storage):
+        self._storage = storage
+
+    def bulk(self):
+        return BulkTable(self._storage, self._name, self._cache_size)
 
     def process_elements(self, func, cond=None, doc_ids=None, eids=None):
         """
@@ -665,6 +681,29 @@ class Table(object):
 
         # Document specified by condition
         return self.get(cond) is not None
+
+
+class BulkTable(Table):
+
+    def __init__(self, storage, name, cache_size=10):
+        """
+        Bulk write to a table.
+
+        :param storage: Access to the storage
+        :type storage: StorageProxy
+        :param name: The table name
+        :param cache_size: Maximum size of query cache.
+        """
+        super().__init__(storage.snapshot(), name, cache_size)
+        self._src_storage = storage
+
+    def flush(self):
+        data = self._read()
+        self._src_storage.write(data)
+        self.reset()
+
+    def reset(self):
+        self.set_storage(self._src_storage.snapshot())
 
 
 # Set the default table class

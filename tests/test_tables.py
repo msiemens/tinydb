@@ -117,3 +117,45 @@ def test_table_repr(db):
         r"<Table name=\'table4\', total=0, "
         "storage=<tinydb\.database\.StorageProxy object at [a-zA-Z0-9]+>>",
         repr(table))
+
+
+def test_bulk(db):
+    table = db.table('table5', cache_size=0)
+    query = where('int') == 1
+
+    bulk = table.bulk()
+    bulk.insert({'int': 1})
+    bulk.insert({'int': 1})
+
+    # not write test
+    assert table.count(query) == 0
+    assert table.count(where('int') == 2) == 0
+    assert len(table._query_cache) == 0
+
+    # test bulk cache
+    assert bulk.count(query) == 2
+    assert bulk.count(where('int') == 2) == 0
+    assert len(bulk._query_cache) == 0
+
+    bulk.flush()
+
+    # test reset is True
+    assert bulk.count(query) == 2
+    assert bulk.count(where('int') == 2) == 0
+    assert len(bulk._query_cache) == 0
+
+    # test write in file
+    assert table.count(query) == 2
+    assert table.count(where('int') == 2) == 0
+    assert len(table._query_cache) == 0
+
+    bulk.insert({'int': 2})
+    bulk.insert({'int': 2})
+
+    assert table.count(where('int') == 2) == 0
+    assert bulk.count(where('int') == 2) == 2
+
+    bulk.reset()
+
+    assert table.count(where('int') == 2) == 0
+    assert bulk.count(where('int') == 2) == 0
