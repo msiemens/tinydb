@@ -2,6 +2,7 @@ import pytest
 import re
 
 from tinydb import where
+from tinydb import TinyDB
 
 
 def test_tables_list(db):
@@ -159,3 +160,10 @@ def test_bulk(db):
 
     assert table.count(where('int') == 2) == 0
     assert bulk.count(where('int') == 2) == 0
+
+
+def test_bulk_json_write(tmpdir):
+    path = str(tmpdir.join('test_bulk.db'))
+
+    with TinyDB(path) as db:
+        test_bulk(db)
