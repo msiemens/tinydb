@@ -1,0 +1,53 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+strategy:
+  matrix:
+    Python27:
+      python.version: '2.7'
+    Python34:
+      python.version: '3.4'
+    Python35:
+      python.version: '3.5'
+    Python36:
+      python.version: '3.6'
+    Python37:
+      python.version: '3.7'
+    PyPy27:
+      python.version: 'pypy2'
+    PyPy3:
+      python.version: 'pypy3'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -U pytest pytest-azurepipelines pytest-cov coveralls wheel twine
+  displayName: 'Install dependencies'
+
+- script: |
+    pytest --cov-report=html:$(pwd)/htmlcov
+  displayName: 'Run tests'
+
+- script: |
+    python setup.py sdist bdist_wheel
+    twine check dist/*
+  displayName: 'Check dist package format'
+
+- script: |
+    coveralls
+  displayName: 'Upload test coverage'
+  env:
+    COVERALLS_REPO_TOKEN: $(token.coveralls)
