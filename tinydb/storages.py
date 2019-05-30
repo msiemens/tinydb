@@ -121,16 +121,19 @@ class MemoryStorage(Storage):
     Store the data as JSON in memory.
     """
 
-    def __init__(self):
+    def __init__(self, memory=None):
         """
         Create a new instance.
         """
 
         super(MemoryStorage, self).__init__()
-        self.memory = None
+        self.memory = memory
 
     def read(self):
         return self.memory
 
     def write(self, data):
         self.memory = data
+
+
+SnapshotStorage = MemoryStorage

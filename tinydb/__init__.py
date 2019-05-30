@@ -24,7 +24,7 @@ Usage example:
 """
 
 from .queries import Query, where
-from .storages import Storage, JSONStorage
+from .storages import Storage, JSONStorage, SnapshotStorage
 from .database import TinyDB
 from .version import __version__
 

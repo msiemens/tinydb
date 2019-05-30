@@ -97,6 +97,24 @@ Tables
     >>> table.all()
     [{'value': True}]
 
+Tables Bulk Write
+=================
+
+.. code-block:: python
+
+    >>> table = db.table('name')
+
+    >>> bulk = table.bulk()
+    >>> bulk.insert({'value': True})
+    >>> bulk.flush()
+    >>> table.all()
+    [{'value': True}]
+
+    >>> bulk.insert({'value2': True})
+    >>> bulk.reset()
+    >>> table.all()
+    [{'value': True}]
+
 Using Middlewares
 =================
 
