@@ -694,7 +694,7 @@ class BulkTable(Table):
         :param name: The table name
         :param cache_size: Maximum size of query cache.
         """
-        super().__init__(storage.snapshot(), name, cache_size)
+        super(BulkTable, self).__init__(storage.snapshot(), name, cache_size)
         self._src_storage = storage
 
     def flush(self):
