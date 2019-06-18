@@ -12,6 +12,12 @@ unreleased
 
 - *Nothing yet*
 
+v3.14.0 (2019-06-18)
+^^^^^^^^^^^^^^^^^^^^
+
+- Change: support for ``ujson`` is now deprecated
+  (see `issue 258 <https://github.com/msiemens/tinydb/issues/263>`_)
+
 v3.13.0 (2019-03-16)
 ^^^^^^^^^^^^^^^^^^^^
 
