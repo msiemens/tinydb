@@ -100,7 +100,7 @@ def test_insert_multiple_with_ids(db):
 
 
 def test_insert_invalid_type_raises_error(db):
-    with pytest.raises(ValueError, message='Document is not a Mapping'):
+    with pytest.raises(ValueError, match='Document is not a Mapping'):
         db.insert(object())  # object() as an example of a non-mapping-type
 
 

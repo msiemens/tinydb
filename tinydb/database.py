@@ -162,6 +162,7 @@ class TinyDB(object):
         # Prepare the default table
 
         self._table_cache = {}
+        #: :type: Table
         self._table = self.table(default_table)
 
     def __repr__(self):
