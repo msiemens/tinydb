@@ -2,16 +2,24 @@
 Contains the :class:`base class <tinydb.storages.Storage>` for storages and
 implementations.
 """
-
 from abc import ABCMeta, abstractmethod
 import codecs
 import os
+import warnings
 
 from .utils import with_metaclass
 
 
 try:
     import ujson as json
+
+    warnings.warn(
+        'Support for `ujson` is reprecated and will be replaced in '
+        'a future version. '
+        'See https://github.com/msiemens/tinydb/issues/263 for '
+        'details.',
+        DeprecationWarning
+    )
 except ImportError:
     import json
 

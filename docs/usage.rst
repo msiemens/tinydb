@@ -28,14 +28,6 @@ library like `pickle <http://docs.python.org/library/pickle.html>`_ or
    ``JSONStorage``) may result in unexpected behavior due to query caching.
    See query_caching_ on how to disable the query cache.
 
-Alternative JSON library
-........................
-
-As already mentioned, the default storage relies upon Python's
-JSON module. To improve performance, you can install
-`ujson <http://pypi.python.org/pypi/ujson>`_ , an extremely fast JSON
-implementation. TinyDB will auto-detect and use it if possible.
-
 Queries
 -------
 
