@@ -363,3 +363,20 @@ def test_repr():
 
     assert repr(Fruit) == "Query()"
     assert repr(Fruit.type == 'peach') == "QueryImpl('==', ('type',), 'peach')"
+
+
+def test_subclass():
+    class MyQueryClass(Query):
+        def my_search(self, regex):
+            return self._generate_test(
+            lambda value: re.search(regex, value),
+            ('search', self._path, regex)
+        )
+
+    query = MyQueryClass().val.my_search(r'\d{2}\.')
+
+    assert query({'val': '42.'})
+    assert not query({'val': '44'})
+    assert not query({'val': 'ab.'})
+    assert not query({'': None})
+    assert hash(query)
