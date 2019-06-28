@@ -366,17 +366,17 @@ def test_repr():
 
 
 def test_subclass():
+    # Test that a new query test method in a custom subclass is properly usable
     class MyQueryClass(Query):
-        def my_search(self, regex):
+        def equal_double(self, rhs):
             return self._generate_test(
-            lambda value: re.search(regex, value),
-            ('search', self._path, regex)
+            lambda value: value == rhs*2,
+            ('equal_double', self._path, rhs)
         )
 
-    query = MyQueryClass().val.my_search(r'\d{2}\.')
+    query = MyQueryClass().val.equal_double('42')
 
-    assert query({'val': '42.'})
-    assert not query({'val': '44'})
-    assert not query({'val': 'ab.'})
+    assert query({'val': '4242'})
+    assert not query({'val': '42'})
     assert not query({'': None})
     assert hash(query)
