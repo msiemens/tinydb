@@ -120,7 +120,7 @@ class Query(QueryImpl):
         return super(Query, self).__hash__()
 
     def __getattr__(self, item):
-        query = Query()
+        query = type(self)()
         query._path = self._path + (item, )
         query.hashval = ('path', query._path)
 

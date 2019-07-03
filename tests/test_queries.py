@@ -363,3 +363,20 @@ def test_repr():
 
     assert repr(Fruit) == "Query()"
     assert repr(Fruit.type == 'peach') == "QueryImpl('==', ('type',), 'peach')"
+
+
+def test_subclass():
+    # Test that a new query test method in a custom subclass is properly usable
+    class MyQueryClass(Query):
+        def equal_double(self, rhs):
+            return self._generate_test(
+            lambda value: value == rhs*2,
+            ('equal_double', self._path, rhs)
+        )
+
+    query = MyQueryClass().val.equal_double('42')
+
+    assert query({'val': '4242'})
+    assert not query({'val': '42'})
+    assert not query({'': None})
+    assert hash(query)
