@@ -45,9 +45,3 @@ steps:
     python setup.py sdist bdist_wheel
     twine check dist/*
   displayName: 'Check dist package format'
-
-- script: |
-    coveralls
-  displayName: 'Upload test coverage'
-  env:
-    COVERALLS_REPO_TOKEN: $(token.coveralls)
