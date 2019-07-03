@@ -12,6 +12,12 @@ unreleased
 
 - *Nothing yet*
 
+v3.14.1 (2019-07-03)
+^^^^^^^^^^^^^^^^^^^^
+
+- Internal change: fix Query class to permit subclass creation
+  (see `pull request 270 <https://github.com/msiemens/tinydb/pull/270>`_)
+
 v3.14.0 (2019-06-18)
 ^^^^^^^^^^^^^^^^^^^^
 
