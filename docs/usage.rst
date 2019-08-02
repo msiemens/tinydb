@@ -233,7 +233,7 @@ your database.
 Inserting data
 ..............
 
-As already described you can insert an document using ``db.insert(...)``.
+As already described you can insert a document using ``db.insert(...)``.
 In case you want to insert multiple documents, you can use ``db.insert_multiple(...)``:
 
 >>> db.insert_multiple([
@@ -250,7 +250,7 @@ can leave out the ``query`` argument:
 >>> db.update({'foo': 'bar'})
 
 When passing a dict to ``db.update(fields, query)``, it only allows you to
-update an document by adding or overwriting its values. But sometimes you may
+update a document by adding or overwriting its values. But sometimes you may
 need to e.g. remove one field or increment its value. In that case you can
 pass a function instead of ``fields``:
 
@@ -398,7 +398,7 @@ Using Document IDs
 ------------------
 
 Internally TinyDB associates an ID with every document you insert. It's returned
-after inserting an document:
+after inserting a document:
 
 >>> db.insert({'name': 'John', 'age': 22})
 3
@@ -433,13 +433,13 @@ Recap
 Let's sum up the way TinyDB supports working with IDs:
 
 +-------------------------------------+------------------------------------------------------------+
-| **Getting an document's ID**                                                                     |
+| **Getting a document's ID**                                                                     |
 +-------------------------------------+------------------------------------------------------------+
 | ``db.insert(...)``                  | Returns the inserted document's ID                         |
 +-------------------------------------+------------------------------------------------------------+
 | ``db.insert_multiple(...)``         | Returns the inserted documents' ID                         |
 +-------------------------------------+------------------------------------------------------------+
-| ``document.doc_id``                 | Get the ID of an document fetched from the db              |
+| ``document.doc_id``                 | Get the ID of a document fetched from the db              |
 +-------------------------------------+------------------------------------------------------------+
 | **Working with IDs**                                                                             |
 +-------------------------------------+------------------------------------------------------------+
