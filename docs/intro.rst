@@ -41,7 +41,7 @@ Why **Not** Use TinyDB?
 - You need **advanced features** like:
     - access from multiple processes or threads,
     - creating indexes for tables,
-    - a HTTP server,
+    - an HTTP server,
     - managing relationships between tables or similar,
     - `ACID guarantees <https://en.wikipedia.org/wiki/ACID>`_.
 - You are really concerned about **performance** and need a high speed
