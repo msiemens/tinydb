@@ -394,11 +394,6 @@ class Table(object):
 
         return current_id
 
-    def _get_doc_id(self, document):
-        if not isinstance(document, Mapping):
-            raise ValueError('Document is not a Mapping')
-        return self._get_next_id()
-
     def _read(self):
         """
         Reading access to the DB.
@@ -454,8 +449,10 @@ class Table(object):
         :param document: the document to insert
         :returns: the inserted document's ID
         """
+        if not isinstance(document, Mapping):
+            raise ValueError('Document is not a Mapping')
 
-        doc_id = self._get_doc_id(document)
+        doc_id = self._get_next_id()
         data = self._read()
         data[doc_id] = dict(document)
         self._write(data)
@@ -469,15 +466,17 @@ class Table(object):
         :param documents: a list of documents to insert
         :returns: a list containing the inserted documents' IDs
         """
-
         doc_ids = []
         data = self._read()
 
-        for doc in documents:
-            doc_id = self._get_doc_id(doc)
+        for document in documents:
+            if not isinstance(document, Mapping):
+                raise ValueError('Document is not a Mapping')
+
+            doc_id = self._get_next_id()
             doc_ids.append(doc_id)
 
-            data[doc_id] = dict(doc)
+            data[doc_id] = dict(document)
 
         self._write(data)
 
