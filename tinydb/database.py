@@ -133,6 +133,7 @@ class TinyDB(object):
     """
 
     DEFAULT_TABLE = '_default'
+    DEFAULT_TABLE_KWARGS = {}
     DEFAULT_STORAGE = JSONStorage
 
     def __init__(self, *args, **kwargs):
@@ -194,7 +195,12 @@ class TinyDB(object):
             return self._table_cache[name]
 
         table_class = options.pop('table_class', self._cls_table)
-        table = table_class(self._cls_storage_proxy(self._storage, name), name, **options)
+
+        table_kwargs = self.DEFAULT_TABLE_KWARGS.copy()
+        table_kwargs.update(options)
+
+        table = table_class(self._cls_storage_proxy(self._storage, name), name,
+                            **table_kwargs)
 
         self._table_cache[name] = table
 

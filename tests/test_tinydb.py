@@ -591,6 +591,16 @@ def test_non_default_table():
     TinyDB.DEFAULT_TABLE = default_table
 
 
+def test_non_default_table_args():
+    TinyDB.DEFAULT_TABLE_KWARGS = {'cache_size': 0}
+
+    db = TinyDB(storage=MemoryStorage)
+    default_table = db.table()
+    assert default_table._query_cache.capacity == 0
+
+    TinyDB.DEFAULT_TABLE_KWARGS = {}
+
+
 def test_purge_table():
     db = TinyDB(storage=MemoryStorage)
     assert [TinyDB.DEFAULT_TABLE] == list(db.tables())
