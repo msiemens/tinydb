@@ -43,6 +43,9 @@ class LRUCache:
     def __getitem__(self, key):
         return self.get(key)
 
+    def __iter__(self):
+        return iter(self.__cache)
+
     def get(self, key, default=None):
         value = self.__cache.get(key)
         if value:
