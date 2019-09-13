@@ -12,6 +12,11 @@ unreleased
 
 - *Nothing yet*
 
+v3.14.2 (2019-09-13)
+^^^^^^^^^^^^^^^^^^^^
+
+- Internal change: support correct iteration for ``LRUCache`` objects
+
 v3.14.1 (2019-07-03)
 ^^^^^^^^^^^^^^^^^^^^
 
