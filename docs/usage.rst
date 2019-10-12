@@ -497,6 +497,12 @@ variable to modify the default table name for all instances:
 >>> #2: for all instances
 >>> TinyDB.DEFAULT_TABLE = 'my-default'
 
+You also can modify the keyword arguments that are passed to the default
+table by setting ``TinyDB.DEFAULT_TABLE_KWARGS``. For example, you can
+disable the query cache for the default table by setting like this:
+
+>>> TinyDB.DEFAULT_TABLE_KWARGS = {'cache_size': 0}
+
 .. _query_caching:
 
 Query Caching
