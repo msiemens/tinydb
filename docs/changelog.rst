@@ -12,6 +12,12 @@ unreleased
 
 - *Nothing yet*
 
+v3.15.0 (2019-10-12)
+^^^^^^^^^^^^^^^^^^^^
+
+- Feature: allow setting the parameters of TinyDB's default table
+  (see `issue 278 <https://github.com/msiemens/tinydb/issues/278>`_)
+
 v3.14.2 (2019-09-13)
 ^^^^^^^^^^^^^^^^^^^^
 
