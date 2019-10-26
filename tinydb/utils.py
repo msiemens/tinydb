@@ -31,8 +31,8 @@ class LRUCache:
     def __len__(self):
         return self.length
 
-    def __contains__(self, item):
-        return item in self.__cache
+    def __contains__(self, key):
+        return key in self.__cache
 
     def __setitem__(self, key, value):
         self.set(key, value)
@@ -41,6 +41,9 @@ class LRUCache:
         del self.__cache[key]
 
     def __getitem__(self, key):
+        if key not in self:
+            raise KeyError(key)
+
         return self.get(key)
 
     def __iter__(self):
@@ -48,10 +51,14 @@ class LRUCache:
 
     def get(self, key, default=None):
         value = self.__cache.get(key)
-        if value:
+
+        if value is not None:
+            # Put the key back to the front of the ordered dict by
+            # re-insertig it
             del self.__cache[key]
             self.__cache[key] = value
             return value
+
         return default
 
     def set(self, key, value):

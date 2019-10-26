@@ -10,7 +10,7 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-- *Nothing yet*
+- Internal change: fix missing values handling for ``LRUCache``
 
 v3.15.0 (2019-10-12)
 ^^^^^^^^^^^^^^^^^^^^
