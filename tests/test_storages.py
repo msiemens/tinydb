@@ -35,7 +35,6 @@ def test_json(tmpdir):
     storage.close()
 
 
-@pytest.mark.skipif(HAS_UJSON, reason="not compatible with ujson")
 def test_json_kwargs(tmpdir):
     db_file = tmpdir.join('test.db')
     db = TinyDB(str(db_file), sort_keys=True, indent=4, separators=(',', ': '))
@@ -146,7 +145,7 @@ def test_custom():
 
 
 def test_read_once():
-    count = [0]
+    count = 0
 
     # noinspection PyAbstractClass
     class MyStorage(Storage):
@@ -154,27 +153,32 @@ def test_read_once():
             self.memory = None
 
         def read(self):
-            count[0] += 1
+            nonlocal count
+            count += 1
+
             return self.memory
 
         def write(self, data):
             self.memory = data
 
-    def reset_counter(expected=1):
-        assert count[0] == expected
-        count[0] = 0
-
     with TinyDB(storage=MyStorage) as db:
-        reset_counter()
+        assert count == 0
+
+        db.table()
+
+        assert count == 1
 
         db.all()
-        reset_counter()
+
+        assert count == 2
 
         db.insert({'foo': 'bar'})
-        reset_counter()
+
+        assert count == 3
 
         db.all()
-        reset_counter()
+
+        assert count == 4
 
 
 def test_custom_with_exception():

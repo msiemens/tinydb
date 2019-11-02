@@ -107,7 +107,7 @@ class Query(QueryImpl):
 
     def __init__(self):
         self._path = ()
-        super(Query, self).__init__(
+        super().__init__(
             self._prepare_test(lambda _: True),
             ('path', self._path)
         )
@@ -116,7 +116,7 @@ class Query(QueryImpl):
         return '{}()'.format(type(self).__name__)
 
     def __hash__(self):
-        return super(Query, self).__hash__()
+        return super().__hash__()
 
     def __getattr__(self, item):
         query = type(self)()
@@ -125,7 +125,8 @@ class Query(QueryImpl):
 
         return query
 
-    __getitem__ = __getattr__
+    def __getitem__(self, item):
+        return getattr(self, item)
 
     def _prepare_test(self, test):
         def runner(value):

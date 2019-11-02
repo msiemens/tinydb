@@ -78,7 +78,7 @@ class JSONStorage(Storage):
         :type path: str
         """
 
-        super(JSONStorage, self).__init__()
+        super().__init__()
         touch(path, create_dirs=create_dirs)  # Create file if not exists
         self.kwargs = kwargs
         self._handle = open(path, 'r+', encoding=encoding)
@@ -117,7 +117,7 @@ class MemoryStorage(Storage):
         Create a new instance.
         """
 
-        super(MemoryStorage, self).__init__()
+        super().__init__()
         self.memory = None
 
     def read(self):

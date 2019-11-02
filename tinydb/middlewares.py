@@ -18,7 +18,7 @@ class Middleware:
     example).
     """
 
-    def __init__(self, storage_cls=TinyDB.DEFAULT_STORAGE):
+    def __init__(self, storage_cls):
         self._storage_cls = storage_cls
         self.storage = None
 
@@ -85,8 +85,8 @@ class CachingMiddleware(Middleware):
     #: The number of write operations to cache before writing to disc
     WRITE_CACHE_SIZE = 1000
 
-    def __init__(self, storage_cls=TinyDB.DEFAULT_STORAGE):
-        super(CachingMiddleware, self).__init__(storage_cls)
+    def __init__(self, storage_cls):
+        super().__init__(storage_cls)
 
         self.cache = None
         self._cache_modified_count = 0

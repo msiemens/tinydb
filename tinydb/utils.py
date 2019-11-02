@@ -2,13 +2,10 @@
 Utility functions.
 """
 
-import warnings
-from collections import OrderedDict
-from contextlib import contextmanager
+from collections import OrderedDict, abc
 
 
-class LRUCache:
-    # @param capacity, an integer
+class LRUCache(abc.MutableMapping):
     def __init__(self, capacity=None):
         self.capacity = capacity
         self.cache = OrderedDict()

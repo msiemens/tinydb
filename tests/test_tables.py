@@ -5,8 +5,8 @@ from tinydb import where
 
 
 def test_tables_list(db):
-    db.table('table1')
-    db.table('table2')
+    db.table('table1').insert({'a': 1})
+    db.table('table2').insert({'a': 1})
 
     assert db.tables() == {'_default', 'table1', 'table2'}
 
@@ -33,7 +33,7 @@ def test_multiple_tables(db):
     assert table2.count(where('char') == 'b') == 1
     assert table3.count(where('char') == 'c') == 1
 
-    db.purge_tables()
+    db.drop_tables()
 
     assert len(table1) == 0
     assert len(table2) == 0
@@ -111,9 +111,8 @@ def test_table_name(db):
 def test_table_repr(db):
     name = 'table4'
     table = db.table(name)
-    print(repr(table))
 
     assert re.match(
         r"<Table name=\'table4\', total=0, "
-        r"storage=<tinydb\.database\.StorageProxy object at [a-zA-Z0-9]+>>",
+        r"storage=<tinydb\.storages\.MemoryStorage object at [a-zA-Z0-9]+>>",
         repr(table))
