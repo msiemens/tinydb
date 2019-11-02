@@ -203,7 +203,7 @@ def test_update_all(db):
 
     db.update({'newField': True})
 
-    assert db.count(where('newField') == True) == 3
+    assert db.count(where('newField') == True) == 3  # noqa
 
 
 def test_update_returns_ids(db):

@@ -93,8 +93,8 @@ def test_ge():
 
 def test_or():
     query = (
-        (Query().val1 == 1) |
-        (Query().val2 == 2)
+            (Query().val1 == 1) |
+            (Query().val2 == 2)
     )
     assert query({'val1': 1})
     assert query({'val2': 2})
@@ -105,8 +105,8 @@ def test_or():
 
 def test_and():
     query = (
-        (Query().val1 == 1) &
-        (Query().val2 == 2)
+            (Query().val1 == 1) &
+            (Query().val2 == 2)
     )
     assert query({'val1': 1, 'val2': 2})
     assert not query({'val1': 1})
@@ -122,8 +122,8 @@ def test_not():
     assert hash(query)
 
     query = (
-        (~ (Query().val1 == 1)) &
-        (Query().val2 == 2)
+            (~ (Query().val1 == 1)) &
+            (Query().val2 == 2)
     )
     assert query({'val1': '', 'val2': 2})
     assert query({'val2': 2})
@@ -370,9 +370,9 @@ def test_subclass():
     class MyQueryClass(Query):
         def equal_double(self, rhs):
             return self._generate_test(
-            lambda value: value == rhs*2,
-            ('equal_double', self._path, rhs)
-        )
+                lambda value: value == rhs * 2,
+                ('equal_double', self._path, rhs)
+            )
 
     query = MyQueryClass().val.equal_double('42')
 

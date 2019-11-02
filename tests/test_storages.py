@@ -248,7 +248,8 @@ def test_encoding(tmpdir):
     japanese_doc = {"Test": u"こんにちは世界"}
 
     path = str(tmpdir.join('test.db'))
-    jap_storage = JSONStorage(path, encoding="cp936")  # cp936 is used for japanese encodings
+    # cp936 is used for japanese encodings
+    jap_storage = JSONStorage(path, encoding="cp936")
     jap_storage.write(japanese_doc)
 
     try:
@@ -257,7 +258,8 @@ def test_encoding(tmpdir):
         exception = ValueError
 
     with pytest.raises(exception):
-        eng_storage = JSONStorage(path, encoding="cp037")  # cp037 is used for english encodings
+        # cp037 is used for english encodings
+        eng_storage = JSONStorage(path, encoding="cp037")
         eng_storage.read()
 
     jap_storage = JSONStorage(path, encoding="cp936")
