@@ -11,30 +11,30 @@ class LRUCache:
     # @param capacity, an integer
     def __init__(self, capacity=None):
         self.capacity = capacity
-        self.__cache = OrderedDict()
+        self.cache = OrderedDict()
 
     @property
     def lru(self):
-        return list(self.__cache.keys())
+        return list(self.cache.keys())
 
     @property
     def length(self):
-        return len(self.__cache)
+        return len(self.cache)
 
     def clear(self):
-        self.__cache.clear()
+        self.cache.clear()
 
     def __len__(self):
         return self.length
 
     def __contains__(self, key):
-        return key in self.__cache
+        return key in self.cache
 
     def __setitem__(self, key, value):
         self.set(key, value)
 
     def __delitem__(self, key):
-        del self.__cache[key]
+        del self.cache[key]
 
     def __getitem__(self, key):
         if key not in self:
@@ -43,31 +43,31 @@ class LRUCache:
         return self.get(key)
 
     def __iter__(self):
-        return iter(self.__cache)
+        return iter(self.cache)
 
     def get(self, key, default=None):
-        value = self.__cache.get(key)
+        value = self.cache.get(key)
 
         if value is not None:
             # Put the key back to the front of the ordered dict by
             # re-insertig it
-            del self.__cache[key]
-            self.__cache[key] = value
+            del self.cache[key]
+            self.cache[key] = value
             return value
 
         return default
 
     def set(self, key, value):
-        if self.__cache.get(key):
-            del self.__cache[key]
-            self.__cache[key] = value
+        if self.cache.get(key):
+            del self.cache[key]
+            self.cache[key] = value
         else:
-            self.__cache[key] = value
+            self.cache[key] = value
             # Check, if the cache is full and we have to remove old items
             # If the queue is of unlimited size, self.capacity is NaN and
             # x > NaN is always False in Python and the cache won't be cleared.
             if self.capacity is not None and self.length > self.capacity:
-                self.__cache.popitem(last=False)
+                self.cache.popitem(last=False)
 
 
 class FrozenDict(dict):
