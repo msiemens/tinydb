@@ -70,14 +70,6 @@ class LRUCache:
                 self.__cache.popitem(last=False)
 
 
-@contextmanager
-def catch_warning(warning_cls):
-    with warnings.catch_warnings():
-        warnings.filterwarnings('error', category=warning_cls)
-
-        yield
-
-
 class FrozenDict(dict):
     def __hash__(self):
         return hash(tuple(sorted(self.items())))

@@ -17,9 +17,8 @@ False
 """
 
 import re
-import sys
 
-from .utils import catch_warning, freeze
+from .utils import freeze
 
 __all__ = ('Query', 'where')
 
