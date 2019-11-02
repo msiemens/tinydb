@@ -3,46 +3,52 @@ Utility functions.
 """
 
 from collections import OrderedDict, abc
+from typing import List, Iterator, TypeVar, Generic, Union, Optional
+
+K = TypeVar('K')
+V = TypeVar('V')
+D = TypeVar('D')
 
 
-class LRUCache(abc.MutableMapping):
+class LRUCache(abc.MutableMapping, Generic[K, V]):
     def __init__(self, capacity=None):
         self.capacity = capacity
-        self.cache = OrderedDict()
+        self.cache = OrderedDict()  # type: OrderedDict[K, V]
 
     @property
-    def lru(self):
+    def lru(self) -> List[K]:
         return list(self.cache.keys())
 
     @property
-    def length(self):
+    def length(self) -> int:
         return len(self.cache)
 
-    def clear(self):
+    def clear(self) -> None:
         self.cache.clear()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.length
 
-    def __contains__(self, key):
+    def __contains__(self, key: object) -> bool:
         return key in self.cache
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: K, value: V) -> None:
         self.set(key, value)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: K) -> None:
         del self.cache[key]
 
-    def __getitem__(self, key):
-        if key not in self:
+    def __getitem__(self, key) -> V:
+        value = self.get(key)
+        if value is None:
             raise KeyError(key)
 
-        return self.get(key)
+        return value
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[K]:
         return iter(self.cache)
 
-    def get(self, key, default=None):
+    def get(self, key: K, default: D = None) -> Optional[Union[V, D]]:
         value = self.cache.get(key)
 
         if value is not None:
@@ -54,7 +60,7 @@ class LRUCache(abc.MutableMapping):
 
         return default
 
-    def set(self, key, value):
+    def set(self, key: K, value: V):
         if self.cache.get(key):
             del self.cache[key]
             self.cache[key] = value
@@ -77,10 +83,14 @@ class FrozenDict(dict):
     __setitem__ = _immutable
     __delitem__ = _immutable
     clear = _immutable
-    update = _immutable
     setdefault = _immutable
-    pop = _immutable
     popitem = _immutable
+
+    def update(self, e=None, **f):
+        raise TypeError('object is immutable')
+
+    def pop(self, k, d=None):
+        raise TypeError('object is immutable')
 
 
 def freeze(obj):

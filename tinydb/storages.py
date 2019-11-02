@@ -5,6 +5,7 @@ implementations.
 from abc import ABC, abstractmethod
 import json
 import os
+from typing import Dict, Any, Optional
 
 
 def touch(fname, create_dirs):
@@ -30,32 +31,29 @@ class Storage(ABC):
     # implemented read and write
 
     @abstractmethod
-    def read(self):
+    def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
         """
         Read the last stored state.
 
         Any kind of deserialization should go here.
         Return ``None`` here to indicate that the storage is empty.
-
-        :rtype: dict
         """
 
         raise NotImplementedError('To be overridden!')
 
     @abstractmethod
-    def write(self, data):
+    def write(self, data: Dict[str, Dict[str, Any]]) -> None:
         """
         Write the current state of the database to the storage.
 
         Any kind of serialization should go here.
 
         :param data: The current state of the database.
-        :type data: dict
         """
 
         raise NotImplementedError('To be overridden!')
 
-    def close(self):
+    def close(self) -> None:
         """
         Optional: Close open file handles, etc.
         """
@@ -68,14 +66,13 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path, create_dirs=False, encoding=None, **kwargs):
+    def __init__(self, path: str, create_dirs=False, encoding=None, **kwargs):
         """
         Create a new instance.
 
         Also creates the storage file, if it doesn't exist.
 
         :param path: Where to store the JSON data.
-        :type path: str
         """
 
         super().__init__()
@@ -83,10 +80,10 @@ class JSONStorage(Storage):
         self.kwargs = kwargs
         self._handle = open(path, 'r+', encoding=encoding)
 
-    def close(self):
+    def close(self) -> None:
         self._handle.close()
 
-    def read(self):
+    def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
         # Get the file size
         self._handle.seek(0, os.SEEK_END)
         size = self._handle.tell()
@@ -98,7 +95,7 @@ class JSONStorage(Storage):
             self._handle.seek(0)
             return json.load(self._handle)
 
-    def write(self, data):
+    def write(self, data: Dict[str, Dict[str, Any]]):
         self._handle.seek(0)
         serialized = json.dumps(data, **self.kwargs)
         self._handle.write(serialized)
@@ -120,8 +117,8 @@ class MemoryStorage(Storage):
         super().__init__()
         self.memory = None
 
-    def read(self):
+    def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
         return self.memory
 
-    def write(self, data):
+    def write(self, data: Dict[str, Dict[str, Any]]):
         self.memory = data

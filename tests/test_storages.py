@@ -3,20 +3,13 @@ import random
 import tempfile
 import json
 
-import pytest
+import pytest  # type: ignore
 
 from tinydb import TinyDB, where
-from tinydb.database import Document
 from tinydb.storages import JSONStorage, MemoryStorage, Storage, touch
+from tinydb.table import Document
 
 random.seed()
-
-try:
-    import ujson as json
-except ImportError:
-    HAS_UJSON = False
-else:
-    HAS_UJSON = True
 
 doc = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
        'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],

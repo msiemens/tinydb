@@ -33,8 +33,12 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    poetry run pytest --cov-report=html:$(pwd)/htmlcov
+    poetry run pytest --cov-report=html:$(pwd)/htmlcov tests
   displayName: 'Run tests'
+
+- script: |
+    poetry run pytest --mypy -m mypy tinydb tests
+  displayName: 'Perform type check'
 
 - script: |
     poetry build

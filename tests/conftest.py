@@ -1,4 +1,4 @@
-import pytest
+import pytest  # type: ignore
 
 from tinydb.middlewares import CachingMiddleware
 from tinydb.storages import MemoryStorage

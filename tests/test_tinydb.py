@@ -1,17 +1,11 @@
 import re
+from collections.abc import Mapping
 
-import pytest
+import pytest  # type: ignore
 
 from tinydb import TinyDB, where, Query
 from tinydb.middlewares import Middleware, CachingMiddleware
 from tinydb.storages import MemoryStorage, JSONStorage
-
-try:
-    import ujson as json
-except ImportError:
-    HAS_UJSON = False
-else:
-    HAS_UJSON = True
 
 
 def test_drop_tables(db: TinyDB):
@@ -103,8 +97,6 @@ def test_insert_invalid_type_raises_error(db: TinyDB):
 
 
 def test_insert_valid_mapping_type(db: TinyDB):
-    from tinydb.database import Mapping
-
     class CustomDocument(Mapping):
         def __init__(self, data):
             self.data = data
@@ -124,8 +116,6 @@ def test_insert_valid_mapping_type(db: TinyDB):
 
 
 def test_cutom_mapping_type_with_json(tmpdir):
-    from tinydb.database import Mapping
-
     class CustomDocument(Mapping):
         def __init__(self, data):
             self.data = data

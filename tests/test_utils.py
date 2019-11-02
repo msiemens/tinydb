@@ -1,5 +1,4 @@
-import warnings
-import pytest
+import pytest  # type: ignore
 
 from tinydb.utils import LRUCache, freeze, FrozenDict
 

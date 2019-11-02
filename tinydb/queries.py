@@ -17,6 +17,7 @@ False
 """
 
 import re
+from typing import Mapping, Tuple, Callable, Any, Union, List, overload
 
 from .utils import freeze
 
@@ -37,11 +38,11 @@ class QueryImpl:
     Queries can be combined with logical and/or and modified with logical not.
     """
 
-    def __init__(self, test, hashval):
+    def __init__(self, test: Callable[[Mapping], bool], hashval: Tuple):
         self._test = test
         self.hashval = hashval
 
-    def __call__(self, value):
+    def __call__(self, value: Mapping) -> bool:
         return self._test(value)
 
     def __hash__(self):
@@ -50,24 +51,27 @@ class QueryImpl:
     def __repr__(self):
         return 'QueryImpl{}'.format(self.hashval)
 
-    def __eq__(self, other):
-        return self.hashval == other.hashval
+    def __eq__(self, other: object):
+        if isinstance(other, QueryImpl):
+            return self.hashval == other.hashval
+
+        return False
 
     # --- Query modifiers -----------------------------------------------------
 
-    def __and__(self, other):
+    def __and__(self, other: 'QueryImpl') -> 'QueryImpl':
         # We use a frozenset for the hash as the AND operation is commutative
         # (a & b == b & a)
         return QueryImpl(lambda value: self(value) and other(value),
                          ('and', frozenset([self.hashval, other.hashval])))
 
-    def __or__(self, other):
+    def __or__(self, other: 'QueryImpl') -> 'QueryImpl':
         # We use a frozenset for the hash as the OR operation is commutative
         # (a | b == b | a)
         return QueryImpl(lambda value: self(value) or other(value),
                          ('or', frozenset([self.hashval, other.hashval])))
 
-    def __invert__(self):
+    def __invert__(self) -> 'QueryImpl':
         return QueryImpl(lambda value: not self(value),
                          ('not', self.hashval))
 
@@ -118,17 +122,20 @@ class Query(QueryImpl):
     def __hash__(self):
         return super().__hash__()
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str):
         query = type(self)()
-        query._path = self._path + (item, )
+        query._path = self._path + (item,)
         query.hashval = ('path', query._path)
 
         return query
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str):
         return getattr(self, item)
 
-    def _prepare_test(self, test):
+    def _prepare_test(
+            self,
+            test: Callable[[Mapping], bool],
+    ) -> Callable[[Mapping], bool]:
         def runner(value):
             try:
                 # Resolve the path
@@ -141,7 +148,11 @@ class Query(QueryImpl):
 
         return runner
 
-    def _generate_test(self, test, hashval):
+    def _generate_test(
+            self,
+            test: Callable[[Any], bool],
+            hashval: Tuple,
+    ) -> QueryImpl:
         """
         Generate a query based on a test function.
 
@@ -154,7 +165,7 @@ class Query(QueryImpl):
 
         return QueryImpl(self._prepare_test(test), hashval)
 
-    def __eq__(self, rhs):
+    def __eq__(self, rhs: Any):
         """
         Test a dict value for equality.
 
@@ -162,6 +173,7 @@ class Query(QueryImpl):
 
         :param rhs: The value to compare against
         """
+
         def test(value):
             return value == rhs
 
@@ -170,7 +182,7 @@ class Query(QueryImpl):
             ('==', self._path, freeze(rhs))
         )
 
-    def __ne__(self, rhs):
+    def __ne__(self, rhs: Any):
         """
         Test a dict value for inequality.
 
@@ -183,7 +195,7 @@ class Query(QueryImpl):
             ('!=', self._path, freeze(rhs))
         )
 
-    def __lt__(self, rhs):
+    def __lt__(self, rhs: Any) -> QueryImpl:
         """
         Test a dict value for being lower than another value.
 
@@ -196,7 +208,7 @@ class Query(QueryImpl):
             ('<', self._path, rhs)
         )
 
-    def __le__(self, rhs):
+    def __le__(self, rhs: Any) -> QueryImpl:
         """
         Test a dict value for being lower than or equal to another value.
 
@@ -209,7 +221,7 @@ class Query(QueryImpl):
             ('<=', self._path, rhs)
         )
 
-    def __gt__(self, rhs):
+    def __gt__(self, rhs: Any) -> QueryImpl:
         """
         Test a dict value for being greater than another value.
 
@@ -222,7 +234,7 @@ class Query(QueryImpl):
             ('>', self._path, rhs)
         )
 
-    def __ge__(self, rhs):
+    def __ge__(self, rhs: Any) -> QueryImpl:
         """
         Test a dict value for being greater than or equal to another value.
 
@@ -235,7 +247,7 @@ class Query(QueryImpl):
             ('>=', self._path, rhs)
         )
 
-    def exists(self):
+    def exists(self) -> QueryImpl:
         """
         Test for a dict where a provided key exists.
 
@@ -246,20 +258,21 @@ class Query(QueryImpl):
             ('exists', self._path)
         )
 
-    def matches(self, regex, flags=0):
+    def matches(self, regex: str, flags: int = 0) -> QueryImpl:
         """
         Run a regex test against a dict value (whole string has to match).
 
         >>> Query().f1.matches(r'^\\w+$')
 
         :param regex: The regular expression to use for matching
+        :param flags: regex flags to pass to ``re.match``
         """
         return self._generate_test(
-            lambda value: re.match(regex, value, flags),
+            lambda value: re.match(regex, value, flags) is not None,
             ('matches', self._path, regex)
         )
 
-    def search(self, regex, flags=0):
+    def search(self, regex: str, flags: int = 0) -> QueryImpl:
         """
         Run a regex test against a dict value (only substring string has to
         match).
@@ -267,13 +280,14 @@ class Query(QueryImpl):
         >>> Query().f1.search(r'^\\w+$')
 
         :param regex: The regular expression to use for matching
+        :param flags: regex flags to pass to ``re.match``
         """
         return self._generate_test(
-            lambda value: re.search(regex, value, flags),
+            lambda value: re.search(regex, value, flags) is not None,
             ('search', self._path, regex)
         )
 
-    def test(self, func, *args):
+    def test(self, func: Callable[[Mapping], bool], *args) -> QueryImpl:
         """
         Run a user-defined test function against a dict value.
 
@@ -291,7 +305,7 @@ class Query(QueryImpl):
             ('test', self._path, func, args)
         )
 
-    def any(self, cond):
+    def any(self, cond: Union[QueryImpl, List[Any]]) -> QueryImpl:
         """
         Check if a condition is met by any document in a list,
         where a condition can also be a sequence (e.g. list).
@@ -326,7 +340,7 @@ class Query(QueryImpl):
             ('any', self._path, freeze(cond))
         )
 
-    def all(self, cond):
+    def all(self, cond: Union['QueryImpl', List[Any]]) -> QueryImpl:
         """
         Check if a condition is met by all documents in a list,
         where a condition can also be a sequence (e.g. list).
@@ -359,7 +373,7 @@ class Query(QueryImpl):
             ('all', self._path, freeze(cond))
         )
 
-    def one_of(self, items):
+    def one_of(self, items: List[Any]) -> QueryImpl:
         """
         Check if the value is contained in a list or generator.
 
@@ -373,5 +387,5 @@ class Query(QueryImpl):
         )
 
 
-def where(key):
+def where(key: str) -> Query:
     return Query()[key]

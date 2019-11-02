@@ -48,7 +48,7 @@ pytest-codestyle = "^1.4.0"
 pytest-cov = "^2.8.1"
 pycodestyle = "^2.5.0"
 pyyaml = {version = "^5.1.2", optional = true}
-
+pytest-mypy = {version = "^0.4.1", optional = true, extras = ["ci"]}
 [tool.poetry.extras]
 ci = ["pyyaml", "pytest-azurepipelines", "coveralls"]
 
