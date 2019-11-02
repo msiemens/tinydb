@@ -4,10 +4,6 @@ from tinydb import TinyDB
 from tinydb.middlewares import CachingMiddleware
 from tinydb.storages import MemoryStorage, JSONStorage
 
-if 'xrange' not in dir(__builtins__):
-    # noinspection PyShadowingBuiltins
-    xrange = range  # Python 3 support
-
 doc = {'none': [None, None], 'int': 42, 'float': 3.1415899999999999,
        'list': ['LITE', 'RES_ACID', 'SUS_DEXT'],
        'dict': {'hp': 13, 'sp': 5},
@@ -34,7 +30,7 @@ def test_caching_write_many(storage):
     assert storage.memory is None
 
     # Write contents
-    for x in xrange(2):
+    for x in range(2):
         storage.write(doc)
         assert storage.memory is None  # Still cached
 

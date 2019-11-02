@@ -5,7 +5,7 @@ middlewares and implementations.
 from . import TinyDB
 
 
-class Middleware(object):
+class Middleware:
     """
     The base class for all Middlewares.
 

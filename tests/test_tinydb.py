@@ -1,5 +1,3 @@
-# coding=utf-8
-import sys
 import re
 
 import pytest
@@ -376,7 +374,7 @@ def test_multiple_dbs():
 
 
 def test_storage_closed_once():
-    class Storage(object):
+    class Storage:
         def __init__(self):
             self.closed = False
 
@@ -443,58 +441,6 @@ def test_lastid_after_open(tmpdir):
 
     with TinyDB(path) as _db:
         assert _db._last_id == NUM
-
-
-@pytest.mark.skipif(sys.version_info >= (3, 0),
-                    reason="requires python2")
-def test_unicode_memory(db):
-    """
-    Regression test for issue #28
-    """
-    unic_str = 'ß'.decode('utf-8')
-    byte_str = 'ß'
-
-    db.insert({'value': unic_str})
-    assert db.contains(where('value') == byte_str)
-    assert db.contains(where('value') == unic_str)
-
-    db.purge()
-    db.insert({'value': byte_str})
-    assert db.contains(where('value') == byte_str)
-    assert db.contains(where('value') == unic_str)
-
-
-@pytest.mark.skipif(sys.version_info >= (3, 0),
-                    reason="requires python2")
-def test_unicode_json(tmpdir):
-    """
-    Regression test for issue #28
-    """
-    unic_str1 = 'a'.decode('utf-8')
-    byte_str1 = 'a'
-
-    unic_str2 = 'ß'.decode('utf-8')
-    byte_str2 = 'ß'
-
-    path = str(tmpdir.join('db.json'))
-
-    with TinyDB(path) as _db:
-        _db.purge()
-        _db.insert({'value': byte_str1})
-        _db.insert({'value': byte_str2})
-        assert _db.contains(where('value') == byte_str1)
-        assert _db.contains(where('value') == unic_str1)
-        assert _db.contains(where('value') == byte_str2)
-        assert _db.contains(where('value') == unic_str2)
-
-    with TinyDB(path) as _db:
-        _db.purge()
-        _db.insert({'value': unic_str1})
-        _db.insert({'value': unic_str2})
-        assert _db.contains(where('value') == byte_str1)
-        assert _db.contains(where('value') == unic_str1)
-        assert _db.contains(where('value') == byte_str2)
-        assert _db.contains(where('value') == unic_str2)
 
 
 def test_doc_ids_json(tmpdir):
@@ -682,7 +628,7 @@ def test_custom_table_class():
 
 
 def test_string_key():
-    from collections import Mapping
+    from collections.abc import Mapping
 
     from tinydb.database import Table, StorageProxy, Document
     from tinydb.storages import MemoryStorage

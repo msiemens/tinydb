@@ -2,14 +2,10 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
-# Python 2/3 independent Mapping import
-try:
-    from collections.abc import Mapping
-except ImportError:
-    from collections import Mapping
+from collections.abc import Mapping
 
 from . import JSONStorage
-from .utils import LRUCache, iteritems, itervalues
+from .utils import LRUCache
 
 
 class Document(dict):
@@ -39,7 +35,7 @@ class DataProxy(dict):
         self.raw_data = raw_data
 
 
-class StorageProxy(object):
+class StorageProxy:
     """
     A proxy that only allows to read a single table from a
     storage.
@@ -57,6 +53,7 @@ class StorageProxy(object):
         raw_data = self._storage.read() or {}
 
         try:
+            #: :type: dict
             table = raw_data[self._table_name]
         except KeyError:
             raw_data.update({self._table_name: {}})
@@ -65,7 +62,7 @@ class StorageProxy(object):
             return DataProxy({}, raw_data)
 
         docs = {}
-        for key, val in iteritems(table):
+        for key, val in table.items():
             doc = self._new_document(key, val)
             docs[doc.doc_id] = doc
 
@@ -91,7 +88,7 @@ class StorageProxy(object):
             pass
 
 
-class TinyDB(object):
+class TinyDB:
     """
     The main class of TinyDB.
 
@@ -251,10 +248,10 @@ class TinyDB(object):
         """
         Iter over all documents from default table.
         """
-        return self._table.__iter__()
+        return iter(self._table)
 
 
-class Table(object):
+class Table:
     """
     Represents a single TinyDB Table.
     """
@@ -400,7 +397,7 @@ class Table(object):
         :rtype: list[Element]
         """
 
-        return list(itervalues(self._read()))
+        return list(self._read().values())
 
     def __iter__(self):
         """
@@ -410,8 +407,7 @@ class Table(object):
         :rtype: listiterator[Element]
         """
 
-        for value in itervalues(self._read()):
-            yield value
+        return iter(self._read().values())
 
     def insert(self, document):
         """

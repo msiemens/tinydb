@@ -28,7 +28,7 @@ def is_sequence(obj):
     return hasattr(obj, '__iter__')
 
 
-class QueryImpl(object):
+class QueryImpl:
     """
     A query implementation.
 
@@ -162,23 +162,8 @@ class Query(QueryImpl):
 
         :param rhs: The value to compare against
         """
-        if sys.version_info <= (3, 0):  # pragma: no cover
-            # Special UTF-8 handling on Python 2
-            def test(value):
-                with catch_warning(UnicodeWarning):
-                    try:
-                        return value == rhs
-                    except UnicodeWarning:
-                        # Dealing with a case, where 'value' or 'rhs'
-                        # is unicode and the other is a byte string.
-                        if isinstance(value, str):
-                            return value.decode('utf-8') == rhs
-                        elif isinstance(rhs, str):
-                            return value == rhs.decode('utf-8')
-
-        else:  # pragma: no cover
-            def test(value):
-                return value == rhs
+        def test(value):
+            return value == rhs
 
         return self._generate_test(
             lambda value: test(value),
