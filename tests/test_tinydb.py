@@ -657,31 +657,6 @@ def test_tinydb_is_iterable(db):
     assert [r for r in db] == db.all()
 
 
-def test_eids(db):
-    with pytest.warns(DeprecationWarning):
-        assert db.contains(eids=[1]) is True
-
-    with pytest.warns(DeprecationWarning):
-        db.update({'field': 'value'}, eids=[1])
-        assert db.contains(where('field') == 'value')
-
-    with pytest.warns(DeprecationWarning):
-        doc = db.get(eid=1)
-
-    with pytest.warns(DeprecationWarning):
-        assert doc.eid == 1
-
-    with pytest.warns(DeprecationWarning):
-        db.remove(eids=[1])
-        assert not db.contains(where('field') == 'value')
-
-    with pytest.raises(TypeError):
-        db.remove(eids=[1], doc_ids=[1])
-
-    with pytest.raises(TypeError):
-        db.get(eid=[1], doc_id=[1])
-
-
 def test_custom_table_class():
     from tinydb.database import Table
 

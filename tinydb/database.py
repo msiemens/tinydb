@@ -7,7 +7,6 @@ try:
     from collections.abc import Mapping
 except ImportError:
     from collections import Mapping
-import warnings
 
 from . import JSONStorage
 from .utils import LRUCache, iteritems, itervalues
@@ -26,38 +25,6 @@ class Document(dict):
 
         self.update(value)
         self.doc_id = doc_id
-
-    @property
-    def eid(self):
-        warnings.warn('eid has been renamed to doc_id', DeprecationWarning)
-        return self.doc_id
-
-
-Element = Document
-
-
-def _get_doc_id(doc_id, eid):
-    # Backwards-compatibility shim
-    if eid is not None:
-        if doc_id is not None:
-            raise TypeError('cannot pass both eid and doc_id')
-
-        warnings.warn('eid has been renamed to doc_id', DeprecationWarning)
-        return eid
-    else:
-        return doc_id
-
-
-def _get_doc_ids(doc_ids, eids):
-    # Backwards-compatibility shim
-    if eids is not None:
-        if doc_ids is not None:
-            raise TypeError('cannot pass both eids and doc_ids')
-
-        warnings.warn('eids has been renamed to doc_ids', DeprecationWarning)
-        return eids
-    else:
-        return doc_ids
 
 
 class DataProxy(dict):
@@ -331,7 +298,7 @@ class Table(object):
         """
         return self._name
 
-    def process_elements(self, func, cond=None, doc_ids=None, eids=None):
+    def process_elements(self, func, cond=None, doc_ids=None):
         """
         Helper function for processing all documents specified by condition
         or IDs.
@@ -347,14 +314,12 @@ class Table(object):
 
         :param func: the function to execute on every included document.
                      first argument: all data
-                     second argument: the current eid
+                     second argument: the current document ID
         :param cond: query that matches documents to use, or
         :param doc_ids: list of document IDs to use
-        :param eids: list of document IDs to use (deprecated)
         :returns: the document IDs that were affected during processing
         """
 
-        doc_ids = _get_doc_ids(doc_ids, eids)
         data = self._read()
 
         if doc_ids is not None:
@@ -488,7 +453,7 @@ class Table(object):
 
         return doc_ids
 
-    def remove(self, cond=None, doc_ids=None, eids=None):
+    def remove(self, cond=None, doc_ids=None):
         """
         Remove all matching documents.
 
@@ -498,8 +463,6 @@ class Table(object):
         :type doc_ids: list
         :returns: a list containing the removed document's ID
         """
-        doc_ids = _get_doc_ids(doc_ids, eids)
-
         if cond is None and doc_ids is None:
             raise RuntimeError('Use purge() to remove all documents')
 
@@ -508,7 +471,7 @@ class Table(object):
             cond, doc_ids
         )
 
-    def update(self, fields, cond=None, doc_ids=None, eids=None):
+    def update(self, fields, cond=None, doc_ids=None):
         """
         Update all matching documents to have a given set of fields.
 
@@ -521,8 +484,6 @@ class Table(object):
         :type doc_ids: list
         :returns: a list containing the updated document's ID
         """
-        doc_ids = _get_doc_ids(doc_ids, eids)
-
         if callable(fields):
             return self.process_elements(
                 lambda data, doc_id: fields(data[doc_id]),
@@ -534,7 +495,7 @@ class Table(object):
                 cond, doc_ids
             )
 
-    def write_back(self, documents, doc_ids=None, eids=None):
+    def write_back(self, documents, doc_ids=None):
         """
         Write back documents by doc_id
 
@@ -542,8 +503,6 @@ class Table(object):
         :param doc_ids: a list of document IDs which need to be written back
         :returns: a list of document IDs that have been written
         """
-        doc_ids = _get_doc_ids(doc_ids, eids)
-
         if doc_ids is not None and not len(documents) == len(doc_ids):
             raise ValueError(
                 'The length of documents and doc_ids is not match.')
@@ -613,7 +572,7 @@ class Table(object):
 
         return docs[:]
 
-    def get(self, cond=None, doc_id=None, eid=None):
+    def get(self, cond=None, doc_id=None):
         """
         Get exactly one document specified by a query or and ID.
 
@@ -627,8 +586,6 @@ class Table(object):
         :returns: the document or None
         :rtype: Element | None
         """
-        doc_id = _get_doc_id(doc_id, eid)
-
         # Cannot use process_elements here because we want to return a
         # specific document
 
@@ -651,20 +608,18 @@ class Table(object):
 
         return len(self.search(cond))
 
-    def contains(self, cond=None, doc_ids=None, eids=None):
+    def contains(self, cond=None, doc_ids=None):
         """
         Check wether the database contains a document matching a condition or
         an ID.
 
-        If ``eids`` is set, it checks if the db contains a document with one
-        of the specified.
+        If ``doc_ids`` is set, it checks if the db contains a document with
+        one of the specified IDs.
 
         :param cond: the condition use
         :type cond: Query
         :param doc_ids: the document IDs to look for
         """
-        doc_ids = _get_doc_ids(doc_ids, eids)
-
         if doc_ids is not None:
             # Documents specified by ID
             return any(self.get(doc_id=doc_id) for doc_id in doc_ids)
