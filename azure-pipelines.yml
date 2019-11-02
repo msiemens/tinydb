@@ -16,8 +16,6 @@ strategy:
       python.version: '3.6'
     Python37:
       python.version: '3.7'
-    PyPy27:
-      python.version: 'pypy2'
     PyPy3:
       python.version: 'pypy3'
 
