@@ -10,16 +10,14 @@ pool:
   vmImage: 'ubuntu-latest'
 strategy:
   matrix:
-    Python27:
-      python.version: '2.7'
-    Python34:
-      python.version: '3.4'
     Python35:
       python.version: '3.5'
     Python36:
       python.version: '3.6'
     Python37:
       python.version: '3.7'
+    Python38:
+      python.version: '3.8'
     PyPy27:
       python.version: 'pypy2'
     PyPy3:
@@ -34,7 +32,7 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    pip install -U pytest pytest-azurepipelines pytest-cov coveralls wheel twine
+    pip install -U pytest pytest-azurepipelines pytest-cov coveralls wheel twine poetry
   displayName: 'Install dependencies'
 
 - script: |
@@ -42,6 +40,6 @@ steps:
   displayName: 'Run tests'
 
 - script: |
-    python setup.py sdist bdist_wheel
+    poetry build
     twine check dist/*
   displayName: 'Check dist package format'
