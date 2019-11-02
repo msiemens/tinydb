@@ -33,7 +33,7 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    pytest --cov-report=html:$(pwd)/htmlcov
+    poetry run pytest --cov-report=html:$(pwd)/htmlcov
   displayName: 'Run tests'
 
 - script: |
