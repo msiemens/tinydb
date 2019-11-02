@@ -53,5 +53,5 @@ pyyaml = {version = "^5.1.2", optional = true}
 ci = ["pyyaml", "pytest-azurepipelines", "coveralls"]
 
 [build-system]
-requires = ["poetry>=0.12", "pytest-runner^=5.2"]
+requires = ["poetry>=0.12", "pytest-runner~=5.2"]
 build-backend = "poetry.masonry.api"
