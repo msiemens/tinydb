@@ -29,7 +29,7 @@ steps:
 - script: |
     python -m pip install --upgrade pip
     pip install -U poetry twine
-    poetry self update --preview
+    poetry self:update --preview
     poetry install -E ci
   displayName: 'Install dependencies'
 
