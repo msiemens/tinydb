@@ -383,7 +383,7 @@ testing = ["pathlib2", "contextlib2", "unittest2"]
 ci = ["pyyaml", "pytest-azurepipelines", "coveralls"]
 
 [metadata]
-content-hash = "40c75bba1931063adf4f9193faa85ad3650271851a2b37e8eb67bff095d4c3c9"
+content-hash = "9e7a5829da412a8d520cf12c2d53d76296ec25b61a40bb2592156bce0642f137"
 python-versions = "^3.5"
 
 [metadata.files]
