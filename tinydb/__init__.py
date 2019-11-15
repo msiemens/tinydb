@@ -8,7 +8,7 @@ backend. It has support for handy querying and tables.
 
 Usage example:
 
->>> from tinydb. import TinyDB, where
+>>> from tinydb import TinyDB, where
 >>> from tinydb.storages import MemoryStorage
 >>> db = TinyDB(storage=MemoryStorage)
 >>> db.insert({'data': 5})  # Insert into '_default' table
