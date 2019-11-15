@@ -39,16 +39,17 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.5"
+coveralls = {version = "^1.8.2", optional = true}
+pytest-azurepipelines = {version = "^0.8.0", optional = true}
+pyyaml = {version = "^5.1.2", optional = true}
+pytest-mypy = {version = "^0.4.1", optional = true, extras = ["ci"]}
 
 [tool.poetry.dev-dependencies]
-coveralls = {version = "^1.8.2", optional = true}
 pytest = "^5.2.2"
-pytest-azurepipelines = {version = "^0.8.0", optional = true}
 pytest-codestyle = "^1.4.0"
 pytest-cov = "^2.8.1"
 pycodestyle = "^2.5.0"
-pyyaml = {version = "^5.1.2", optional = true}
-pytest-mypy = {version = "^0.4.1", optional = true, extras = ["ci"]}
+
 [tool.poetry.extras]
 ci = ["pyyaml", "pytest-azurepipelines", "coveralls"]
 
