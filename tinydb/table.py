@@ -24,6 +24,10 @@ class Table:
     Represents a single TinyDB Table.
     """
 
+    document_class = Document
+    document_id_class = int
+    query_cache_class = LRUCache
+
     def __init__(self, storage: Storage, name: str, cache_size: int = 10):
         """
         Get access to a table.
@@ -35,10 +39,10 @@ class Table:
 
         self._storage = storage
         self._name = name
-        self._query_cache = LRUCache(capacity=cache_size) \
+        self._query_cache = self.query_cache_class(capacity=cache_size) \
             # type: LRUCache[Query, List[Document]]
 
-        self._last_id = self._get_last_id()
+        self._last_id = self.get_last_id()
 
     def __repr__(self):
         args = [
@@ -73,7 +77,7 @@ class Table:
         if not isinstance(document, Mapping):
             raise ValueError('Document is not a Mapping')
 
-        doc_id = self._get_next_id()
+        doc_id = self.get_next_id()
         self._update(lambda table: table.update({doc_id: dict(document)}))
 
         return doc_id
@@ -92,7 +96,7 @@ class Table:
                 if not isinstance(document, Mapping):
                     raise ValueError('Document is not a Mapping')
 
-                doc_id = self._get_next_id()
+                doc_id = self.get_next_id()
                 doc_ids.append(doc_id)
 
                 table[doc_id] = dict(document)
@@ -155,7 +159,7 @@ class Table:
             if raw_doc is None:
                 return None
 
-            return Document(raw_doc, doc_id)
+            return self.document_class(raw_doc, doc_id)
 
         elif cond is not None:
             # Document specified by condition
@@ -292,17 +296,17 @@ class Table:
         """
 
         for doc_id, doc in self._read().items():
-            yield Document(doc, doc_id)
+            yield self.document_class(doc, doc_id)
 
-    def _get_last_id(self) -> int:
+    def get_last_id(self) -> int:
         data = self._read()
 
         if not data:
             return 0
 
-        return max(int(i) for i in data)
+        return max(self.document_id_class(i) for i in data)
 
-    def _get_next_id(self):
+    def get_next_id(self):
         """
         Increment the ID used the last time and return it
         """
@@ -369,7 +373,7 @@ class Table:
 
         try:
             return {
-                int(doc_id): doc
+                self.document_id_class(doc_id): doc
                 for doc_id, doc in data[self.name].items()
             }
         except KeyError:
@@ -384,7 +388,7 @@ class Table:
             raw_table = {}
 
         table = {
-            int(doc_id): doc
+            self.document_id_class(doc_id): doc
             for doc_id, doc in raw_table.items()
         }
 

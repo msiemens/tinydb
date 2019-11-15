@@ -17,6 +17,9 @@ class TinyDB:
     and getting tables.
     """
 
+    table_class = Table
+    default_storage_class = JSONStorage
+
     def __init__(self, *args, **kwargs):
         """
         Create a new instance of TinyDB.
@@ -29,7 +32,7 @@ class TinyDB:
         :param default_table: The name of the default table to populate.
         """
 
-        storage = kwargs.pop('storage', JSONStorage)
+        storage = kwargs.pop('storage', self.default_storage_class)
 
         # Prepare the storage
         self._storage = storage(*args, **kwargs)  # type: Storage
@@ -65,7 +68,7 @@ class TinyDB:
         if name in self._tables:
             return self._tables[name]
 
-        self._tables[name] = Table(self.storage, name, **options)
+        self._tables[name] = self.table_class(self.storage, name, **options)
 
         return self._tables[name]
 
