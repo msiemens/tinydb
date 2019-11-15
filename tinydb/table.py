@@ -1,6 +1,13 @@
-from collections import MutableMapping
-from typing import Mapping, Iterable, List, Optional, Union, Callable, Dict, \
-    Iterator
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Union,
+)
 
 from tinydb import Storage, Query
 from tinydb.utils import LRUCache

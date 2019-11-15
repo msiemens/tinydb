@@ -2,7 +2,7 @@
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.
 """
-from typing import Dict, Set, Iterator
+from typing import Dict, Iterator, Set
 
 from tinydb.table import Table, Document
 from . import JSONStorage
