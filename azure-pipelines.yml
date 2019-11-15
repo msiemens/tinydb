@@ -28,8 +28,8 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    pip install -U poetry twine
-    poetry self:update --preview
+    pip install -U twine
+    POETRY_PREVIEW=1 curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
     poetry install -E ci
   displayName: 'Install dependencies'
 
