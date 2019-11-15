@@ -30,18 +30,18 @@ steps:
     python -m pip install --upgrade pip
     pip install -U twine
     POETRY_PREVIEW=1 curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
-    poetry install -E ci
+    PATH=$HOME/.poetry/bin:$PATH poetry install -E ci
   displayName: 'Install dependencies'
 
 - script: |
-    poetry run pytest --cov-report=html:$(pwd)/htmlcov tests
+    PATH=$HOME/.poetry/bin:$PATH poetry run pytest --cov-report=html:$(pwd)/htmlcov tests
   displayName: 'Run tests'
 
 - script: |
-    poetry run pytest --mypy -m mypy tinydb tests
+    PATH=$HOME/.poetry/bin:$PATH poetry run pytest --mypy -m mypy tinydb tests
   displayName: 'Perform type check'
 
 - script: |
-    poetry build
+    PATH=$HOME/.poetry/bin:$PATH poetry build
     twine check dist/*
   displayName: 'Check dist package format'
