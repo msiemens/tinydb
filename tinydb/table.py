@@ -185,7 +185,7 @@ class Table:
             doc_ids: Optional[Iterable[int]] = None,
     ) -> bool:
         """
-        Check wether the database contains a document matching a condition or
+        Check whether the database contains a document matching a condition or
         an ID.
 
         If ``doc_ids`` is set, it checks if the db contains a document with
