@@ -12,6 +12,13 @@ unreleased
 
 - *nothing yet*
 
+v3.15.2 (2019-12-18)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fix: handle ``Query().search`` and ``Query().matches`` with non-string values
+  correctly (see `a forum post by foprel <https://forum.m-siemens.de/d/66-query-multiple-fields-at-once>`_).
+
+
 v3.15.1 (2019-10-26)
 ^^^^^^^^^^^^^^^^^^^^
 
