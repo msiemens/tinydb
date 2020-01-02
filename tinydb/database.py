@@ -68,6 +68,11 @@ class TinyDB:
     #: .. versionadded:: 4.0
     table_class = Table
 
+    #: The name of the default table
+    #:
+    #: .. versionadded:: 4.0
+    default_table_name = '_default'
+
     #: The class that will be used by default to create storage instances
     #:
     #: .. versionadded:: 4.0
@@ -98,7 +103,7 @@ class TinyDB:
 
         return '<{} {}>'.format(type(self).__name__, ', '.join(args))
 
-    def table(self, name: str = '_default', **options) -> Table:
+    def table(self, name: str, **kwargs) -> Table:
         """
         Get access to a specific table.
 
@@ -111,13 +116,13 @@ class TinyDB:
         for further parameters you can pass.
 
         :param name: The name of the table.
-        :param options: Keyword arguments to pass to the table class constructor
+        :param kwargs: Keyword arguments to pass to the table class constructor
         """
 
         if name in self._tables:
             return self._tables[name]
 
-        table = self.table_class(self.storage, name, **options)
+        table = self.table_class(self.storage, name, **kwargs)
         self._tables[name] = table
 
         return table
@@ -242,7 +247,7 @@ class TinyDB:
         """
         Forward all unknown attribute calls to the default table instance.
         """
-        return getattr(self.table(), name)
+        return getattr(self.table(self.default_table_name), name)
 
     # Here we forward magic methods to the default table instance. These are
     # not handled by __getattr__ so we need to forward them manually here
@@ -255,10 +260,10 @@ class TinyDB:
         >>> len(db)
         0
         """
-        return len(self.table())
+        return len(self.table(self.default_table_name))
 
     def __iter__(self) -> Iterator[Document]:
         """
         Return an iterater for the default table's documents.
         """
-        return iter(self.table())
+        return iter(self.table(self.default_table_name))

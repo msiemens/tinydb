@@ -464,7 +464,7 @@ def test_gc(tmpdir):
 
 def test_drop_table():
     db = TinyDB(storage=MemoryStorage)
-    default_table_name = db.table().name
+    default_table_name = db.table(db.default_table_name).name
     assert [] == list(db.tables())
 
     db.insert({'a': 1})
@@ -511,7 +511,7 @@ def test_query_cache():
 
     # Modify the db instance to not return any results when
     # bypassing the query cache
-    db._tables[db.table().name]._read = lambda: {}
+    db._tables[db.table(db.default_table_name).name]._read_table = lambda: {}
 
     # Make sure we got an independent copy of the result list
     results.extend([1])

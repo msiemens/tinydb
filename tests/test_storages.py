@@ -157,7 +157,7 @@ def test_read_once():
     with TinyDB(storage=MyStorage) as db:
         assert count == 0
 
-        db.table()
+        db.table(db.default_table_name)
 
         assert count == 1
 
