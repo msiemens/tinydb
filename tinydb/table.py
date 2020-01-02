@@ -7,6 +7,7 @@ from typing import (
     Mapping,
     Optional,
     Union,
+    cast
 )
 
 from tinydb import Storage, Query
@@ -208,10 +209,10 @@ class Table:
         return self.get(cond) is not None
 
     def update(
-            self,
-            fields: Union[Mapping, Callable[[Mapping], None]],
-            cond: Optional[Query] = None,
-            doc_ids: Optional[int] = None,
+        self,
+        fields: Union[Mapping, Callable[[Mapping], None]],
+        cond: Optional[Query] = None,
+        doc_ids: Optional[Iterable[int]] = None,
     ) -> List[int]:
         """
         Update all matching documents to have a given set of fields.
@@ -223,15 +224,50 @@ class Table:
         :returns: a list containing the updated document's ID
         """
         if callable(fields):
-            return self._process_docs(
-                lambda data, doc_id: fields(data[doc_id]),
-                cond, doc_ids
-            )
+            def perform_update(table, doc_id):
+                fields(table[doc_id])
         else:
-            return self._process_docs(
-                lambda data, doc_id: data[doc_id].update(fields),
-                cond, doc_ids
-            )
+            def perform_update(table, doc_id):
+                table[doc_id].update(fields)
+
+        if doc_ids is not None:
+            updated_ids = list(doc_ids)
+
+            def updater(table: dict):
+                for doc_id in updated_ids:
+                    perform_update(table, doc_id)
+
+            self._update(updater)
+
+            return updated_ids
+
+        elif cond is not None:
+            updated_ids = []
+
+            def updater(table: dict):
+                _cond = cast('Query', cond)
+
+                for doc_id in list(table.keys()):
+                    if _cond(table[doc_id]):
+                        perform_update(table, doc_id)
+                        updated_ids.append(doc_id)
+
+            self._update(updater)
+
+            return updated_ids
+
+        else:
+            updated_ids = []
+
+            def updater(table: dict):
+                # Process all documents
+                for doc_id in list(table.keys()):
+                    updated_ids.append(doc_id)
+                    perform_update(table, doc_id)
+
+            self._update(updater)
+
+            return updated_ids
 
     def upsert(self, document: Mapping, cond: Query) -> List[int]:
         """
@@ -251,24 +287,47 @@ class Table:
             return [self.insert(document)]
 
     def remove(
-            self,
-            cond: Optional[Query] = None,
-            doc_ids: Optional[int] = None,
+        self,
+        cond: Optional[Query] = None,
+        doc_ids: Optional[Iterable[int]] = None,
     ) -> List[int]:
         """
         Remove all matching documents.
 
         :param cond: the condition to check against
         :param doc_ids: a list of document IDs
-        :returns: a list containing the removed document's ID
+        :returns: a list containing the removed documents' ID
         """
         if cond is None and doc_ids is None:
             raise RuntimeError('Use truncate() to remove all documents')
 
-        return self._process_docs(
-            lambda data, doc_id: data.pop(doc_id),
-            cond, doc_ids
-        )
+        if cond is not None:
+            removed_ids = []
+
+            def updater(table: dict):
+                _cond = cast('Query', cond)
+
+                for doc_id in list(table.keys()):
+                    if _cond(table[doc_id]):
+                        removed_ids.append(doc_id)
+                        table.pop(doc_id)
+
+            self._update(updater)
+
+            return removed_ids
+
+        if doc_ids is not None:
+            removed_ids = list(doc_ids)
+
+            def updater(table: dict):
+                for doc_id in removed_ids:
+                    table.pop(doc_id)
+
+            self._update(updater)
+
+            return removed_ids
+
+        raise RuntimeError('This should never happen')
 
     def truncate(self) -> None:
         """
@@ -341,58 +400,6 @@ class Table:
         self._next_id = max_id + 1
 
         return self._next_id
-
-    def _process_docs(self, func, cond=None, doc_ids=None):
-        """
-        Helper function for processing all documents specified by condition
-        or IDs.
-
-        A repeating pattern in TinyDB is to run some code on all documents
-        that match a condition or are specified by their ID. This is
-        implemented in this function.
-        The function passed as ``func`` has to be a callable. Its first
-        argument will be the data currently in the database. Its second
-        argument is the document ID of the currently processed document.
-
-        See: :meth:`~.update`, :meth:`.remove`
-
-        :param func: the function to execute on every included document.
-                     first argument: all data
-                     second argument: the current document ID
-        :param cond: query that matches documents to use, or
-        :param doc_ids: list of document IDs to use
-        :returns: the document IDs that were affected during processing
-        """
-
-        if doc_ids is not None:
-            # Processed document specified by id
-            def updater(table: dict):
-                for doc_id in doc_ids:
-                    func(table, doc_id)
-
-        elif cond is not None:
-            # Collect affected doc_ids
-            doc_ids = []
-
-            def updater(table: dict):
-                # Processed documents specified by condition
-                for doc_id in list(table):
-                    if cond(table[doc_id]):
-                        func(table, doc_id)
-                        doc_ids.append(doc_id)
-
-        else:
-            doc_ids = []
-
-            # Processed documents
-            def updater(table: dict):
-                for doc_id in table:
-                    doc_ids.append(doc_id)
-                    func(table, doc_id)
-
-        self._update(updater)
-
-        return doc_ids
 
     def _read(self) -> Dict[int, Mapping]:
         data = self.storage.read() or {}
