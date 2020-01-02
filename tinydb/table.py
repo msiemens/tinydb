@@ -1,3 +1,8 @@
+"""
+This module implements tables, the central place for accessing and manipulating
+data in TinyDB.
+"""
+
 from typing import (
     Callable,
     Dict,
@@ -10,16 +15,19 @@ from typing import (
     cast
 )
 
-from tinydb import Storage, Query
-from tinydb.utils import LRUCache
+from .storages import Storage
+from .queries import Query
+from .utils import LRUCache
+
+__all__ = ('Document', 'Table')
 
 
 class Document(dict):
     """
-    Represents a document stored in the database.
+    A document stored in the database.
 
-    This is a transparent proxy for database records. It exists
-    to provide a way to access a record's id via ``el.doc_id``.
+    This class provides a way to access both a document's content as well as
+    its ID using ``doc.doc_id``.
     """
 
     def __init__(self, value: Mapping, doc_id: int):
@@ -29,12 +37,44 @@ class Document(dict):
 
 class Table:
     """
-    Represents a single TinyDB Table.
+    Represents a single TinyDB table.
+
+    It provides methods for accessing and manipulating documents.
+
+    .. admonition:: Query Cache
+
+        As an optimization, a query cache is implemented using a
+        :class:`~tinydb.utils.LRUCache`. This class mimics the interface of
+        a normal ``dict``, but starts to remove the least-recently used entries
+        once a threshold is reached.
+
+        The query cache is updated on every search operation. When writing
+        data, the whole cache is discareded as the query results may have
+        changed.
+
+    :param storage: The storage instance to use for this table
+    :param name: The table name
+    :param cache_size: Maximum capacity of query cache
     """
 
+    #: The class used to represent documents
+    #:
+    #: .. versionadded:: 4.0
     document_class = Document
+
+    #: The class used to represent a document ID
+    #:
+    #: .. versionadded:: 4.0
     document_id_class = int
+
+    #: The class used for caching query results
+    #:
+    #: .. versionadded:: 4.0
     query_cache_class = LRUCache
+
+    #: The default capacity of the query cache
+    #:
+    #: .. versionadded:: 4.0
     default_query_cache_capacity = 10
 
     def __init__(
@@ -44,11 +84,7 @@ class Table:
         cache_size: int = default_query_cache_capacity
     ):
         """
-        Get access to a table.
-
-        :param storage: Access to the storage
-        :param name: The table name
-        :param cache_size: Maximum size of query cache.
+        Create a table instance.
         """
 
         self._storage = storage
@@ -62,7 +98,7 @@ class Table:
         args = [
             'name={!r}'.format(self.name),
             'total={}'.format(len(self)),
-            'storage={}'.format(self.storage),
+            'storage={}'.format(self._storage),
         ]
 
         return '<{} {}>'.format(type(self).__name__, ', '.join(args))
@@ -77,7 +113,7 @@ class Table:
     @property
     def storage(self) -> Storage:
         """
-        Get the table storage.
+        Get the table storage instance.
         """
         return self._storage
 
@@ -88,11 +124,23 @@ class Table:
         :param document: the document to insert
         :returns: the inserted document's ID
         """
+
+        # Make sure the document implements the ``Mapping`` interface
         if not isinstance(document, Mapping):
             raise ValueError('Document is not a Mapping')
 
-        doc_id = self.get_next_id()
-        self._update_table(lambda table: table.update({doc_id: dict(document)}))
+        # First, we get the document ID for the new document
+        doc_id = self._get_next_id()
+
+        # Now, we update the table and add the document
+        def updater(table: dict):
+            # By calling ``dict(document)`` we convert the data we got to a
+            # ``dict`` instance even if it was a different class that
+            # implemented the ``Mapping`` interface
+            table[doc_id] = dict(document)
+
+        # See below for details on ``Table._update``
+        self._update_table(updater)
 
         return doc_id
 
@@ -100,21 +148,27 @@ class Table:
         """
         Insert multiple documents into the table.
 
-        :param documents: a list of documents to insert
+        :param documents: a Iterable of documents to insert
         :returns: a list containing the inserted documents' IDs
         """
         doc_ids = []
 
         def updater(table: dict):
             for document in documents:
+                # Make sure the document implements the ``Mapping`` interface
                 if not isinstance(document, Mapping):
                     raise ValueError('Document is not a Mapping')
 
-                doc_id = self.get_next_id()
+                # Get the document ID for this document and store it so we
+                # can return all document IDs later
+                doc_id = self._get_next_id()
                 doc_ids.append(doc_id)
 
+                # Convert the document to a ``dict`` (see Table.insert) and
+                # store it
                 table[doc_id] = dict(document)
 
+        # See below for details on ``Table._update``
         self._update_table(updater)
 
         return doc_ids
@@ -126,6 +180,11 @@ class Table:
         :returns: a list with all documents.
         """
 
+        # iter(self) (implemented in Table.__iter__ provides an iterator
+        # that returns all documents in this table. We use it to get a list
+        # of all documents by using the ``list`` constructor to perform the
+        # conversion.
+
         return list(iter(self))
 
     def search(self, cond: Query) -> List[Document]:
@@ -136,67 +195,68 @@ class Table:
         :returns: list of matching documents
         """
 
+        # First, we check the query cache to see if it has results for this
+        # query
         if cond in self._query_cache:
             docs = self._query_cache.get(cond)
-            if docs is None:
-                return []
+            if docs is not None:
+                return docs[:]
 
-            return docs[:]
-
+        # Perform the search by applying the query to all documents
         docs = [doc for doc in self if cond(doc)]
+
+        # Update the query cache
         self._query_cache[cond] = docs[:]
 
         return docs
 
     def get(
-            self,
-            cond: Optional[Query] = None,
-            doc_id: Optional[int] = None,
+        self,
+        cond: Optional[Query] = None,
+        doc_id: Optional[int] = None,
     ) -> Optional[Document]:
         """
-        Get exactly one document specified by a query or and ID.
+        Get exactly one document specified by a query or a document ID.
 
-        Returns ``None`` if the document doesn't exist
+        Returns ``None`` if the document doesn't exist.
 
         :param cond: the condition to check against
         :param doc_id: the document's ID
 
-        :returns: the document or None
+        :returns: the document or ``None``
         """
-        # Cannot use process_elements here because we want to return a
-        # specific document
 
         if doc_id is not None:
-            # Document specified by ID
+            # Retrieve a document specified by its ID
             table = self._read_table()
             raw_doc = table.get(doc_id, None)
+
             if raw_doc is None:
                 return None
 
+            # Convert the raw data to the document class
             return self.document_class(raw_doc, doc_id)
 
         elif cond is not None:
-            # Document specified by condition
+            # Find a document specified by a query
             for doc in self:
                 if cond(doc):
                     return doc
 
-        else:
-            raise RuntimeError('You have to pass either cond or doc_id')
+            return None
 
-        return None
+        raise RuntimeError('You have to pass either cond or doc_id')
 
     def contains(
-            self,
-            cond: Optional[Query] = None,
-            doc_id: Optional[int] = None,
+        self,
+        cond: Optional[Query] = None,
+        doc_id: Optional[int] = None
     ) -> bool:
         """
-        Check whether the database contains a document matching a condition or
+        Check whether the database contains a document matching a query or
         an ID.
 
-        If ``doc_ids`` is set, it checks if the db contains a document with
-        one of the specified IDs.
+        If ``doc_id`` is set, it checks if the db contains the specified ID.
 
         :param cond: the condition use
         :param doc_id: the document ID to look for
@@ -226,55 +286,85 @@ class Table:
         :param doc_ids: a list of document IDs
         :returns: a list containing the updated document's ID
         """
+
+        # Define the function that will perform the update
         if callable(fields):
             def perform_update(table, doc_id):
+                # Update documents by calling the update function provided by
+                # the user
                 fields(table[doc_id])
         else:
             def perform_update(table, doc_id):
+                # Update documents by setting all fields from the provided data
                 table[doc_id].update(fields)
 
         if doc_ids is not None:
+            # Perform the update operation for documents specified by a list
+            # of document IDs
+
             updated_ids = list(doc_ids)
 
             def updater(table: dict):
+                # Call the processing callback with all document IDs
                 for doc_id in updated_ids:
                     perform_update(table, doc_id)
 
+            # Perform the update operation (see _update_table for details)
             self._update_table(updater)
 
             return updated_ids
 
         elif cond is not None:
+            # Perform the update operation for documents specified by a query
+
+            # Collect affected doc_ids
             updated_ids = []
 
             def updater(table: dict):
                 _cond = cast('Query', cond)
 
+                # We need to convert the keys iterator to a list because
+                # we may remove entries from the ``table`` dict during
+                # iteration and doing this without the list conversion would
+                # result in an exception (RuntimeError: dictionary changed size
+                # during iteration)
                 for doc_id in list(table.keys()):
+                    # Pass through all documents to find documents matching the
+                    # query. Call the processing callback with the document ID
                     if _cond(table[doc_id]):
-                        perform_update(table, doc_id)
+                        # Add ID to list of updated documents
                         updated_ids.append(doc_id)
 
+                        # Perform the update (see above)
+                        perform_update(table, doc_id)
+
+            # Perform the update operation (see _update_table for details)
             self._update_table(updater)
 
             return updated_ids
 
         else:
+            # Update all documents unconditionally
+
             updated_ids = []
 
             def updater(table: dict):
                 # Process all documents
                 for doc_id in list(table.keys()):
+                    # Add ID to list of updated documents
                     updated_ids.append(doc_id)
+
+                    # Perform the update (see above)
                     perform_update(table, doc_id)
 
+            # Perform the update operation (see _update_table for details)
             self._update_table(updater)
 
             return updated_ids
 
     def upsert(self, document: Mapping, cond: Query) -> List[int]:
         """
-        Update a document, if it exist - insert it otherwise.
+        Update a document, if it exist, insert it otherwise.
 
         Note: this will update *all* documents matching the query.
 
@@ -282,12 +372,17 @@ class Table:
         :param cond: which document to look for
         :returns: a list containing the updated document's ID
         """
+
+        # Perform the update operation
         updated_docs = self.update(document, cond)
 
+        # If documents have been updated: return their IDs
         if updated_docs:
             return updated_docs
-        else:
-            return [self.insert(document)]
+
+        # There are no documents that match the specified query -> insert the
+        # data as a new document
+        return [self.insert(document)]
 
     def remove(
         self,
@@ -307,25 +402,48 @@ class Table:
         if cond is not None:
             removed_ids = []
 
+            # This updater function will be called with the table data
+            # as its first argument. See ``Table._update`` for details on this
+            # operation
             def updater(table: dict):
+                # We need to convince MyPy (the static type checker) that
+                # the ``cond is not None`` invariant still holds true when
+                # the updater function is called
                 _cond = cast('Query', cond)
 
+                # We need to convert the keys iterator to a list because
+                # we may remove entries from the ``table`` dict during
+                # iteration and doing this without the list conversion would
+                # result in an exception (RuntimeError: dictionary changed size
+                # during iteration)
                 for doc_id in list(table.keys()):
                     if _cond(table[doc_id]):
+                        # Add document ID to list of removed document IDs
                         removed_ids.append(doc_id)
+
+                        # Remove document from the table
                         table.pop(doc_id)
 
+            # Perform the remove operation
             self._update_table(updater)
 
             return removed_ids
 
         if doc_ids is not None:
+            # This function returns the list of IDs for the documents that have
+            # been removed. When removing documents identified by a set of
+            # document IDs, it's this list of document IDs we need to return
+            # later.
+            # We convert the document ID iterator into a list so we can both
+            # use the document IDs to remove the specified documents as well as
+            # to return the list of affected document IDs
             removed_ids = list(doc_ids)
 
             def updater(table: dict):
                 for doc_id in removed_ids:
                     table.pop(doc_id)
 
+            # Perform the remove operation
             self._update_table(updater)
 
             return removed_ids
@@ -337,12 +455,15 @@ class Table:
         Truncate the table by removing all documents.
         """
 
+        # Update the table by resetting all data
         self._update_table(lambda table: table.clear())
+
+        # Reset document ID counter
         self._next_id = None
 
     def count(self, cond: Query) -> int:
         """
-        Count the documents matching a condition.
+        Count the documents matching a query.
 
         :param cond: the condition use
         """
@@ -352,14 +473,13 @@ class Table:
     def clear_cache(self) -> None:
         """
         Clear the query cache.
-
-        A simple helper that clears the internal query cache.
         """
+
         self._query_cache.clear()
 
     def __len__(self):
         """
-        Get the total number of documents in the table.
+        Count the total number of documents in this table.
         """
 
         # Using self._read_table() will convert all documents into
@@ -373,12 +493,14 @@ class Table:
 
     def __iter__(self) -> Iterator[Document]:
         """
-        Iter over all documents stored in the table.
+        Iterate over all documents stored in the table.
 
         :returns: an iterator over all documents.
         """
 
+        # Iterate all documents and their IDs
         for doc_id, doc in self._read_table().items():
+            # Convert documents to the document class
             yield self.document_class(doc, doc_id)
 
     def _get_next_id(self):
@@ -413,35 +535,75 @@ class Table:
         return self._next_id
 
     def _read_table(self) -> Dict[int, Mapping]:
-        data = self.storage.read() or {}
+        """
+        Read the table data from the underlying storage.
 
-        try:
-            return {
-                self.document_id_class(doc_id): doc
-                for doc_id, doc in data[self.name].items()
-            }
-        except KeyError:
+        Here we read the data from the underlying storage and convert all
+        IDs to the document ID class. Documents themselves are NOT yet
+        transformed into the document class, we may not want to convert
+        *all* documents when returning only one document for example.
+        """
+
+        # Retrieve the tables from the storage
+        tables = self._storage.read()
+
+        if tables is None:
+            # The database is empty
             return {}
 
-    def _update_table(self, updater: Callable[[Dict[int, Mapping]], None]):
-        data = self.storage.read() or {}
-
+        # Retrieve the current table's data
         try:
-            raw_table = data[self.name]
+            table = tables[self.name]
         except KeyError:
-            raw_table = {}
+            # The table does not exist yet, so it is empty
+            return {}
 
-        table = {
+        # Convert all document IDs to the correct document ID class and return
+        # the table data dict
+        return {
             self.document_id_class(doc_id): doc
-            for doc_id, doc in raw_table.items()
+            for doc_id, doc in table.items()
         }
 
+    def _update_table(self, updater: Callable[[Dict[int, Mapping]], None]):
+        """
+        Perform an table update operation.
+
+        The storage interface used by TinyDB only allows to read/write the
+        complete database data, but not modifying only portions of it. Thus
+        to only update portions of the table data, we first perform a read
+        operation, perform the update on the table data and then write
+        the updated data back to the storage.
+
+        As a further optimization, we don't convert the documents into the
+        document class, as the table data will *not* be returned to the user.
+        """
+
+        tables = self._storage.read()
+
+        if tables is None:
+            # The database is empty
+            tables = {}
+
+        try:
+            table = tables[self.name]
+        except KeyError:
+            # The table does not exist yet, so it is empty
+            table = {}
+
+        # Perform the table update operation
         updater(table)
 
-        data[self.name] = {
+        # Convert the document IDs to strings.
+        # This is required as some storages (most notably the JSON
+        # file format) don't require IDs other than strings.
+        tables[self.name] = {
             str(doc_id): doc
             for doc_id, doc in table.items()
         }
 
-        self.storage.write(data)
+        # Write the newly updated data back to the storage
+        self._storage.write(tables)
+
+        # Clear the query cache, as the table contents have changed
         self.clear_cache()
