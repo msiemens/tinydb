@@ -92,7 +92,7 @@ class Table:
             raise ValueError('Document is not a Mapping')
 
         doc_id = self.get_next_id()
-        self._update(lambda table: table.update({doc_id: dict(document)}))
+        self._update_table(lambda table: table.update({doc_id: dict(document)}))
 
         return doc_id
 
@@ -115,7 +115,7 @@ class Table:
 
                 table[doc_id] = dict(document)
 
-        self._update(updater)
+        self._update_table(updater)
 
         return doc_ids
 
@@ -168,7 +168,7 @@ class Table:
 
         if doc_id is not None:
             # Document specified by ID
-            table = self._read()
+            table = self._read_table()
             raw_doc = table.get(doc_id, None)
             if raw_doc is None:
                 return None
@@ -237,7 +237,7 @@ class Table:
                 for doc_id in updated_ids:
                     perform_update(table, doc_id)
 
-            self._update(updater)
+            self._update_table(updater)
 
             return updated_ids
 
@@ -252,7 +252,7 @@ class Table:
                         perform_update(table, doc_id)
                         updated_ids.append(doc_id)
 
-            self._update(updater)
+            self._update_table(updater)
 
             return updated_ids
 
@@ -265,7 +265,7 @@ class Table:
                     updated_ids.append(doc_id)
                     perform_update(table, doc_id)
 
-            self._update(updater)
+            self._update_table(updater)
 
             return updated_ids
 
@@ -312,7 +312,7 @@ class Table:
                         removed_ids.append(doc_id)
                         table.pop(doc_id)
 
-            self._update(updater)
+            self._update_table(updater)
 
             return removed_ids
 
@@ -323,7 +323,7 @@ class Table:
                 for doc_id in removed_ids:
                     table.pop(doc_id)
 
-            self._update(updater)
+            self._update_table(updater)
 
             return removed_ids
 
@@ -334,7 +334,7 @@ class Table:
         Truncate the table by removing all documents.
         """
 
-        self._update(lambda table: table.clear())
+        self._update_table(lambda table: table.clear())
         self._next_id = None
 
     def count(self, cond: Query) -> int:
@@ -358,7 +358,7 @@ class Table:
         """
         Get the total number of documents in the table.
         """
-        return len(self._read())
+        return len(self._read_table())
 
     def __iter__(self) -> Iterator[Document]:
         """
@@ -367,7 +367,7 @@ class Table:
         :returns: an iterator over all documents.
         """
 
-        for doc_id, doc in self._read().items():
+        for doc_id, doc in self._read_table().items():
             yield self.document_class(doc, doc_id)
 
     def _get_next_id(self):
@@ -386,7 +386,7 @@ class Table:
         # of the current table documents
 
         # Read the table documents
-        table = self._read()
+        table = self._read_table()
 
         # If the table is empty, set the initial ID
         if not table:
@@ -401,7 +401,7 @@ class Table:
 
         return self._next_id
 
-    def _read(self) -> Dict[int, Mapping]:
+    def _read_table(self) -> Dict[int, Mapping]:
         data = self.storage.read() or {}
 
         try:
@@ -412,7 +412,7 @@ class Table:
         except KeyError:
             return {}
 
-    def _update(self, updater: Callable[[Dict[int, Mapping]], None]):
+    def _update_table(self, updater: Callable[[Dict[int, Mapping]], None]):
         data = self.storage.read() or {}
 
         try:
