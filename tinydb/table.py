@@ -34,8 +34,14 @@ class Table:
     document_class = Document
     document_id_class = int
     query_cache_class = LRUCache
+    default_query_cache_capacity = 10
 
-    def __init__(self, storage: Storage, name: str, cache_size: int = 10):
+    def __init__(
+        self,
+        storage: Storage,
+        name: str,
+        cache_size: int = default_query_cache_capacity
+    ):
         """
         Get access to a table.
 
