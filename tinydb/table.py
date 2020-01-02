@@ -358,7 +358,15 @@ class Table:
         """
         Get the total number of documents in the table.
         """
-        return len(self._read_table())
+
+        # Using self._read_table() will convert all documents into
+        # the document class. But for counting the number of documents
+        # this conversion is not necessary, thus we read the storage
+        # directly here
+
+        tables = self._storage.read()
+
+        return len(tables[self.name])
 
     def __iter__(self) -> Iterator[Document]:
         """
