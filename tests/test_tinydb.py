@@ -289,8 +289,9 @@ def test_contains(db: TinyDB):
 
 
 def test_contains_ids(db: TinyDB):
-    assert db.contains(doc_ids=[1, 2])
-    assert not db.contains(doc_ids=[88])
+    assert db.contains(doc_id=1)
+    assert db.contains(doc_id=2)
+    assert not db.contains(doc_id=88)
 
 
 def test_get_idempotent(db: TinyDB):
@@ -403,8 +404,9 @@ def test_doc_ids_json(tmpdir):
                                     {'int': 1, 'char': 'b'},
                                     {'int': 1, 'char': 'c'}]) == [1, 2, 3]
 
-        assert _db.contains(doc_ids=[1, 2])
-        assert not _db.contains(doc_ids=[88])
+        assert _db.contains(doc_id=1)
+        assert _db.contains(doc_id=2)
+        assert not _db.contains(doc_id=88)
 
         _db.update({'int': 2}, doc_ids=[1, 2])
         assert _db.count(where('int') == 2) == 2

@@ -189,7 +189,7 @@ class Table:
     def contains(
             self,
             cond: Optional[Query] = None,
-            doc_ids: Optional[Iterable[int]] = None,
+            doc_id: Optional[int] = None,
     ) -> bool:
         """
         Check whether the database contains a document matching a condition or
@@ -199,14 +199,17 @@ class Table:
         one of the specified IDs.
 
         :param cond: the condition use
-        :param doc_ids: the document IDs to look for
+        :param doc_id: the document ID to look for
         """
-        if doc_ids is not None:
+        if doc_id is not None:
             # Documents specified by ID
-            return any(self.get(doc_id=doc_id) for doc_id in doc_ids)
+            return self.get(doc_id=doc_id) is not None
 
-        # Document specified by condition
-        return self.get(cond) is not None
+        elif cond is not None:
+            # Document specified by condition
+            return self.get(cond) is not None
+
+        raise RuntimeError('You have to pass either cond or doc_id')
 
     def update(
         self,
