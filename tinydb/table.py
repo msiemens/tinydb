@@ -55,7 +55,7 @@ class Table:
         self._query_cache = self.query_cache_class(capacity=cache_size) \
             # type: LRUCache[Query, List[Document]]
 
-        self._last_id = self.get_last_id()
+        self._next_id = None
 
     def __repr__(self):
         args = [
@@ -276,7 +276,7 @@ class Table:
         """
 
         self._update(lambda table: table.clear())
-        self._last_id = 0
+        self._next_id = None
 
     def count(self, cond: Query) -> int:
         """
@@ -311,23 +311,36 @@ class Table:
         for doc_id, doc in self._read().items():
             yield self.document_class(doc, doc_id)
 
-    def get_last_id(self) -> int:
-        data = self._read()
-
-        if not data:
-            return 0
-
-        return max(self.document_id_class(i) for i in data)
-
-    def get_next_id(self):
+    def _get_next_id(self):
         """
-        Increment the ID used the last time and return it
+        Return the ID for a newly inserted document.
         """
 
-        current_id = self._last_id + 1
-        self._last_id = current_id
+        # If we already know the next ID
+        if self._next_id is not None:
+            next_id = self._next_id
+            self._next_id = next_id + 1
 
-        return current_id
+            return next_id
+
+        # Determine the next document ID by finding out the max ID value
+        # of the current table documents
+
+        # Read the table documents
+        table = self._read()
+
+        # If the table is empty, set the initial ID
+        if not table:
+            self._next_id = 1  # TODO: change to 0
+
+            return self._next_id
+
+        # Find the maximum ID that is currently in use
+        max_id = max(self.document_id_class(i) for i in table.keys())
+
+        self._next_id = max_id + 1
+
+        return self._next_id
 
     def _process_docs(self, func, cond=None, doc_ids=None):
         """
