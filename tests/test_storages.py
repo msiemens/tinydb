@@ -91,8 +91,9 @@ def test_json_read(tmpdir):
     db.close()
     # Access in read mode
     db = TinyDB(path, storage=JSONStorage, access_mode='r')
+    assert db.get(where('a') == 1) == {'a': 1}  # reading is fine
     with pytest.raises(IOError):
-        db.insert({'c': 1})
+        db.insert({'c': 1})  # writing is not
     db.close()
 
 
