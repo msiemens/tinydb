@@ -79,6 +79,24 @@ def test_json_readwrite(tmpdir):
     db.close()
 
 
+def test_json_read(tmpdir):
+    r"""Open a database only for reading"""
+    path = str(tmpdir.join('test.db'))
+    with pytest.raises(FileNotFoundError):
+        db = TinyDB(path, storage=JSONStorage, access_mode='r')
+    # Create small database
+    db = TinyDB(path, storage=JSONStorage)
+    db.insert({'b': 1})
+    db.insert({'a': 1})
+    db.close()
+    # Access in read mode
+    db = TinyDB(path, storage=JSONStorage, access_mode='r')
+    assert db.get(where('a') == 1) == {'a': 1}  # reading is fine
+    with pytest.raises(IOError):
+        db.insert({'c': 1})  # writing is not
+    db.close()
+
+
 def test_create_dirs():
     temp_dir = tempfile.gettempdir()
 

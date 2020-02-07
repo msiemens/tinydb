@@ -3,6 +3,7 @@ Contains the :class:`base class <tinydb.storages.Storage>` for storages and
 implementations.
 """
 
+import io
 import json
 import os
 from abc import ABC, abstractmethod
@@ -79,25 +80,29 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path: str, create_dirs=False, encoding=None, **kwargs):
+    def __init__(self, path: str, create_dirs=False, encoding=None, access_mode='r+', **kwargs):
         """
         Create a new instance.
 
-        Also creates the storage file, if it doesn't exist.
+        Also creates the storage file, if it doesn't exist and the access mode is appropriate for writing.
 
         :param path: Where to store the JSON data.
+        :param access_mode: mode in which the file is opened (r, r+, w, a, x, b, t, +, U)
+        :type access_mode: str
         """
 
         super().__init__()
 
-        # Create file if not exists
-        touch(path, create_dirs=create_dirs)
-
-        # Store keyword arguments for ``json.dumps``
+        self._mode = access_mode
         self.kwargs = kwargs
 
+        # Create the file if it doesn't exist and creating is allowed by the
+        # access mode
+        if any([character in self._mode for character in ('+', 'w', 'a')]):  # any of the writing modes
+            touch(path, create_dirs=create_dirs)
+
         # Open the file for reading/writing
-        self._handle = open(path, 'r+', encoding=encoding)
+        self._handle = open(path, mode=self._mode, encoding=encoding)
 
     def close(self) -> None:
         self._handle.close()
@@ -126,8 +131,13 @@ class JSONStorage(Storage):
         # Serialize the database state using the user-provided arguments
         serialized = json.dumps(data, **self.kwargs)
 
-        # Write the serialized data to the file and ensure it has been writtens
-        self._handle.write(serialized)
+        # Write the serialized data to the file
+        try:
+            self._handle.write(serialized)
+        except io.UnsupportedOperation:
+            raise IOError('Cannot write to the database. Access mode is "{0}"'.format(self._mode))
+
+        # Ensure the file has been writtens
         self._handle.flush()
         os.fsync(self._handle.fileno())
 
