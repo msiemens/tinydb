@@ -3,6 +3,7 @@ Contains the :class:`base class <tinydb.storages.Storage>` for storages and
 implementations.
 """
 from abc import ABC, abstractmethod
+import io
 import json
 import os
 from typing import Dict, Any, Optional
@@ -66,19 +67,23 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path: str, create_dirs=False, encoding=None, **kwargs):
+    def __init__(self, path: str, create_dirs=False, encoding=None, access_mode='r+', **kwargs):
         """
         Create a new instance.
 
-        Also creates the storage file, if it doesn't exist.
+        Also creates the storage file, if it doesn't exist and the access mode is appropriate for writing.
 
         :param path: Where to store the JSON data.
+        :param access_mode: mode in which the file is opened (r, r+, w, a, x, b, t, +, U)
+        :type access_mode: str
         """
 
         super().__init__()
-        touch(path, create_dirs=create_dirs)  # Create file if not exists
+        self._mode = access_mode
         self.kwargs = kwargs
-        self._handle = open(path, 'r+', encoding=encoding)
+        if any([character in self._mode for character in ('+', 'w', 'a')]):  # any of the writing modes
+            touch(path, create_dirs=create_dirs)  # Create file if not exists
+        self._handle = open(path, mode=self._mode, encoding=encoding)
 
     def close(self) -> None:
         self._handle.close()
@@ -98,7 +103,10 @@ class JSONStorage(Storage):
     def write(self, data: Dict[str, Dict[str, Any]]):
         self._handle.seek(0)
         serialized = json.dumps(data, **self.kwargs)
-        self._handle.write(serialized)
+        try:
+            self._handle.write(serialized)
+        except io.UnsupportedOperation:
+            raise IOError('Cannot write to the database. Access mode is "{0}"'.format(self._mode))
         self._handle.flush()
         os.fsync(self._handle.fileno())
         self._handle.truncate()
