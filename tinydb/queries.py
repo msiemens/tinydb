@@ -17,7 +17,7 @@ False
 """
 
 import re
-from typing import Mapping, Tuple, Callable, Any, Union, List, overload
+from typing import Mapping, Tuple, Callable, Any, Union, List
 
 from .utils import freeze
 
@@ -28,7 +28,7 @@ def is_sequence(obj):
     return hasattr(obj, '__iter__')
 
 
-class QueryImpl:
+class QueryInstance:
     """
     A query instance.
 
@@ -47,7 +47,7 @@ class QueryImpl:
 
     def __init__(self, test: Callable[[Mapping], bool], hashval: Tuple):
         self._test = test
-        self.hashval = hashval
+        self._hash = hashval
 
     def __call__(self, value: Mapping) -> bool:
         """
@@ -62,39 +62,39 @@ class QueryImpl:
         # We calculate the query hash by using the ``hashval`` object which
         # describes this query uniquely so we can calculate a stable hash value
         # by simply hashing it
-        return hash(self.hashval)
+        return hash(self._hash)
 
     def __repr__(self):
-        return 'QueryImpl{}'.format(self.hashval)
+        return 'QueryImpl{}'.format(self._hash)
 
     def __eq__(self, other: object):
-        if isinstance(other, QueryImpl):
-            return self.hashval == other.hashval
+        if isinstance(other, QueryInstance):
+            return self._hash == other._hash
 
         return False
 
     # --- Query modifiers -----------------------------------------------------
 
-    def __and__(self, other: 'QueryImpl') -> 'QueryImpl':
+    def __and__(self, other: 'QueryInstance') -> 'QueryInstance':
         # We use a frozenset for the hash as the AND operation is commutative
         # (a & b == b & a) and the frozenset does not consider the order of
         # elements
-        return QueryImpl(lambda value: self(value) and other(value),
-                         ('and', frozenset([self.hashval, other.hashval])))
+        return QueryInstance(lambda value: self(value) and other(value),
+                             ('and', frozenset([self._hash, other._hash])))
 
-    def __or__(self, other: 'QueryImpl') -> 'QueryImpl':
+    def __or__(self, other: 'QueryInstance') -> 'QueryInstance':
         # We use a frozenset for the hash as the OR operation is commutative
         # (a | b == b | a) and the frozenset does not consider the order of
         # elements
-        return QueryImpl(lambda value: self(value) or other(value),
-                         ('or', frozenset([self.hashval, other.hashval])))
+        return QueryInstance(lambda value: self(value) or other(value),
+                             ('or', frozenset([self._hash, other._hash])))
 
-    def __invert__(self) -> 'QueryImpl':
-        return QueryImpl(lambda value: not self(value),
-                         ('not', self.hashval))
+    def __invert__(self) -> 'QueryInstance':
+        return QueryInstance(lambda value: not self(value),
+                             ('not', self._hash))
 
 
-class Query(QueryImpl):
+class Query(QueryInstance):
     """
     TinyDB Queries.
 
@@ -131,7 +131,7 @@ class Query(QueryImpl):
         # The current path of fields to access when evaluating the object
         self._path = ()
         super().__init__(
-            self._prepare_test(lambda _: True),
+            self._generate_test(lambda _: True),
             ('path', self._path)
         )
 
@@ -151,7 +151,7 @@ class Query(QueryImpl):
         query._path = self._path + (item,)
 
         # ... and update the query hash
-        query.hashval = ('path', query._path)
+        query._hash = ('path', query._path)
 
         return query
 
@@ -159,10 +159,22 @@ class Query(QueryImpl):
         # A different syntax for ``__getattr__``
         return getattr(self, item)
 
-    def _prepare_test(
+    def _generate_test(
             self,
-            test: Callable[[Mapping], bool],
-    ) -> Callable[[Mapping], bool]:
+            test: Callable[[Any], bool],
+            hashval: Tuple,
+    ) -> QueryInstance:
+        """
+        Generate a query based on a test function that first resolves the query
+        path.
+
+        :param test: The test the query executes.
+        :param hashval: The hash of the query.
+        :return: A :class:`~tinydb.queries.QueryInstance` object
+        """
+        if not self._path:
+            raise ValueError('Query has no path')
+
         def runner(value):
             try:
                 # Resolve the path
@@ -171,26 +183,13 @@ class Query(QueryImpl):
             except (KeyError, TypeError):
                 return False
             else:
+                # Perform the specified test
                 return test(value)
 
-        return runner
-
-    def _generate_test(
-            self,
-            test: Callable[[Any], bool],
-            hashval: Tuple,
-    ) -> QueryImpl:
-        """
-        Generate a query based on a test function.
-
-        :param test: The test the query executes.
-        :param hashval: The hash of the query.
-        :return: A :class:`~tinydb.queries.QueryImpl` object
-        """
-        if not self._path:
-            raise ValueError('Query has no path')
-
-        return QueryImpl(self._prepare_test(test), hashval)
+        return QueryInstance(
+            lambda value: runner(value),
+            hashval
+        )
 
     def __eq__(self, rhs: Any):
         """
@@ -200,12 +199,8 @@ class Query(QueryImpl):
 
         :param rhs: The value to compare against
         """
-
-        def test(value):
-            return value == rhs
-
         return self._generate_test(
-            lambda value: test(value),
+            lambda value: value == rhs,
             ('==', self._path, freeze(rhs))
         )
 
@@ -222,7 +217,7 @@ class Query(QueryImpl):
             ('!=', self._path, freeze(rhs))
         )
 
-    def __lt__(self, rhs: Any) -> QueryImpl:
+    def __lt__(self, rhs: Any) -> QueryInstance:
         """
         Test a dict value for being lower than another value.
 
@@ -235,7 +230,7 @@ class Query(QueryImpl):
             ('<', self._path, rhs)
         )
 
-    def __le__(self, rhs: Any) -> QueryImpl:
+    def __le__(self, rhs: Any) -> QueryInstance:
         """
         Test a dict value for being lower than or equal to another value.
 
@@ -248,7 +243,7 @@ class Query(QueryImpl):
             ('<=', self._path, rhs)
         )
 
-    def __gt__(self, rhs: Any) -> QueryImpl:
+    def __gt__(self, rhs: Any) -> QueryInstance:
         """
         Test a dict value for being greater than another value.
 
@@ -261,7 +256,7 @@ class Query(QueryImpl):
             ('>', self._path, rhs)
         )
 
-    def __ge__(self, rhs: Any) -> QueryImpl:
+    def __ge__(self, rhs: Any) -> QueryInstance:
         """
         Test a dict value for being greater than or equal to another value.
 
@@ -274,7 +269,7 @@ class Query(QueryImpl):
             ('>=', self._path, rhs)
         )
 
-    def exists(self) -> QueryImpl:
+    def exists(self) -> QueryInstance:
         """
         Test for a dict where a provided key exists.
 
@@ -285,7 +280,7 @@ class Query(QueryImpl):
             ('exists', self._path)
         )
 
-    def matches(self, regex: str, flags: int = 0) -> QueryImpl:
+    def matches(self, regex: str, flags: int = 0) -> QueryInstance:
         """
         Run a regex test against a dict value (whole string has to match).
 
@@ -299,7 +294,7 @@ class Query(QueryImpl):
             ('matches', self._path, regex)
         )
 
-    def search(self, regex: str, flags: int = 0) -> QueryImpl:
+    def search(self, regex: str, flags: int = 0) -> QueryInstance:
         """
         Run a regex test against a dict value (only substring string has to
         match).
@@ -314,7 +309,7 @@ class Query(QueryImpl):
             ('search', self._path, regex)
         )
 
-    def test(self, func: Callable[[Mapping], bool], *args) -> QueryImpl:
+    def test(self, func: Callable[[Mapping], bool], *args) -> QueryInstance:
         """
         Run a user-defined test function against a dict value.
 
@@ -339,7 +334,7 @@ class Query(QueryImpl):
             ('test', self._path, func, args)
         )
 
-    def any(self, cond: Union[QueryImpl, List[Any]]) -> QueryImpl:
+    def any(self, cond: Union[QueryInstance, List[Any]]) -> QueryInstance:
         """
         Check if a condition is met by any document in a list,
         where a condition can also be a sequence (e.g. list).
@@ -362,19 +357,19 @@ class Query(QueryImpl):
                      in the tested document.
         """
         if callable(cond):
-            def _cmp(value):
+            def test(value):
                 return is_sequence(value) and any(cond(e) for e in value)
 
         else:
-            def _cmp(value):
+            def test(value):
                 return is_sequence(value) and any(e in cond for e in value)
 
         return self._generate_test(
-            lambda value: _cmp(value),
+            lambda value: test(value),
             ('any', self._path, freeze(cond))
         )
 
-    def all(self, cond: Union['QueryImpl', List[Any]]) -> QueryImpl:
+    def all(self, cond: Union['QueryInstance', List[Any]]) -> QueryInstance:
         """
         Check if a condition is met by all documents in a list,
         where a condition can also be a sequence (e.g. list).
@@ -395,19 +390,19 @@ class Query(QueryImpl):
                      which has to be contained in the tested document.
         """
         if callable(cond):
-            def _cmp(value):
+            def test(value):
                 return is_sequence(value) and all(cond(e) for e in value)
 
         else:
-            def _cmp(value):
+            def test(value):
                 return is_sequence(value) and all(e in value for e in cond)
 
         return self._generate_test(
-            lambda value: _cmp(value),
+            lambda value: test(value),
             ('all', self._path, freeze(cond))
         )
 
-    def one_of(self, items: List[Any]) -> QueryImpl:
+    def one_of(self, items: List[Any]) -> QueryInstance:
         """
         Check if the value is contained in a list or generator.
 
