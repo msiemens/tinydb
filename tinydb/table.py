@@ -590,10 +590,10 @@ class Table:
             tables = {}
 
         try:
-            table = tables[self.name]
+            raw_table = tables[self.name]
         except KeyError:
             # The table does not exist yet, so it is empty
-            table = {}
+            raw_table = {}
 
         # Convert the document IDs to the document ID class.
         # This is required as the rest of TinyDB expects the document IDs
@@ -601,7 +601,7 @@ class Table:
         # might convert dict keys to strings.
         table = {
             self.document_id_class(doc_id): doc
-            for doc_id, doc in table.items()
+            for doc_id, doc in raw_table.items()
         }
 
         # Perform the table update operation
