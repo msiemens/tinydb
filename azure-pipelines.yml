@@ -43,7 +43,7 @@ steps:
     PATH=$HOME/.poetry/bin:$PATH poetry run pip install pytest-mypy
     PATH=$HOME/.poetry/bin:$PATH poetry run pytest --mypy -m mypy tinydb tests
   displayName: 'Perform type check'
-  condition: and(succeeded(), ne('$(python.version)', 'pypy3'))
+  condition: and(succeeded(), ne('$[python.version]', 'pypy3'))
 
 - script: |
     PATH=$HOME/.poetry/bin:$PATH poetry build
