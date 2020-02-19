@@ -155,6 +155,7 @@ def test_regex():
     assert query({'val': 'ab3'})
     assert not query({'val': 'abc'})
     assert not query({'val': ''})
+    assert not query({'val': True})
     assert not query({'': None})
     assert hash(query)
 
@@ -162,6 +163,7 @@ def test_regex():
     assert query({'val': 'john'})
     assert query({'val': 'xJohNx'})
     assert not query({'val': 'JOH'})
+    assert not query({'val': 12})
     assert not query({'': None})
     assert hash(query)
 

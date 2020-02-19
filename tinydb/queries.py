@@ -289,10 +289,13 @@ class Query(QueryInstance):
         :param regex: The regular expression to use for matching
         :param flags: regex flags to pass to ``re.match``
         """
-        return self._generate_test(
-            lambda value: re.match(regex, value, flags) is not None,
-            ('matches', self._path, regex)
-        )
+        def test(value):
+            if not isinstance(value, str):
+                return False
+
+            return re.match(regex, value, flags) is not None
+
+        return self._generate_test(test, ('matches', self._path, regex))
 
     def search(self, regex: str, flags: int = 0) -> QueryInstance:
         """
@@ -304,10 +307,14 @@ class Query(QueryInstance):
         :param regex: The regular expression to use for matching
         :param flags: regex flags to pass to ``re.match``
         """
-        return self._generate_test(
-            lambda value: re.search(regex, value, flags) is not None,
-            ('search', self._path, regex)
-        )
+
+        def test(value):
+            if not isinstance(value, str):
+                return False
+
+            return re.search(regex, value, flags) is not None
+
+        return self._generate_test(test, ('search', self._path, regex))
 
     def test(self, func: Callable[[Mapping], bool], *args) -> QueryInstance:
         """
