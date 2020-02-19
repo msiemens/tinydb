@@ -25,10 +25,10 @@ def touch(path: str, create_dirs: bool):
         if not os.path.exists(base_dir):
             os.makedirs(base_dir)
 
-    # Create the file if it's missing
-    if not os.path.exists(path):
-        with open(path, 'a'):
-            os.utime(path, None)
+    # Create the file by opening it in 'a' mode which creates the file if it
+    # does not exist yet but does not modify its contents
+    with open(path, 'a'):
+        pass
 
 
 class Storage(ABC):
