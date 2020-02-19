@@ -489,7 +489,10 @@ class Table:
 
         tables = self._storage.read()
 
-        return len(tables[self.name])
+        try:
+            return len(tables[self.name])
+        except KeyError:
+            return 0
 
     def __iter__(self) -> Iterator[Document]:
         """
