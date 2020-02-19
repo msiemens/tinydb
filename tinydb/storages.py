@@ -2,21 +2,33 @@
 Contains the :class:`base class <tinydb.storages.Storage>` for storages and
 implementations.
 """
-from abc import ABC, abstractmethod
+
 import json
 import os
+from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
+__all__ = ('Storage', 'JSONStorage', 'MemoryStorage')
 
-def touch(fname, create_dirs):
+
+def touch(path: str, create_dirs: bool):
+    """
+    Create a file if it doesn't exist yet.
+
+    :param path: The file to create.
+    :param create_dirs: Whether to create all missing parent directories.
+    """
     if create_dirs:
-        base_dir = os.path.dirname(fname)
+        base_dir = os.path.dirname(path)
+
+        # Check if we need to create missing parent directories
         if not os.path.exists(base_dir):
             os.makedirs(base_dir)
 
-    if not os.path.exists(fname):
-        with open(fname, 'a'):
-            os.utime(fname, None)
+    # Create the file if it's missing
+    if not os.path.exists(path):
+        with open(path, 'a'):
+            os.utime(path, None)
 
 
 class Storage(ABC):
@@ -33,9 +45,10 @@ class Storage(ABC):
     @abstractmethod
     def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
         """
-        Read the last stored state.
+        Read the current state.
 
         Any kind of deserialization should go here.
+
         Return ``None`` here to indicate that the storage is empty.
         """
 
@@ -76,31 +89,50 @@ class JSONStorage(Storage):
         """
 
         super().__init__()
-        touch(path, create_dirs=create_dirs)  # Create file if not exists
+
+        # Create file if not exists
+        touch(path, create_dirs=create_dirs)
+
+        # Store keyword arguments for ``json.dumps``
         self.kwargs = kwargs
+
+        # Open the file for reading/writing
         self._handle = open(path, 'r+', encoding=encoding)
 
     def close(self) -> None:
         self._handle.close()
 
     def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
-        # Get the file size
+        # Get the file size by moving the cursor to the file end and reading
+        # its location
         self._handle.seek(0, os.SEEK_END)
         size = self._handle.tell()
 
         if not size:
-            # File is empty
+            # File is empty so we return ``None`` so TinyDB can properly
+            # initialize the database
             return None
         else:
+            # Return the cursor to the beginning of the file
             self._handle.seek(0)
+
+            # Load the JSON contents of the file
             return json.load(self._handle)
 
     def write(self, data: Dict[str, Dict[str, Any]]):
+        # Move the cursor to the beginning of the file just in case
         self._handle.seek(0)
+
+        # Serialize the database state using the user-provided arguments
         serialized = json.dumps(data, **self.kwargs)
+
+        # Write the serialized data to the file and ensure it has been writtens
         self._handle.write(serialized)
         self._handle.flush()
         os.fsync(self._handle.fileno())
+
+        # Remove data that is behind the new cursor in case the file has
+        # gotten shorter
         self._handle.truncate()
 
 

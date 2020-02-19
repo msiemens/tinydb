@@ -1,3 +1,14 @@
+"""
+A collection of update operations for TinyDB.
+
+They are used for updates like this:
+
+>>> db.update(delete('foo'), where('foo') == 2
+
+This would delete the ``foo`` field from all documents where ``foo`` equals 2.
+"""
+
+
 def delete(field):
     """
     Delete a given field from the document.
@@ -10,7 +21,7 @@ def delete(field):
 
 def add(field, n):
     """
-    Add n to a given field in the document.
+    Add ``n`` to a given field in the document.
     """
     def transform(doc):
         doc[field] += n
@@ -20,7 +31,7 @@ def add(field, n):
 
 def subtract(field, n):
     """
-    Subtract n from a given field in the document.
+    Substract ``n`` to a given field in the document.
     """
     def transform(doc):
         doc[field] -= n
@@ -30,7 +41,7 @@ def subtract(field, n):
 
 def set(field, val):
     """
-    Set a given field to val.
+    Set a given field to ``val``.
     """
     def transform(doc):
         doc[field] = val
@@ -40,7 +51,7 @@ def set(field, val):
 
 def increment(field):
     """
-    Increment a given field in the document.
+    Increment a given field in the document by 1.
     """
     def transform(doc):
         doc[field] += 1
@@ -50,7 +61,7 @@ def increment(field):
 
 def decrement(field):
     """
-    Decrement a given field in the document.
+    Decrement a given field in the document by 1.
     """
     def transform(doc):
         doc[field] -= 1

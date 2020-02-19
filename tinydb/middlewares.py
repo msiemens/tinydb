@@ -2,7 +2,6 @@
 Contains the :class:`base class <tinydb.middlewares.Middleware>` for
 middlewares and implementations.
 """
-from tinydb import Storage
 
 
 class Middleware:
@@ -12,10 +11,8 @@ class Middleware:
     Middlewares hook into the read/write process of TinyDB allowing you to
     extend the behaviour by adding caching, logging, ...
 
-    Your middleware's ``__init__`` method has to accept exactly one
-    argument which is the class of the "real" storage. It has to be stored as
-    ``_storage_cls`` (see :class:`~tinydb.middlewares.CachingMiddleware` for an
-    example).
+    Your middleware's ``__init__`` method has to call the parent class
+    constructor so the middleware chain can be configured properly.
     """
 
     def __init__(self, storage_cls):
@@ -30,7 +27,7 @@ class Middleware:
 
             TinyDB(storage=StorageClass)
 
-        The storage kwarg is used by TinyDB this way::
+        The storage keyword argument is used by TinyDB this way::
 
             self.storage = storage(*args, **kwargs)
 
@@ -86,20 +83,27 @@ class CachingMiddleware(Middleware):
     WRITE_CACHE_SIZE = 1000
 
     def __init__(self, storage_cls):
+        # Initialize the parent constructor
         super().__init__(storage_cls)
 
+        # Prepare the cache
         self.cache = None
         self._cache_modified_count = 0
 
     def read(self):
         if self.cache is None:
+            # Empty cache: read from the storage
             self.cache = self.storage.read()
+
+        # Return the cached data
         return self.cache
 
     def write(self, data):
+        # Store data in cache
         self.cache = data
         self._cache_modified_count += 1
 
+        # Check if we need to flush the cache
         if self._cache_modified_count >= self.WRITE_CACHE_SIZE:
             self.flush()
 
@@ -108,9 +112,13 @@ class CachingMiddleware(Middleware):
         Flush all unwritten data to disk.
         """
         if self._cache_modified_count > 0:
+            # Force-flush the cache by writing the data to the storage
             self.storage.write(self.cache)
             self._cache_modified_count = 0
 
     def close(self):
-        self.flush()  # Flush potentially unwritten data
+        # Flush potentially unwritten data
+        self.flush()
+
+        # Let the storage clean up too
         self.storage.close()
