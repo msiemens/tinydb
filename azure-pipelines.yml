@@ -32,6 +32,7 @@ steps:
     curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
     PATH=$HOME/.poetry/bin:$PATH poetry self:update --preview
     PATH=$HOME/.poetry/bin:$PATH poetry install -E ci
+    PATH=$HOME/.poetry/bin:$PATH poetry run pip install pytest-mypy
   displayName: 'Install dependencies'
 
 - script: |
