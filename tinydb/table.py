@@ -595,12 +595,21 @@ class Table:
             # The table does not exist yet, so it is empty
             table = {}
 
+        # Convert the document IDs to the document ID class.
+        # This is required as the rest of TinyDB expects the document IDs
+        # to be an instance of ``self.document_id_class`` but the storage
+        # might convert dict keys to strings.
+        table = {
+            self.document_id_class(doc_id): doc
+            for doc_id, doc in table.items()
+        }
+
         # Perform the table update operation
         updater(table)
 
-        # Convert the document IDs to strings.
-        # This is required as some storages (most notably the JSON
-        # file format) don't require IDs other than strings.
+        # Convert the document IDs back to strings.
+        # This is required as some storages (most notably the JSON file format)
+        # don't require IDs other than strings.
         tables[self.name] = {
             str(doc_id): doc
             for doc_id, doc in table.items()
