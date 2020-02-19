@@ -49,6 +49,7 @@ pytest = "^5.2.2"
 pytest-codestyle = "^1.4.0"
 pytest-cov = "^2.8.1"
 pycodestyle = "^2.5.0"
+sphinx = "^2.2.1"
 
 [tool.poetry.extras]
 ci = ["pyyaml", "pytest-azurepipelines", "coveralls"]
