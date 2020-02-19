@@ -384,7 +384,7 @@ def test_lastid_after_open(tmpdir):
         _db.insert_multiple({'i': i} for i in range(NUM))
 
     with TinyDB(path) as _db:
-        assert _db._next_id - 1 == NUM
+        assert _db._get_next_id() - 1 == NUM
 
 
 def test_doc_ids_json(tmpdir):

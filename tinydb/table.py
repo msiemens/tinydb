@@ -523,9 +523,10 @@ class Table:
 
         # If the table is empty, set the initial ID
         if not table:
-            self._next_id = 1  # TODO: change to 0
+            next_id = 1
+            self._next_id = next_id + 1
 
-            return self._next_id
+            return next_id
 
         # Find the maximum ID that is currently in use
         max_id = max(self.document_id_class(i) for i in table.keys())

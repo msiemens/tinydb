@@ -4,6 +4,14 @@ import re
 from tinydb import where
 
 
+def test_next_id(db):
+    db.truncate()
+
+    assert db._get_next_id() == 1
+    assert db._get_next_id() == 2
+    assert db._get_next_id() == 3
+
+
 def test_tables_list(db):
     db.table('table1').insert({'a': 1})
     db.table('table2').insert({'a': 1})
@@ -116,3 +124,8 @@ def test_table_repr(db):
         r"<Table name=\'table4\', total=0, "
         r"storage=<tinydb\.storages\.MemoryStorage object at [a-zA-Z0-9]+>>",
         repr(table))
+
+
+def test_truncate_table(db):
+    db.truncate()
+    assert db._get_next_id() == 1
