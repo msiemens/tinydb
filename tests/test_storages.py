@@ -159,15 +159,15 @@ def test_read_once():
 
         db.table(db.default_table_name)
 
-        assert count == 1
+        assert count == 0
 
         db.all()
 
-        assert count == 2
+        assert count == 1
 
         db.insert({'foo': 'bar'})
 
-        assert count == 3
+        assert count == 3  # One for getting the next ID, one for the insert
 
         db.all()
 
