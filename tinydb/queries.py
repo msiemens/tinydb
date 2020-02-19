@@ -33,9 +33,9 @@ class QueryInstance:
     A query instance.
 
     This is the object on which the actual query operations are performed. The
-    ``Query`` class acts like a query builder and generates ``QueryInstance``
-    objects which will evaluate their query against a given document when
-    called.
+    :class:`~tinydb.queries.Query` class acts like a query builder and
+    generates :class:`~tinydb.queries.QueryInstance` objects which will
+    evaluate their query against a given document when called.
 
     Query instances can be combined using logical OR and AND and inverted using
     logical NOT.
