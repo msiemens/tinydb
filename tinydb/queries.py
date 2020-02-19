@@ -130,9 +130,14 @@ class Query(QueryInstance):
     def __init__(self):
         # The current path of fields to access when evaluating the object
         self._path = ()
+
+        # Prevent empty queries to be evaluated
+        def notest(_):
+            raise RuntimeError('Empty query was evaluated')
+
         super().__init__(
-            self._generate_test(lambda _: True),
-            ('path', self._path)
+            test=notest,
+            hashval=(None,)
         )
 
     def __repr__(self):

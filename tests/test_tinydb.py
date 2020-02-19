@@ -255,16 +255,16 @@ def test_search(db: TinyDB):
 
 def test_search_path(db: TinyDB):
     assert not db._query_cache
-    assert len(db.search(where('int'))) == 3
+    assert len(db.search(where('int').exists())) == 3
     assert len(db._query_cache) == 1
 
-    assert len(db.search(where('asd'))) == 0
-    assert len(db.search(where('int'))) == 3  # Query result from cache
+    assert len(db.search(where('asd').exists())) == 0
+    assert len(db.search(where('int').exists())) == 3  # Query result from cache
 
 
 def test_search_no_results_cache(db: TinyDB):
-    assert len(db.search(where('missing'))) == 0
-    assert len(db.search(where('missing'))) == 0
+    assert len(db.search(where('missing').exists())) == 0
+    assert len(db.search(where('missing').exists())) == 0
 
 
 def test_get(db: TinyDB):

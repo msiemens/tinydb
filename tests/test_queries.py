@@ -8,16 +8,16 @@ def test_no_path():
         _ = Query() == 2
 
 
-def test_path_only():
-    query = Query()['value']
-    assert query == where('value')
+def test_path_exists():
+    query = Query()['value'].exists()
+    assert query == where('value').exists()
     assert query({'value': 1})
     assert not query({'something': 1})
     assert hash(query)
     assert hash(query) != hash(where('asd'))
 
-    query = Query()['value']['val']
-    assert query == where('value')['val']
+    query = Query()['value']['val'].exists()
+    assert query == where('value')['val'].exists()
     assert query({'value': {'val': 2}})
     assert not query({'value': 1})
     assert not query({'value': {'asd': 1}})
@@ -27,7 +27,7 @@ def test_path_only():
 
 
 def test_path_and():
-    query = Query()['value'] & (Query()['value'] == 5)
+    query = Query()['value'].exists() & (Query()['value'] == 5)
     assert query({'value': 5})
     assert not query({'value': 10})
     assert not query({'something': 1})
