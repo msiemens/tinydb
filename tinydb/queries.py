@@ -30,12 +30,19 @@ def is_sequence(obj):
 
 class QueryImpl:
     """
-    A query implementation.
+    A query instance.
 
-    This query implementation wraps a test function which is run when the
-    query is evaluated by calling the object.
+    This is the object on which the actual query operations are performed. The
+    ``Query`` class acts like a query builder and generates ``QueryInstance``
+    objects which will evaluate their query against a given document when
+    called.
 
-    Queries can be combined with logical and/or and modified with logical not.
+    Query instances can be combined using logical OR and AND and inverted using
+    logical NOT.
+
+    In order to be usable in a query cache, a query needs to have a stable hash
+    value with the same query always returning the same hash. That way a query
+    instance can be used as a key in a dictionary.
     """
 
     def __init__(self, test: Callable[[Mapping], bool], hashval: Tuple):
@@ -43,9 +50,18 @@ class QueryImpl:
         self.hashval = hashval
 
     def __call__(self, value: Mapping) -> bool:
+        """
+        Evaluate the query to check if it matches a specified value.
+
+        :param value: The value to check.
+        :return: Wether the value matchs this query.
+        """
         return self._test(value)
 
     def __hash__(self):
+        # We calculate the query hash by using the ``hashval`` object which
+        # describes this query uniquely so we can calculate a stable hash value
+        # by simply hashing it
         return hash(self.hashval)
 
     def __repr__(self):
@@ -61,13 +77,15 @@ class QueryImpl:
 
     def __and__(self, other: 'QueryImpl') -> 'QueryImpl':
         # We use a frozenset for the hash as the AND operation is commutative
-        # (a & b == b & a)
+        # (a & b == b & a) and the frozenset does not consider the order of
+        # elements
         return QueryImpl(lambda value: self(value) and other(value),
                          ('and', frozenset([self.hashval, other.hashval])))
 
     def __or__(self, other: 'QueryImpl') -> 'QueryImpl':
         # We use a frozenset for the hash as the OR operation is commutative
-        # (a | b == b | a)
+        # (a | b == b | a) and the frozenset does not consider the order of
+        # elements
         return QueryImpl(lambda value: self(value) or other(value),
                          ('or', frozenset([self.hashval, other.hashval])))
 
@@ -110,6 +128,7 @@ class Query(QueryImpl):
     """
 
     def __init__(self):
+        # The current path of fields to access when evaluating the object
         self._path = ()
         super().__init__(
             self._prepare_test(lambda _: True),
@@ -123,13 +142,21 @@ class Query(QueryImpl):
         return super().__hash__()
 
     def __getattr__(self, item: str):
+        # Generate a new query object with the new query path
+        # We use type(self) to get the class of the current query in case
+        # someone uses a subclass of ``Query``
         query = type(self)()
+
+        # Now we add the accessed item to the query path ...
         query._path = self._path + (item,)
+
+        # ... and update the query hash
         query.hashval = ('path', query._path)
 
         return query
 
     def __getitem__(self, item: str):
+        # A different syntax for ``__getattr__``
         return getattr(self, item)
 
     def _prepare_test(
@@ -296,6 +323,13 @@ class Query(QueryImpl):
         ...
         >>> Query().f1.test(test_func)
 
+        .. warning::
+
+            The test fuction provided needs to be deterministic (returning the
+            same value when provided with the same arguments), otherwise this
+            may mess up the query cache that :class:`~tinydb.table.Table`
+            implements.
+
         :param func: The function to call, passing the dict as the first
                      argument
         :param args: Additional arguments to pass to the test function
@@ -388,4 +422,7 @@ class Query(QueryImpl):
 
 
 def where(key: str) -> Query:
+    """
+    A shorthand for ``Query()[key]``
+    """
     return Query()[key]
