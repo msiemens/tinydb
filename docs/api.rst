@@ -6,19 +6,21 @@ API Documentation
 
 .. autoclass:: tinydb.database.TinyDB
     :members:
-    :special-members:
-    :exclude-members: __dict__, __weakref__
+    :private-members:
     :member-order: bysource
+
+``tinydb.table``
+----------------
 
 .. _table_api:
 
-.. autoclass:: tinydb.database.Table
+.. autoclass:: tinydb.table.Table
     :members:
     :special-members:
     :exclude-members: __dict__, __weakref__
     :member-order: bysource
 
-.. autoclass:: tinydb.database.Document
+.. autoclass:: tinydb.table.Document
     :members:
     :special-members:
     :exclude-members: __dict__, __weakref__
@@ -28,12 +30,25 @@ API Documentation
 
         The document's id
 
-.. autoclass:: tinydb.database.Element
-
 ``tinydb.queries``
 ------------------
 
 .. autoclass:: tinydb.queries.Query
+    :members:
+    :special-members:
+    :exclude-members: __weakref__
+    :member-order: bysource
+
+.. autoclass:: tinydb.queries.QueryInstance
+    :members:
+    :special-members:
+    :exclude-members: __weakref__
+    :member-order: bysource
+
+``tinydb.operations``
+---------------------
+
+.. automodule:: tinydb.operations
     :members:
     :special-members:
     :exclude-members: __weakref__
@@ -101,3 +116,10 @@ API Documentation
         .. method:: close()
 
             Optional: Close open file handles, etc.
+
+``tinydb.utils``
+----------------
+
+.. autoclass:: tinydb.utils.LRUCache
+    :members:
+    :special-members:
