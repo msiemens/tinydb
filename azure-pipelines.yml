@@ -27,14 +27,12 @@ steps:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
-
 - script: |
     python -m pip install --upgrade pip
     pip install -U twine
     curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
     PATH=$HOME/.poetry/bin:$PATH poetry self:update --preview
     PATH=$HOME/.poetry/bin:$PATH poetry install -E ci
-    PATH=$HOME/.poetry/bin:$PATH poetry run pip install pytest-mypy
   displayName: 'Install dependencies'
 
 - script: |
@@ -42,8 +40,10 @@ steps:
   displayName: 'Run tests'
 
 - script: |
+    PATH=$HOME/.poetry/bin:$PATH poetry run pip install pytest-mypy
     PATH=$HOME/.poetry/bin:$PATH poetry run pytest --mypy -m mypy tinydb tests
   displayName: 'Perform type check'
+  condition: and(succeeded(), ne('$(python.version)', 'pypy3'))
 
 - script: |
     PATH=$HOME/.poetry/bin:$PATH poetry build
