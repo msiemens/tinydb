@@ -12,6 +12,53 @@ unreleased
 
 - *nothing yet*
 
+v4.0.0 (not released yet)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Breaking Changes
+----------------
+
+- Python 2 support has been removed, see `issue 284
+  <https://github.com/msiemens/tinydb/issues/284>`_
+  for background
+- API changes:
+    - Removed classes: ``DataProxy``, ``StorageProxy``
+    - Attributes removed from ``TinyDB``: ``DEFAULT_TABLE``,
+      ``DEFAULT_TABLE_KWARGS``, ``DEFAULT_STORAGE``, removed in favor of
+      customizing ``TinyDB``'s behavior by subclassing it and overloading
+      ``__init__(...)`` and ``table(...)``
+    - ``TinyDB.contains(...)``'s ``doc_ids`` parameter has been renamed to
+      ``doc_id`` and now only takes a single document ID
+    - ``TinyDB.purge_tables(...)`` has been renamed to ``TinyDB.drop_tables(...)``
+    - ``TinyDB.purge_table(...)`` has been renamed to ``TinyDB.drop_table(...)``
+    - ``TinyDB.process_elements(...)`` has been removed
+    - ``Table.purge()`` has been renamed to ``Table.trunacte()``
+- ``ujson`` support has been removed, see `issue 263
+  <https://github.com/msiemens/tinydb/issues/263>`_ and `issue 306
+  <https://github.com/msiemens/tinydb/issues/306>`_ for background
+- The deprecated Element ID API has been removed (e.g. using the ``Element``
+  class or ``eids`` parameter) in favor the Document API, see
+  `pull request 158 <https://github.com/msiemens/tinydb/pull/158>`_ for details
+  on the replacement
+
+Improvements
+------------
+
+- TinyDB's internal architecture has been reworked to be more simple and
+  streamlined in order to make it easier to customize TinyDB's behavior
+- With the new architecture, TinyDB performance will improve for many
+  applications
+
+Bugfixes
+--------
+
+- Don't break the tests when ``ujson`` is installed (see `issue 262
+  <https://github.com/msiemens/tinydb/issues/262>`_)
+- Fix performance when reading data (see `issue 250
+  <https://github.com/msiemens/tinydb/issues/250>`_)
+- Fix inconsistent purge function names (see `issue 103
+  <https://github.com/msiemens/tinydb/issues/103>`_)
+
 v3.15.1 (2019-10-26)
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -38,7 +85,7 @@ v3.14.0 (2019-06-18)
 ^^^^^^^^^^^^^^^^^^^^
 
 - Change: support for ``ujson`` is now deprecated
-  (see `issue 258 <https://github.com/msiemens/tinydb/issues/263>`_)
+  (see `issue 263 <https://github.com/msiemens/tinydb/issues/263>`_)
 
 v3.13.0 (2019-03-16)
 ^^^^^^^^^^^^^^^^^^^^
