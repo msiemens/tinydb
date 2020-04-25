@@ -23,10 +23,8 @@ small apps that would be blown away by a SQL-DB or an external database server.
 
 TinyDB is:
 
-- **tiny:** The current source code has 1600 lines of code (with about 33%
-  documentation) and 1800 lines of tests. For comparison: Buzhug_ has about 2500
-  lines of code (w/o tests), CodernityDB_ has about 7000 lines of code
-  (w/o tests).
+- **tiny:** The current source code has 1800 lines of code (with about 40%
+  documentation) and 1600 lines tests.
 
 - **document oriented:** Like MongoDB_, you can store any document
   (represented as ``dict``) in TinyDB.
@@ -35,11 +33,11 @@ TinyDB is:
   fun to use by providing a simple and clean API.
 
 - **written in pure Python:** TinyDB neither needs an external server (as
-  e.g. `PyMongo <http://api.mongodb.org/python/current/>`_) nor any dependencies
+  e.g. `PyMongo <https://api.mongodb.org/python/current/>`_) nor any dependencies
   from PyPI.
 
-- **works on Python 2.7 and 3.3 – 3.7 and PyPy:** TinyDB works on all modern
-  versions of Python and PyPy.
+- **works on Python 3.5+ and PyPy:** TinyDB works on all modern versions of Python
+  and PyPy.
 
 - **powerfully extensible:** You can easily extend TinyDB by writing new
   storages or modify the behaviour of storages with Middlewares.
@@ -54,7 +52,7 @@ projects on the `discussion forum <http://forum.m-siemens.de/.>`_.
 Supported Python Versions
 *************************
 
-TinyDB has been tested with Python 2.7, 3.3 - 3.6 and PyPy.
+TinyDB has been tested with Python 3.5 - 3.8 and PyPy.
 
 Example Code
 ************

@@ -339,27 +339,6 @@ In a similar manner you can look up the number of documents matching a query:
 >>> db.count(User.name == 'John')
 2
 
-Replacing data
-..............
-
-Another occasionally useful operation is to replace a list of documents. If you
-have a list of documents with IDs (see document_ids_), you can pass them to
-``db.write_back(list)``:
-
->>> docs = db.search(User.name == 'John')
-[{name: 'John', age: 12}, {name: 'John', age: 44}]
->>> for doc in docs:
-...     doc['name'] = 'Jane'
->>> db.write_back(docs)  # Will update the documents we retrieved
->>> docs = db.search(User.name == 'John')
-[]
->>> docs = db.search(User.name == 'Jane')
-[{name: 'Jane', age: 12}, {name: 'Jane', age: 44}]
-
-Alternatively you can pass a list of documents along with a list of document IDs
-to achieve the same goal. In this case, the length of the document list and the
-ID list has to be equal.
-
 Recap
 ^^^^^
 
@@ -373,8 +352,6 @@ Let's summarize the ways to handle data:
 | **Updating data**                                                                             |
 +-------------------------------+---------------------------------------------------------------+
 | ``db.update(operation, ...)`` | Update all matching documents with a special operation        |
-+-------------------------------+---------------------------------------------------------------+
-| ``db.write_back(docs)``       | Replace all documents with the updated versions               |
 +-------------------------------+---------------------------------------------------------------+
 | **Retrieving data**                                                                           |
 +-------------------------------+---------------------------------------------------------------+

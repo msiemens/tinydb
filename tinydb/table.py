@@ -52,6 +52,22 @@ class Table:
         data, the whole cache is discareded as the query results may have
         changed.
 
+    .. admonition:: Customization
+
+        For customization, the following class variables can be set:
+
+        - ``document_class`` defines the class that is used to represent
+          documents,
+        - ``document_id_class`` defines the class that is used to represent
+          document IDs,
+        - ``query_cache_class`` defines the class that is used for the query
+          cache
+        - ``default_query_cache_capacity`` defines the default capacity of
+          the query cache
+
+        .. versionadded:: 4.0
+
+
     :param storage: The storage instance to use for this table
     :param name: The table name
     :param cache_size: Maximum capacity of query cache

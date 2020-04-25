@@ -3,30 +3,24 @@ How to Extend TinyDB
 
 There are three main ways to extend TinyDB and modify its behaviour:
 
-1. custom storage,
-2. custom middleware, and
-3. custom table classes.
+1. custom storages,
+2. custom middlewares,
+3. use hooks and overrides, and
+4. subclassing ``TinyDB`` and ``Table``.
 
 Let's look at them in this order.
 
-Write Custom Storage
+Write a Custom Storage
 ----------------------
 
-First, we have support for custom storage. By default TinyDB comes with an
-in-memory storage mechanism and a JSON file storage mechanism. But of course you can add your own.
+First, we have support for custom storages. By default TinyDB comes with an
+in-memory storage and a JSON file storage. But of course you can add your own.
 Let's look how you could add a `YAML <http://yaml.org/>`_ storage using
 `PyYAML <http://pyyaml.org/wiki/PyYAML>`_:
 
 .. code-block:: python
 
     import yaml
-
-    def represent_doc(dumper, data):
-        # Represent `Document` objects as their dict's string representation
-        # which PyYAML understands
-        return dumper.represent_data(dict(data))
-
-    yaml.add_representer(Document, represent_doc)
 
     class YAMLStorage(Storage):
         def __init__(self, filename):  # (1)
@@ -41,7 +35,7 @@ Let's look how you could add a `YAML <http://yaml.org/>`_ storage using
                     return None  # (3)
 
         def write(self, data):
-            with open(self.filename, 'w') as handle:
+            with open(self.filename, 'w+') as handle:
                 yaml.dump(data, handle)
 
         def close(self):  # (4)
@@ -79,9 +73,9 @@ Finally, using the YAML storage is very straight-forward:
 Write Custom Middleware
 -------------------------
 
-Sometimes you don't want to write a new storage module but rather modify the behaviour
-of an existing one. As an example we'll build middleware that filters out
-any empty items.
+Sometimes you don't want to write a new storage module but rather modify the
+behaviour of an existing one. As an example we'll build middleware that filters
+out empty items.
 
 Because middleware acts as a wrapper around a storage, they needs a ``read()``
 and a ``write(data)`` method. In addition, they can access the underlying storage
@@ -110,34 +104,34 @@ Now let's implement that:
 .. code-block:: python
 
     class RemoveEmptyItemsMiddleware(Middleware):
-        def __init__(self, storage_cls=TinyDB.DEFAULT_STORAGE):
+        def __init__(self, storage_cls):
             # Any middleware *has* to call the super constructor
             # with storage_cls
-            super(CustomMiddleware, self).__init__(storage_cls)
+            super(self).__init__(storage_cls)  # (1)
 
         def read(self):
             data = self.storage.read()
 
             for table_name in data:
-                table = data[table_name]
+                table_data = data[table_name]
 
                 for doc_id in table:
-                    item = table[doc_id]
+                    item = table_data[doc_id]
 
                     if item == {}:
-                        del table[doc_id]
+                        del table_data[doc_id]
 
             return data
 
         def write(self, data):
             for table_name in data:
-                table = data[table_name]
+                table_data = data[table_name]
 
                 for doc_id in table:
-                    item = table[doc_id]
+                    item = table_data[doc_id]
 
                     if item == {}:
-                        del table[doc_id]
+                        del table_data[doc_id]
 
             self.storage.write(data)
 
@@ -145,13 +139,8 @@ Now let's implement that:
             self.storage.close()
 
 
-Two remarks:
-
-1. You have to use the ``super(...)`` call as shown in the example. To run your
-   own initialization, add it below the ``super(...)`` call.
-2. This is an example for middleware, not an example for clean code. Don't
-   use it as shown here without at least refactoring the loops into a separate
-   method.
+Note that the constructor calls the middleware constructor (1) and passes
+the storage class to the middleware constructor.
 
 To wrap storage with this new middleware, we use it like this:
 
@@ -162,67 +151,50 @@ To wrap storage with this new middleware, we use it like this:
 Here ``SomeStorageClass`` should be replaced with the storage you want to use.
 If you leave it empty, the default storage will be used (which is the ``JSONStorage``).
 
-Creating a Custom Table Classes
--------------------------------
+Use hooks and overrides
+-----------------------
 
-Custom storage and middleware are useful if you want to modify the way
-TinyDB stores its data. But there are cases where you want to modify how
-TinyDB itself behaves. For that use case TinyDB supports custom table classes.
-Internally TinyDB creates a ``Table`` instance for every table that is used.
-You can overwrite which class is used by setting ``TinyDB.table_class``
-before creating a ``TinyDB`` instance. This class has to support the
-:ref:`Table API <table_api>`. The best way to accomplish that is to subclass
-it:
+There are cases when neither creating a custom storage nor using a custom
+middlware will allow you to adapt TinyDB in the way you need. In this case
+you can modify TinyDB's behavior by using predefined hooks and override points.
+For example you can configure the name of the default table by setting
+``TinyDB.default_table_name``:
 
 .. code-block:: python
 
-    from tinydb import TinyDB
-    from tinydb.database import Table
+    TinyDB.default_table_name = 'my_table_name'
 
-    class YourTableClass(Table):
-        pass  # Modify original methods as needed
-
-    TinyDB.table_class = YourTableClass
-
-For an more advanced example, see the source of the
-`tinydb-smartcache <https://github.com/msiemens/tinydb-smartcache>`_ extension.
-
-Creating a Custom Storage Proxy Classes
----------------------------------------
-
-.. warning::
-    This extension requires knowledge of TinyDB internals. Use it if
-    you understand how TinyDB works in detail.
-
-Another way to modify TinyDB's behavior is to create a custom storage
-proxy class. Internally, TinyDB uses a proxy class to allow tables to
-access a storage object. The proxy makes sure the table only accesses
-its own table data and doesn't accidentally modify other table's data.
-
-In this class you can modify how a table can read and write from a
-storage instance. Also, the proxy class has a method called
-``_new_document`` which creates a new document object. If you want
-to replace it with a different document class, you can do it right
-here.
+Both :class:`~tinydb.database.TinyDB` and the :class:`~tinydb.table.Table`
+classes allow modifying their behavior using hooks and overrides. To use
+``Table``'s overrides, you can access the class using ``TinyDB.table_class``:
 
 .. code-block:: python
 
-    from tinydb import TinyDB
-    from tinydb.database import Table, StorageProxy, Document
-    from tinydb.storages import MemoryStorage
+    TinyDB.table_class.default_query_cache_capacity = 100
 
-    class YourStorageProxy(StorageProxy):
-        def _new_document(self, key, val):
-            # Modify document object creation
-            doc_id = int(key)
-            return Document(val, doc_id)
+Read the :ref:`api_docs` for more details on the available hooks and override
+points.
 
-        def read(self):
-            return {}  # Modify reading
+Subclassing ``TinyDB`` and ``Table``
+------------------------------------
 
-       def write(self, data):
-            pass  # Modify writing
+Finally, there's the last option to modify TinyDB's behavior. That way you
+can change how TinyDB itself works more deeply than using the other extension
+mechanisms.
 
-    TinyDB.storage_proxy_class = YourStorageProxy
-    # Or:
-    TinyDB(storage=..., storage_proxy_class=YourStorageProxy)
+When creating a subclass you can use it by using hooks and overrides to override
+the default classes that TinyDB uses:
+
+.. code-block:: python
+
+    class MyTable(Table):
+        # Add your method overrides
+        ...
+
+    TinyDB.table_class = MyTable
+
+    # Continue using TinyDB as usual
+
+TinyDB's source code is documented with extensions in mind, explaining how
+everything works even for internal methods and classes. Feel free to dig into
+the source and adapt everything you need for your projects.

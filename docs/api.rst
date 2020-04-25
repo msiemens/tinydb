@@ -1,3 +1,5 @@
+.. _api_docs:
+
 API Documentation
 =================
 
@@ -9,10 +11,10 @@ API Documentation
     :private-members:
     :member-order: bysource
 
+.. _table_api:
+
 ``tinydb.table``
 ----------------
-
-.. _table_api:
 
 .. autoclass:: tinydb.table.Table
     :members:
