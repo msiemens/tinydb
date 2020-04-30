@@ -505,6 +505,9 @@ class Table:
 
         tables = self._storage.read()
 
+        if tables is None:
+            return 0
+
         try:
             return len(tables[self.name])
         except KeyError:

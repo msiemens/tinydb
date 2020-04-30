@@ -566,3 +566,8 @@ def test_access_storage():
                       MemoryStorage)
     assert isinstance(TinyDB(storage=CachingMiddleware(MemoryStorage)).storage,
                       CachingMiddleware)
+
+
+def test_empty_db_len():
+    db = TinyDB(storage=MemoryStorage)
+    assert len(db) == 0
