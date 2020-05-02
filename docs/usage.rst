@@ -447,11 +447,11 @@ the ``TinyDB`` class. To create and use a table, use ``db.table(name)``.
 
 To remove a table from a database, use:
 
->>> db.purge_table('table_name')
+>>> db.drop_table('table_name')
 
 If on the other hand you want to remove all tables, use the counterpart:
 
->>> db.purge_tables()
+>>> db.drop_tables()
 
 Finally, you can get a list with the names of all tables in your database:
 
