@@ -12,8 +12,8 @@ unreleased
 
 - *nothing yet*
 
-v4.0.0 (not released yet)
-^^^^^^^^^^^^^^^^^^^^^^^^^
+v4.0.0 (2020-05-02)
+^^^^^^^^^^^^^^^^^^^
 
 :ref:`Upgrade Notes <upgrade_v4_0>`
 
