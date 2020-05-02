@@ -154,6 +154,8 @@ If you leave it empty, the default storage will be used (which is the ``JSONStor
 Use hooks and overrides
 -----------------------
 
+.. _extend_hooks:
+
 There are cases when neither creating a custom storage nor using a custom
 middlware will allow you to adapt TinyDB in the way you need. In this case
 you can modify TinyDB's behavior by using predefined hooks and override points.

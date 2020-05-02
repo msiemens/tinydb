@@ -15,6 +15,8 @@ unreleased
 v4.0.0 (not released yet)
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
+:ref:`Upgrade Notes <upgrade_v4_0>`
+
 Breaking Changes
 ----------------
 
