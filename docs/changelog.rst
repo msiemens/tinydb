@@ -10,6 +10,11 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
+- *nothing yet*
+
+v4.1.0 (2020-05-07)
+^^^^^^^^^^^^^^^^^^^
+
 - Feature: Add a no-op query ``Query().noop()`` (see
   `issue 313 <https://github.com/msiemens/tinydb/issues/313>`_)
 - Feature: Add a ``access_mode`` flag to ``JSONStorage`` to allow opening
