@@ -571,3 +571,20 @@ def test_access_storage():
 def test_empty_db_len():
     db = TinyDB(storage=MemoryStorage)
     assert len(db) == 0
+
+
+def test_insert_on_existing_db(tmpdir):
+    path = str(tmpdir.join('db.json'))
+
+    db = TinyDB(path, ensure_ascii=False)
+    db.insert({'foo': 'bar'})
+
+    assert len(db) == 1
+
+    db.close()
+
+    db = TinyDB(path, ensure_ascii=False)
+    db.insert({'foo': 'bar'})
+    db.insert({'foo': 'bar'})
+
+    assert len(db) == 3

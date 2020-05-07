@@ -10,7 +10,8 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-- *nothing yet*
+- Fix inserting data on an existing database dropping the first document that's
+  being inserted (see `issue 314 <https://github.com/msiemens/tinydb/issues/314>`_)
 
 v4.0.0 (2020-05-02)
 ^^^^^^^^^^^^^^^^^^^

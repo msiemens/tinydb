@@ -550,12 +550,15 @@ class Table:
 
             return next_id
 
-        # Find the maximum ID that is currently in use
+        # Determine the next ID based on the maximum ID that's currently in use
         max_id = max(self.document_id_class(i) for i in table.keys())
+        next_id = max_id + 1
 
-        self._next_id = max_id + 1
+        # The next ID we wil return AFTER this call needs to be larger than
+        # the current next ID we calculated
+        self._next_id = next_id + 1
 
-        return self._next_id
+        return next_id
 
     def _read_table(self) -> Dict[int, Mapping]:
         """
