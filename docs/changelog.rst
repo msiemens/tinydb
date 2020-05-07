@@ -10,8 +10,11 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-- Fix inserting data on an existing database dropping the first document that's
-  being inserted (see `issue 314 <https://github.com/msiemens/tinydb/issues/314>`_)
+- Feature: Add a no-op query ``Query().noop()`` (see
+  `issue 313 <https://github.com/msiemens/tinydb/issues/313>`_)
+- Fix: Don't dropping the first document that's being inserted when inserting
+  data on an existing database (see `issue 314
+  <https://github.com/msiemens/tinydb/issues/314>`_)
 
 v4.0.0 (2020-05-02)
 ^^^^^^^^^^^^^^^^^^^
@@ -36,6 +39,8 @@ Breaking Changes
     - ``TinyDB.purge_table(...)`` has been renamed to ``TinyDB.drop_table(...)``
     - ``TinyDB.process_elements(...)`` has been removed
     - ``Table.purge()`` has been renamed to ``Table.trunacte()``
+    - Evaluating an empty ``Query()`` without any test operators will now result
+      in an exception, use ``Query().noop()`` (introduced in v4.1.0) instead
 - ``ujson`` support has been removed, see `issue 263
   <https://github.com/msiemens/tinydb/issues/263>`_ and `issue 306
   <https://github.com/msiemens/tinydb/issues/306>`_ for background

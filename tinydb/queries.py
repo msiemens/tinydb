@@ -427,6 +427,18 @@ class Query(QueryInstance):
             ('one_of', self._path, freeze(items))
         )
 
+    def noop(self) -> QueryInstance:
+        """
+        Always evaluate to ``True``.
+
+        Useful for having a base value when composing queries dynamically.
+        """
+
+        return QueryInstance(
+            lambda value: True,
+            ()
+        )
+
 
 def where(key: str) -> Query:
     """
