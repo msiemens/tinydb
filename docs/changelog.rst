@@ -12,6 +12,8 @@ unreleased
 
 - Feature: Add a no-op query ``Query().noop()`` (see
   `issue 313 <https://github.com/msiemens/tinydb/issues/313>`_)
+- Feature: Add a ``access_mode`` flag to ``JSONStorage`` to allow opening
+  files read-only (see `issue 297 <https://github.com/msiemens/tinydb/issues/297>`_)
 - Fix: Don't dropping the first document that's being inserted when inserting
   data on an existing database (see `issue 314
   <https://github.com/msiemens/tinydb/issues/314>`_)
