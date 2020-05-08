@@ -49,10 +49,7 @@ sphinx = "^2.2.1"
 coveralls = "^1.8.2"
 pytest-azurepipelines = "^0.8.0"
 pyyaml = "^5.1.2"
-pytest-mypy = "^0.4.1"
-
-[tool.poetry.extras]
-ci = ["pyyaml", "pytest-azurepipelines", "coveralls"]
+pytest-mypy = { version = "^0.4.1", markers = "platform_python_implementation != 'PyPy'" }
 
 [build-system]
 requires = ["poetry>=0.12"]
