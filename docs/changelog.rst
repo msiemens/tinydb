@@ -12,6 +12,12 @@ unreleased
 
 - *nothing yet*
 
+v4.1.1 (2020-05-08)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix: Don't install dev-dependencies when installing from PyPI (see
+  `issue 315 <https://github.com/msiemens/tinydb/issues/315>`_)
+
 v4.1.0 (2020-05-07)
 ^^^^^^^^^^^^^^^^^^^
 
