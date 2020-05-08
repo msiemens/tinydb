@@ -32,7 +32,7 @@ steps:
     pip install -U twine
     curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
     PATH=$HOME/.poetry/bin:$PATH poetry self update
-    PATH=$HOME/.poetry/bin:$PATH poetry install -E ci
+    PATH=$HOME/.poetry/bin:$PATH poetry install
   displayName: 'Install dependencies'
 
 - script: |
