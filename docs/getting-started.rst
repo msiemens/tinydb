@@ -13,7 +13,7 @@ To install TinyDB from PyPI, run::
 You can also grab the latest development version from GitHub_. After downloading
 and unpacking it, you can install it using::
 
-    $ python setup.py install
+    $ pip install .
 
 
 Basic Usage

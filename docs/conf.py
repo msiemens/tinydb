@@ -57,8 +57,8 @@ try:
     release = pkg_resources.get_distribution('tinydb').version
 except pkg_resources.DistributionNotFound:
     print('To build the documentation, The distribution information of TinyDB')
-    print('Has to be available. Either install the package into your')
-    print('development environment or run "setup.py develop" to setup the')
+    print('has to be available. Either install the package into your')
+    print('development environment or run "pip install -e ." to setup the')
     print('metadata. A virtualenv is recommended!')
     sys.exit(1)
 del pkg_resources
