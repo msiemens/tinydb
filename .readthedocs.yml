@@ -7,3 +7,5 @@ python:
       path: .
       extra_requirements:
         - docs
+
+formats: all
