@@ -18,7 +18,7 @@ Why Use TinyDB?
   fun to use by providing a simple and clean API.
 
 - **written in pure Python:** TinyDB neither needs an external server (as
-  e.g. `PyMongo <https://api.mongodb.org/python/current/>`_) nor any dependencies
+  e.g. `PyMongo <https://pymongo.readthedocs.io/en/stable/>`_) nor any dependencies
   from PyPI.
 
 - **works on Python 3.5+ and PyPy:** TinyDB works on all modern versions of Python
