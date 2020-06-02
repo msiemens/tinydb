@@ -50,6 +50,7 @@ Breaking Changes
       ``doc_id`` and now only takes a single document ID
     - ``TinyDB.purge_tables(...)`` has been renamed to ``TinyDB.drop_tables(...)``
     - ``TinyDB.purge_table(...)`` has been renamed to ``TinyDB.drop_table(...)``
+    - ``TinyDB.write_back(...)`` has been removed
     - ``TinyDB.process_elements(...)`` has been removed
     - ``Table.purge()`` has been renamed to ``Table.trunacte()``
     - Evaluating an empty ``Query()`` without any test operators will now result
