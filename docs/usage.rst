@@ -485,8 +485,10 @@ disable the query cache for the default table by setting like this:
 Query Caching
 .............
 
-TinyDB caches query result for performance. You can optimize the query cache
-size by passing the ``cache_size`` to the ``table(...)`` function:
+TinyDB caches query result for performance. That way re-running a query won't
+have to read the data from the storage as long as the database hasn't been
+modified. You can optimize the query cache size by passing the ``cache_size``
+to the ``table(...)`` function:
 
 >>> table = db.table('table_name', cache_size=30)
 
