@@ -495,6 +495,11 @@ to the ``table(...)`` function:
 .. hint:: You can set ``cache_size`` to ``None`` to make the cache unlimited in
    size. Also, you can set ``cache_size`` to 0 to disable it.
 
+.. hint:: When using an unlimited cache size and ``test()`` queries, TinyDB
+   will store a reference to the test function. As a result of that behavior
+   long-running applications that use ``lambda`` functions as a test function
+   may experience memory leaks.
+
 Storage & Middleware
 --------------------
 
