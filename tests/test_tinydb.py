@@ -6,6 +6,7 @@ import pytest  # type: ignore
 from tinydb import TinyDB, where, Query
 from tinydb.middlewares import Middleware, CachingMiddleware
 from tinydb.storages import MemoryStorage, JSONStorage
+from tinydb.table import Document
 
 
 def test_drop_tables(db: TinyDB):
@@ -46,6 +47,22 @@ def test_insert_ids(db: TinyDB):
     db.drop_tables()
     assert db.insert({'int': 1, 'char': 'a'}) == 1
     assert db.insert({'int': 1, 'char': 'a'}) == 2
+
+
+def test_insert_with_doc_id(db: TinyDB):
+    db.drop_tables()
+    assert db.insert({'int': 1, 'char': 'a'}) == 1
+    assert db.insert(Document({'int': 1, 'char': 'a'}, 12)) == 12
+    assert db.insert(Document({'int': 1, 'char': 'a'}, 77)) == 77
+    assert db.insert({'int': 1, 'char': 'a'}) == 78
+
+
+def test_insert_with_duplicate_doc_id(db: TinyDB):
+    db.drop_tables()
+    assert db.insert({'int': 1, 'char': 'a'}) == 1
+
+    with pytest.raises(AssertionError):
+        db.insert(Document({'int': 1, 'char': 'a'}, 1))
 
 
 def test_insert_multiple(db: TinyDB):

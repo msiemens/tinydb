@@ -10,7 +10,8 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-- *nothing yet*
+- Feature: Add support for specifiying document IDs during insertion
+  (see `issue 303 <https://github.com/msiemens/tinydb/issues/303>`_)
 
 v4.1.1 (2020-05-08)
 ^^^^^^^^^^^^^^^^^^^

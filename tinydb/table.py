@@ -146,10 +146,21 @@ class Table:
             raise ValueError('Document is not a Mapping')
 
         # First, we get the document ID for the new document
-        doc_id = self._get_next_id()
+        if isinstance(document, Document):
+            # For a `Document` object we use the specified ID
+            doc_id = document.doc_id
+
+            # We also reset the stored next ID so the next insert won't
+            # re-use document IDs by accident when storing an old value
+            self._next_id = None
+        else:
+            # In all other cases we use the next free ID
+            doc_id = self._get_next_id()
 
         # Now, we update the table and add the document
         def updater(table: dict):
+            assert doc_id not in table, 'doc_id '+str(doc_id)+' already exists'
+
             # By calling ``dict(document)`` we convert the data we got to a
             # ``dict`` instance even if it was a different class that
             # implemented the ``Mapping`` interface

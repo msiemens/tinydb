@@ -241,6 +241,13 @@ In case you want to insert multiple documents, you can use ``db.insert_multiple(
         {'name': 'John', 'age': 37}])
 >>> db.insert_multiple({'int': 1, 'value': i} for i in range(2))
 
+Also in some cases it may be useful to specify the document ID yourself when
+inserting data. You can do that by using the :class:`~tinydb.table.Document`
+class:
+
+>>> db.insert(Document({'name': 'John', 'age': 22}, doc_id=12))
+12
+
 Updating data
 .............
 
