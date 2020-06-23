@@ -502,6 +502,11 @@ to the ``table(...)`` function:
 .. hint:: You can set ``cache_size`` to ``None`` to make the cache unlimited in
    size. Also, you can set ``cache_size`` to 0 to disable it.
 
+.. hint:: The TinyDB query cache doesn't check if the underlying storage
+   that the database uses has been modified by an external process. In this
+   case the query cache may return outdated results. To clear the cache and
+   read data from the storage again you can use ``db.clear_cache()``.
+
 .. hint:: When using an unlimited cache size and ``test()`` queries, TinyDB
    will store a reference to the test function. As a result of that behavior
    long-running applications that use ``lambda`` functions as a test function
