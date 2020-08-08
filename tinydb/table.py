@@ -416,7 +416,7 @@ class Table:
 
     def remove(
         self,
-        cond: Optional[Document, Query] = None,
+        cond: Optional[Union[Document, Query]] = None,
         doc_ids: Optional[Iterable[int]] = None,
     ) -> List[int]:
         """
