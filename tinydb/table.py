@@ -325,6 +325,9 @@ class Table:
                 # Update documents by setting all fields from the provided data
                 table[doc_id].update(fields)
 
+        if cond is None and doc_ids is None and isinstance(fields, Document):
+            doc_ids = [fields.doc_id]
+
         if doc_ids is not None:
             # Perform the update operation for documents specified by a list
             # of document IDs
