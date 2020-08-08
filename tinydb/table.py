@@ -416,18 +416,22 @@ class Table:
 
     def remove(
         self,
-        cond: Optional[Query] = None,
+        cond: Optional[Document, Query] = None,
         doc_ids: Optional[Iterable[int]] = None,
     ) -> List[int]:
         """
         Remove all matching documents.
 
-        :param cond: the condition to check against
+        :param cond: the condition to check against, or the document to remove
         :param doc_ids: a list of document IDs
         :returns: a list containing the removed documents' ID
         """
         if cond is None and doc_ids is None:
             raise RuntimeError('Use truncate() to remove all documents')
+
+        if doc_ids is None and isinstance(cond, Document):
+            doc_ids = [cond.doc_id]
+            cond = None
 
         if cond is not None:
             removed_ids = []
