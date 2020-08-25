@@ -1,0 +1,44 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8, pypy3]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip twine
+        pip install poetry
+        poetry install
+    - name: Run test suite
+      run: |
+        poetry run py.test -v --cov=tinydb
+    - name: Perform type check
+      run: |
+        poetry run pip install pytest-mypy
+        poetry run pytest --mypy -m mypy tinydb tests
+      if: matrix.python-version != 'pypy3'
+    - name: Verify dist package format
+      run: |
+        poetry build
+        twine check dist/*
+    - name: Upload coverage result
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: |
+        poetry run coveralls
