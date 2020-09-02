@@ -67,7 +67,7 @@ class LRUCache(abc.MutableMapping, Generic[K, V]):
         value = self.cache.get(key)
 
         if value is not None:
-            # Move the entry to the front by re-inserting it
+            # Move to the front
             self.cache.move_to_end(key, last=True)
 
             return value
@@ -76,7 +76,7 @@ class LRUCache(abc.MutableMapping, Generic[K, V]):
 
     def set(self, key: K, value: V):
         if self.cache.get(key):
-            # Move the entry to the front by re-inserting it
+            # Move to the front
             self.cache.move_to_end(key, last=True)
 
         else:
