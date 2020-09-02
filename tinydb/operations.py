@@ -3,7 +3,7 @@ A collection of update operations for TinyDB.
 
 They are used for updates like this:
 
->>> db.update(delete('foo'), where('foo') == 2
+>>> db.update(delete('foo'), where('foo') == 2)
 
 This would delete the ``foo`` field from all documents where ``foo`` equals 2.
 """
