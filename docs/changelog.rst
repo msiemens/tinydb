@@ -10,7 +10,7 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-- Feature: Add support for specifiying document IDs during insertion
+- Feature: Add support for specifying document IDs during insertion
   (see `issue 303 <https://github.com/msiemens/tinydb/issues/303>`_)
 
 v4.1.1 (2020-05-08)
@@ -26,7 +26,7 @@ v4.1.0 (2020-05-07)
   `issue 313 <https://github.com/msiemens/tinydb/issues/313>`_)
 - Feature: Add a ``access_mode`` flag to ``JSONStorage`` to allow opening
   files read-only (see `issue 297 <https://github.com/msiemens/tinydb/issues/297>`_)
-- Fix: Don't dropping the first document that's being inserted when inserting
+- Fix: Don't drop the first document that's being inserted when inserting
   data on an existing database (see `issue 314
   <https://github.com/msiemens/tinydb/issues/314>`_)
 
@@ -53,7 +53,7 @@ Breaking Changes
     - ``TinyDB.purge_table(...)`` has been renamed to ``TinyDB.drop_table(...)``
     - ``TinyDB.write_back(...)`` has been removed
     - ``TinyDB.process_elements(...)`` has been removed
-    - ``Table.purge()`` has been renamed to ``Table.trunacte()``
+    - ``Table.purge()`` has been renamed to ``Table.truncate()``
     - Evaluating an empty ``Query()`` without any test operators will now result
       in an exception, use ``Query().noop()`` (introduced in v4.1.0) instead
 - ``ujson`` support has been removed, see `issue 263
