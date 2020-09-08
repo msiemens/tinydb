@@ -403,7 +403,7 @@ Different TinyDB methods also work with IDs, namely: ``update``, ``remove``,
 ``contains`` and ``get``. The first two also return a list of affected IDs.
 
 >>> db.update({'value': 2}, doc_ids=[1, 2])
->>> db.contains(doc_ids=[1])
+>>> db.contains(doc_id=1)
 True
 >>> db.remove(doc_ids=[1, 2])
 >>> db.get(doc_id=3)
@@ -429,8 +429,7 @@ Let's sum up the way TinyDB supports working with IDs:
 +-------------------------------------+------------------------------------------------------------+
 | ``db.get(doc_id=...)``              | Get the document with the given ID                         |
 +-------------------------------------+------------------------------------------------------------+
-| ``db.contains(doc_ids=[...])``      | Check if the db contains documents with one of the given   |
-|                                     | IDs                                                        |
+| ``db.contains(doc_id=...)``         | Check if the db contains a document with the given         |                                     | IDs                                                        |
 +-------------------------------------+------------------------------------------------------------+
 | ``db.update({...}, doc_ids=[...])`` | Update all documents with the given IDs                    |
 +-------------------------------------+------------------------------------------------------------+
