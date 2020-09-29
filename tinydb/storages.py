@@ -6,6 +6,7 @@ implementations.
 import io
 import json
 import os
+import s3fs
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
@@ -164,3 +165,34 @@ class MemoryStorage(Storage):
 
     def write(self, data: Dict[str, Dict[str, Any]]):
         self.memory = data
+
+
+class S3Storage(Storage):
+    """
+    Store the data as JSON in s3.
+    """
+    def __init__(self, bucket, filename):
+        """
+        Create a new instance.
+        """
+        self.bucket = bucket
+        self.filename = filename
+        self.s3 = s3fs.S3FileSystem(anon=False)
+
+    def read(self):
+        try:
+            with self.s3.open(f'{self.bucket}/{self.filename}', 'r') as handle:
+                try:
+                    data = json.loads(handle.read())
+                    return data
+                except:
+                    return None
+        except FileNotFoundError:
+            return None
+
+    def write(self, data):
+        with self.s3.open(f'{self.bucket}/{self.filename}', 'w') as handle:
+            handle.write(json.dumps(data))
+
+    def close(self):
+        pass
