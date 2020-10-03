@@ -12,7 +12,8 @@ from typing import (
     Mapping,
     Optional,
     Union,
-    cast
+    cast,
+    Tuple
 )
 
 from .storages import Storage
@@ -388,6 +389,58 @@ class Table:
             self._update_table(updater)
 
             return updated_ids
+
+    def update_multiple(
+        self,
+        updates: Iterable[
+            Tuple[Union[Mapping, Callable[[Mapping], None]], Query]
+        ],
+    ) -> List[int]:
+        """
+        Update all matching documents to have a given set of fields.
+
+        :returns: a list containing the updated document's ID
+        """
+
+        # Define the function that will perform the update
+        def perform_update(fields, table, doc_id):
+            if callable(fields):
+                # Update documents by calling the update function provided
+                # by the user
+                fields(table[doc_id])
+            else:
+                # Update documents by setting all fields from the provided
+                # data
+                table[doc_id].update(fields)
+
+        # Perform the update operation for documents specified by a query
+
+        # Collect affected doc_ids
+        updated_ids = []
+
+        def updater(table: dict):
+            # We need to convert the keys iterator to a list because
+            # we may remove entries from the ``table`` dict during
+            # iteration and doing this without the list conversion would
+            # result in an exception (RuntimeError: dictionary changed size
+            # during iteration)
+            for doc_id in list(table.keys()):
+                for fields, cond in updates:
+                    _cond = cast('Query', cond)
+
+                    # Pass through all documents to find documents matching the
+                    # query. Call the processing callback with the document ID
+                    if _cond(table[doc_id]):
+                        # Add ID to list of updated documents
+                        updated_ids.append(doc_id)
+
+                        # Perform the update (see above)
+                        perform_update(fields, table, doc_id)
+
+        # Perform the update operation (see _update_table for details)
+        self._update_table(updater)
+
+        return updated_ids
 
     def upsert(self, document: Mapping, cond: Query) -> List[int]:
         """

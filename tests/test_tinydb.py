@@ -250,6 +250,19 @@ def test_update_ids(db: TinyDB):
     assert db.count(where('int') == 2) == 2
 
 
+def test_update_multiple(db: TinyDB):
+    assert len(db) == 3
+
+    db.update_muliple([
+        ({'int': 2}, where('char') == 'a'),
+        ({'int': 4}, where('char') == 'b'),
+    ])
+
+    assert db.count(where('int') == 1) == 1
+    assert db.count(where('int') == 2) == 1
+    assert db.count(where('int') == 4) == 1
+
+
 def test_upsert(db: TinyDB):
     assert len(db) == 3
 
