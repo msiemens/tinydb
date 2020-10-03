@@ -1,7 +1,7 @@
 name: Python CI
 
 on:
-  push
+  push: {}
   pull_request_target:
     branches: [ master ]
 
