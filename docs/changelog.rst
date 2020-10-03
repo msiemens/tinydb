@@ -10,8 +10,15 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
+- *nothing here yet*
+
+v4.2.0 (2020-10-03)
+^^^^^^^^^^^^^^^^^^^
+
 - Feature: Add support for specifying document IDs during insertion
   (see `issue 303 <https://github.com/msiemens/tinydb/issues/303>`_)
+- Internal change: Use ``OrderedDict.move_to_end()`` in the query cache
+  (see `issue 338 <https://github.com/msiemens/tinydb/issues/338>`_)
 
 v4.1.1 (2020-05-08)
 ^^^^^^^^^^^^^^^^^^^
