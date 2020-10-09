@@ -49,6 +49,7 @@ Breaking Changes
   <https://github.com/msiemens/tinydb/issues/284>`_
   for background
 - API changes:
+
     - Removed classes: ``DataProxy``, ``StorageProxy``
     - Attributes removed from ``TinyDB`` in favor of
       customizing ``TinyDB``'s behavior by subclassing it and overloading
@@ -57,10 +58,12 @@ Breaking Changes
         - ``DEFAULT_TABLE``
         - ``DEFAULT_TABLE_KWARGS``
         - ``DEFAULT_STORAGE``
+
     - Arguments removed from ``TinyDB(...)``:
 
         - ``default_table``: replace with ``TinyDB.default_table_name = 'name'``
         - ``table_class``: replace with ``TinyDB.table_class = Class``
+
     - ``TinyDB.contains(...)``'s ``doc_ids`` parameter has been renamed to
       ``doc_id`` and now only takes a single document ID
     - ``TinyDB.purge_tables(...)`` has been renamed to ``TinyDB.drop_tables(...)``
@@ -70,6 +73,7 @@ Breaking Changes
     - ``Table.purge()`` has been renamed to ``Table.truncate()``
     - Evaluating an empty ``Query()`` without any test operators will now result
       in an exception, use ``Query().noop()`` (introduced in v4.1.0) instead
+
 - ``ujson`` support has been removed, see `issue 263
   <https://github.com/msiemens/tinydb/issues/263>`_ and `issue 306
   <https://github.com/msiemens/tinydb/issues/306>`_ for background
