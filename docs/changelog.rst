@@ -50,10 +50,17 @@ Breaking Changes
   for background
 - API changes:
     - Removed classes: ``DataProxy``, ``StorageProxy``
-    - Attributes removed from ``TinyDB``: ``DEFAULT_TABLE``,
-      ``DEFAULT_TABLE_KWARGS``, ``DEFAULT_STORAGE``, removed in favor of
+    - Attributes removed from ``TinyDB`` in favor of
       customizing ``TinyDB``'s behavior by subclassing it and overloading
-      ``__init__(...)`` and ``table(...)``
+      ``__init__(...)`` and ``table(...)``:
+
+        - ``DEFAULT_TABLE``
+        - ``DEFAULT_TABLE_KWARGS``
+        - ``DEFAULT_STORAGE``
+    - Arguments removed from ``TinyDB(...)``:
+
+        - ``default_table``: replace with ``TinyDB.default_table_name = 'name'``
+        - ``table_class``: replace with ``TinyDB.table_class = Class``
     - ``TinyDB.contains(...)``'s ``doc_ids`` parameter has been renamed to
       ``doc_id`` and now only takes a single document ID
     - ``TinyDB.purge_tables(...)`` has been renamed to ``TinyDB.drop_tables(...)``
