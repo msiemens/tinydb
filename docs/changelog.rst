@@ -12,6 +12,14 @@ unreleased
 
 - *nothing here yet*
 
+v4.3.0 (2020-11-14)
+^^^^^^^^^^^^^^^^^^^
+
+- Feature: Add operation for updating multiple documents: ``update_multiple``
+  (see `issue 346 <https://github.com/msiemens/tinydb/issues/346>`_)
+- Improvement: Expose type information for MyPy typechecking (PEP 561)
+  (see `pull request 352 <https://github.com/msiemens/tinydb/pull/352>`_)
+
 v4.2.0 (2020-10-03)
 ^^^^^^^^^^^^^^^^^^^
 
