@@ -287,14 +287,14 @@ Of course you also can write your own operations:
 In order to perform multiple update operations at once, you can use the
 ``update_multiple`` method like this:
 
->>> db.update_muliple([
+>>> db.update_multiple([
 ...     ({'int': 2}, where('char') == 'a'),
 ...     ({'int': 4}, where('char') == 'b'),
 ... ])
 
 You also can use mix normal updates with update operations:
 
->>> db.update_muliple([
+>>> db.update_multiple([
 ...     ({'int': 2}, where('char') == 'a'),
 ...     ({delete('int'), where('char') == 'b'),
 ... ])

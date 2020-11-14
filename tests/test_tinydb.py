@@ -253,7 +253,7 @@ def test_update_ids(db: TinyDB):
 def test_update_multiple(db: TinyDB):
     assert len(db) == 3
 
-    db.update_muliple([
+    db.update_multiple([
         ({'int': 2}, where('char') == 'a'),
         ({'int': 4}, where('char') == 'b'),
     ])
