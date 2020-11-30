@@ -412,6 +412,9 @@ In addition you can get the ID of already inserted documents using
 3
 >>> el = db.all()[0]
 >>> el.doc_id
+1
+>>> el = db.all()[-1]
+>>> el.doc_id
 12
 
 Different TinyDB methods also work with IDs, namely: ``update``, ``remove``,
