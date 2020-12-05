@@ -76,3 +76,11 @@ Here are some extensions that might be useful to you:
 | **Description:** asyncio compatibility shim for TinyDB. Enables usage of
                    TinyDB in asyncio-aware contexts without slow syncronous
                    IO.
+
+``TinyDBTimestamps``
+*************
+
+| **Repo:**        https://github.com/pachacamac/TinyDBTimestamps
+| **Status:**      *experimental*
+| **Description:** Automatically add create at/ update at timestamps to TinyDB
+                   documents.
