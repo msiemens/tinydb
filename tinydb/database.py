@@ -25,7 +25,7 @@ class TinyDB:
 
     When creating a new instance, all arguments and keyword arguments (except
     for ``storage``) will be passed to the storage class that is provided. If
-    no storage class is specified, :class:`~tinydb.storages.JSONStorage` wil be
+    no storage class is specified, :class:`~tinydb.storages.JSONStorage` will be
     used.
 
     .. admonition:: Customization
