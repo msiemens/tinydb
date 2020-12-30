@@ -129,7 +129,7 @@ class Query(QueryInstance):
 
     def __init__(self) -> None:
         # The current path of fields to access when evaluating the object
-        self._path = ()
+        self._path = ()  # type: Tuple[str, ...]
 
         # Prevent empty queries to be evaluated
         def notest(_):
