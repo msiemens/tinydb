@@ -78,7 +78,7 @@ class TinyDB:
     #: .. versionadded:: 4.0
     default_storage_class = JSONStorage
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """
         Create a new instance of TinyDB.
         """

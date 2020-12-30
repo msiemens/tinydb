@@ -127,7 +127,7 @@ class Query(QueryInstance):
     ``False`` depending on whether the documents matches the query or not.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # The current path of fields to access when evaluating the object
         self._path = ()
 
