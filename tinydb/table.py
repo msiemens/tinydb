@@ -326,6 +326,9 @@ class Table:
                 # Update documents by setting all fields from the provided data
                 table[doc_id].update(fields)
 
+        if cond is None and doc_ids is None and isinstance(fields, Document):
+            doc_ids = [fields.doc_id]
+
         if doc_ids is not None:
             # Perform the update operation for documents specified by a list
             # of document IDs
@@ -466,18 +469,22 @@ class Table:
 
     def remove(
         self,
-        cond: Optional[Query] = None,
+        cond: Optional[Union[Document, Query]] = None,
         doc_ids: Optional[Iterable[int]] = None,
     ) -> List[int]:
         """
         Remove all matching documents.
 
-        :param cond: the condition to check against
+        :param cond: the condition to check against, or the document to remove
         :param doc_ids: a list of document IDs
         :returns: a list containing the removed documents' ID
         """
         if cond is None and doc_ids is None:
             raise RuntimeError('Use truncate() to remove all documents')
+
+        if doc_ids is None and isinstance(cond, Document):
+            doc_ids = [cond.doc_id]
+            cond = None
 
         if cond is not None:
             removed_ids = []
