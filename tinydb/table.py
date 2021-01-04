@@ -225,10 +225,9 @@ class Table:
 
         # First, we check the query cache to see if it has results for this
         # query
-        if cond in self._query_cache:
-            docs = self._query_cache.get(cond)
-            if docs is not None:
-                return docs[:]
+        cached_results = self._query_cache.get(cond)
+        if cached_results is not None:
+            return cached_results[:]
 
         # Perform the search by applying the query to all documents
         docs = [doc for doc in self if cond(doc)]

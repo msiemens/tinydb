@@ -55,6 +55,24 @@ def test_caching(db):
     assert table1 is table2
 
 
+def test_query_cache(db):
+    query1 = where('int') == 1
+
+    assert db.count(query1) == 3
+    assert query1 in db._query_cache
+
+    assert db.count(query1) == 3
+    assert query1 in db._query_cache
+
+    query2 = where('int') == 0
+
+    assert db.count(query2) == 0
+    assert query2 in db._query_cache
+
+    assert db.count(query2) == 0
+    assert query2 in db._query_cache
+
+
 def test_zero_cache_size(db):
     table = db.table('table3', cache_size=0)
     query = where('int') == 1

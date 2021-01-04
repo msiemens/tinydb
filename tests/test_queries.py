@@ -147,6 +147,8 @@ def test_regex():
     assert query({'val': '42.'})
     assert not query({'val': '44'})
     assert not query({'val': 'ab.'})
+    assert not query({'val': 155})
+    assert not query({'val': False})
     assert not query({'': None})
     assert hash(query)
 
@@ -382,3 +384,22 @@ def test_subclass():
     assert not query({'val': '42'})
     assert not query({'': None})
     assert hash(query)
+
+
+def test_noop():
+    query = Query().noop()
+
+    assert query({'foo': True})
+    assert query({'foo': None})
+    assert query({})
+
+
+def test_equality():
+    q = Query()
+    assert (q.foo == 2) != 0
+    assert (q.foo == 'yes') != ''
+
+
+def test_empty_query_error():
+    with pytest.raises(RuntimeError, match='Empty query was evaluated'):
+        Query()({})

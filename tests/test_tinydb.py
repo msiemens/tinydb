@@ -263,6 +263,23 @@ def test_update_multiple(db: TinyDB):
     assert db.count(where('int') == 4) == 1
 
 
+def test_update_multiple_operation(db: TinyDB):
+    def increment(field):
+        def transform(el):
+            el[field] += 1
+
+        return transform
+
+    assert db.count(where('int') == 1) == 3
+
+    db.update_multiple([
+        (increment('int'), where('char') == 'a'),
+        (increment('int'), where('char') == 'b')
+    ])
+
+    assert db.count(where('int') == 2) == 2
+
+
 def test_upsert(db: TinyDB):
     assert len(db) == 3
 
@@ -308,6 +325,11 @@ def test_get_ids(db: TinyDB):
     assert db.get(doc_id=float('NaN')) is None
 
 
+def test_get_invalid(db: TinyDB):
+    with pytest.raises(RuntimeError):
+        db.get()
+
+
 def test_count(db: TinyDB):
     assert db.count(where('int') == 1) == 3
     assert db.count(where('char') == 'd') == 0
@@ -322,6 +344,11 @@ def test_contains_ids(db: TinyDB):
     assert db.contains(doc_id=1)
     assert db.contains(doc_id=2)
     assert not db.contains(doc_id=88)
+
+
+def test_contains_invalid(db: TinyDB):
+    with pytest.raises(RuntimeError):
+        db.contains()
 
 
 def test_get_idempotent(db: TinyDB):
@@ -497,7 +524,9 @@ def test_gc(tmpdir):
 def test_drop_table():
     db = TinyDB(storage=MemoryStorage)
     default_table_name = db.table(db.default_table_name).name
+
     assert [] == list(db.tables())
+    db.drop_table(default_table_name)
 
     db.insert({'a': 1})
     assert [default_table_name] == list(db.tables())
@@ -618,3 +647,9 @@ def test_insert_on_existing_db(tmpdir):
     db.insert({'foo': 'bar'})
 
     assert len(db) == 3
+
+
+def test_storage_access():
+    db = TinyDB(storage=MemoryStorage)
+
+    assert isinstance(db.storage, MemoryStorage)

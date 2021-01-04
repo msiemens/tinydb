@@ -100,3 +100,6 @@ def test_freeze():
 
     with pytest.raises(TypeError):
         frozen[3]['a'] = 10
+
+    with pytest.raises(TypeError):
+        frozen[3].pop('a')
