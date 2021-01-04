@@ -475,9 +475,6 @@ class Table:
         :param doc_ids: a list of document IDs
         :returns: a list containing the removed documents' ID
         """
-        if cond is None and doc_ids is None:
-            raise RuntimeError('Use truncate() to remove all documents')
-
         if cond is not None:
             removed_ids = []
 
@@ -527,7 +524,7 @@ class Table:
 
             return removed_ids
 
-        raise RuntimeError('This should never happen')
+        raise RuntimeError('Use truncate() to remove all documents')
 
     def truncate(self) -> None:
         """

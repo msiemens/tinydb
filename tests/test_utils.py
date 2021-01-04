@@ -103,3 +103,6 @@ def test_freeze():
 
     with pytest.raises(TypeError):
         frozen[3].pop('a')
+
+    with pytest.raises(TypeError):
+        frozen[3].update({'a': 9})
