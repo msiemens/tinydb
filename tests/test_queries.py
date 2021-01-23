@@ -403,3 +403,21 @@ def test_equality():
 def test_empty_query_error():
     with pytest.raises(RuntimeError, match='Empty query was evaluated'):
         Query()({})
+
+
+def test_fragment():
+    query = Query().fragment({'a': 4, 'b': True})
+
+    assert query({'a': 4, 'b': True, 'c': 'yes'})
+    assert not query({'a': 4, 'c': 'yes'})
+    assert not query({'b': True, 'c': 'yes'})
+    assert not query({'a': 5, 'b': True, 'c': 'yes'})
+    assert not query({'a': 4, 'b': 'no', 'c': 'yes'})
+
+
+def test_fragment_with_path():
+    query = Query().doc.fragment({'a': 4, 'b': True})
+
+    assert query({'doc': {'a': 4, 'b': True, 'c': 'yes'}})
+    assert not query({'a': 4, 'b': True, 'c': 'yes'})
+    assert not query({'doc': {'a': 4, 'c': 'yes'}})

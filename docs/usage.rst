@@ -95,6 +95,17 @@ queries:
 >>> db.search(User.age.test(test_func, 0, 21))
 >>> db.search(User.age.test(test_func, 21, 99))
 
+Another case is if you have a ``dict`` where you want to find all documents
+that match this ``dict``. We call this searching for a fragment:
+
+>>> db.search(Query().fragment({'foo': True, 'bar': False}))
+[{'foo': True, 'bar': False, 'foobar: 'yes!'}]
+
+You also can search for documents where a specific field matches the fragment:
+
+>>> db.search(Query().field.fragment({'foo': True, 'bar': False}))
+[{'field': {'foo': True, 'bar': False, 'foobar: 'yes!'}]
+
 When a field contains a list, you also can use the ``any`` and ``all`` methods.
 There are two ways to use them: with lists of values and with nested queries.
 Let's start with the first one. Assuming we have a user object with a groups list

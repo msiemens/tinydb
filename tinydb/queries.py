@@ -168,6 +168,7 @@ class Query(QueryInstance):
             self,
             test: Callable[[Any], bool],
             hashval: Tuple,
+            allow_empty_path: bool = False
     ) -> QueryInstance:
         """
         Generate a query based on a test function that first resolves the query
@@ -177,7 +178,7 @@ class Query(QueryInstance):
         :param hashval: The hash of the query.
         :return: A :class:`~tinydb.queries.QueryInstance` object
         """
-        if not self._path:
+        if not self._path and not allow_empty_path:
             raise ValueError('Query has no path')
 
         def runner(value):
@@ -425,6 +426,20 @@ class Query(QueryInstance):
         return self._generate_test(
             lambda value: value in items,
             ('one_of', self._path, freeze(items))
+        )
+
+    def fragment(self, document: Mapping) -> QueryInstance:
+        def test(value):
+            for key in document:
+                if key not in value or value[key] != document[key]:
+                    return False
+
+            return True
+
+        return self._generate_test(
+            lambda value: test(value),
+            ('fragment', freeze(document)),
+            allow_empty_path=True
         )
 
     def noop(self) -> QueryInstance:
