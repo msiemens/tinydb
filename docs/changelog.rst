@@ -12,6 +12,15 @@ unreleased
 
 - *nothing here yet*
 
+v4.4.0 (2020-11-14)
+^^^^^^^^^^^^^^^^^^^
+
+- Feature: Add operation for searching for all documents that match a ``dict``
+  fragment (see `issue 300 <https://github.com/msiemens/tinydb/issues/300>`_)
+- Fix: Correctly handle queries that use fields that are also Query methods,
+  e.g. ``Query()['test']`` for searching for documents with a ``test`` field
+  (see `issue 373 <https://github.com/msiemens/tinydb/issues/373>`_)
+
 v4.3.0 (2020-11-14)
 ^^^^^^^^^^^^^^^^^^^
 
