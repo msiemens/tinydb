@@ -162,7 +162,14 @@ class Query(QueryInstance):
 
     def __getitem__(self, item: str):
         # A different syntax for ``__getattr__``
-        return getattr(self, item)
+
+        # We cannot call ``getattr(item)`` here as it would try to resolve
+        # the name as a method name first, only then call our ``__getattr__``
+        # method. By calling ``__getattr__`` directly, we make sure that
+        # calling e.g. ``Query()['test']`` will always generate a query for a
+        # document's ``test`` field instead of returning a reference to the
+        # ``Query.test`` method
+        return self.__getattr__(item)
 
     def _generate_test(
             self,

@@ -421,3 +421,10 @@ def test_fragment_with_path():
     assert query({'doc': {'a': 4, 'b': True, 'c': 'yes'}})
     assert not query({'a': 4, 'b': True, 'c': 'yes'})
     assert not query({'doc': {'a': 4, 'c': 'yes'}})
+
+
+def test_get_item():
+    query = Query()['test'] == 1
+
+    assert query({'test': 1})
+    assert not query({'test': 0})
