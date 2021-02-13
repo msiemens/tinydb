@@ -134,6 +134,12 @@ def test_table_name(db):
         table.name = 'foo'
 
 
+def test_table_storage_property_only_read(db):
+    db.drop_tables()
+    db.insert({'int': 1})
+    assert {db.default_table_name: {'1': {'int': 1}}} == db.storage.read()
+
+
 def test_table_repr(db):
     name = 'table4'
     table = db.table(name)

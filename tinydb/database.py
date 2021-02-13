@@ -8,7 +8,7 @@ from .storages import Storage
 from .table import Table, Document
 
 
-class TinyDB:
+class TinyDB(Table):
     """
     The main class of TinyDB.
 
@@ -168,6 +168,9 @@ class TinyDB:
         # create new table instances when a table is accessed again.
         self._tables.clear()
 
+        # Clear default table by reinitialising default table
+        super().__init__(self.storage, self.default_table_name)
+
     def drop_table(self, name: str) -> None:
         """
         Drop a specific table from the database. **CANNOT BE REVERSED!**
@@ -195,6 +198,9 @@ class TinyDB:
 
         # Store the updated data back to the storage
         self.storage.write(data)
+
+        if name == self.default_table_name:
+            super().__init__(self.storage, self.default_table_name)
 
     @property
     def storage(self) -> Storage:

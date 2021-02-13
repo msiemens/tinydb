@@ -45,6 +45,14 @@ def test_insert(db: TinyDB):
 
 def test_insert_ids(db: TinyDB):
     db.drop_tables()
+    assert len(db) == 0
+    assert db.insert({'int': 1, 'char': 'a'}) == 1
+    assert db.insert({'int': 1, 'char': 'a'}) == 2
+
+
+def test_insert_ids_after_drop_default_table(db: TinyDB):
+    db.drop_table(db.default_table_name)
+    assert len(db) == 0
     assert db.insert({'int': 1, 'char': 'a'}) == 1
     assert db.insert({'int': 1, 'char': 'a'}) == 2
 
