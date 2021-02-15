@@ -12,7 +12,7 @@ unreleased
 
 - *nothing here yet*
 
-v4.4.0 (2020-11-14)
+v4.4.0 (2021-02-11)
 ^^^^^^^^^^^^^^^^^^^
 
 - Feature: Add operation for searching for all documents that match a ``dict``
