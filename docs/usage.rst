@@ -458,7 +458,8 @@ Let's sum up the way TinyDB supports working with IDs:
 +-------------------------------------+------------------------------------------------------------+
 | ``db.get(doc_id=...)``              | Get the document with the given ID                         |
 +-------------------------------------+------------------------------------------------------------+
-| ``db.contains(doc_id=...)``         | Check if the db contains a document with the given         |                                     | IDs                                                        |
+| ``db.contains(doc_id=...)``         | Check if the db contains a document with the given         |
+|                                     | IDs                                                        |
 +-------------------------------------+------------------------------------------------------------+
 | ``db.update({...}, doc_ids=[...])`` | Update all documents with the given IDs                    |
 +-------------------------------------+------------------------------------------------------------+
