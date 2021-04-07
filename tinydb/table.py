@@ -187,9 +187,20 @@ class Table:
                 if not isinstance(document, Mapping):
                     raise ValueError('Document is not a Mapping')
 
-                # Get the document ID for this document and store it so we
-                # can return all document IDs later
-                doc_id = self._get_next_id()
+
+                # First, we get the document ID for the new document
+                if isinstance(document, Document):
+                    # For a `Document` object we use the specified ID
+                    doc_id = document.doc_id
+
+                    # We also reset the stored next ID so the next insert won't
+                    # re-use document IDs by accident when storing an old value
+                    self._next_id = None
+                else:
+                    # In all other cases we use the next free ID
+                    doc_id = self._get_next_id()
+
+                # store document ID so we can return all document IDs later
                 doc_ids.append(doc_id)
 
                 # Convert the document to a ``dict`` (see Table.insert) and
