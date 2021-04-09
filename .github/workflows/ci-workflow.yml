@@ -37,7 +37,7 @@ jobs:
       run: |
         poetry build
         twine check dist/*
-      if: ${{ !contains(matrix.python-version, '3.7') && !contains(matrix.python-version, '3.6') }}
+      if: ${{ contains(matrix.python-version, '3.9') }}
     - name: Upload coverage result
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
