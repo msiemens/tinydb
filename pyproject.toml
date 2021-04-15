@@ -54,5 +54,5 @@ pyyaml = "^5.1.2"
 pytest-mypy = { version = "^0.4.1", markers = "platform_python_implementation != 'PyPy'" }
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
