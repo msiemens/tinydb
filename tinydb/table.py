@@ -443,13 +443,13 @@ class Table:
 
     def upsert(self, document: Mapping, cond: Query) -> List[int]:
         """
-        Update a document, if it exist, insert it otherwise.
+        Update documents, if they exist, insert them otherwise.
 
-        Note: this will update *all* documents matching the query.
+        Note: This will update *all* documents matching the query.
 
         :param document: the document to insert or the fields to update
         :param cond: which document to look for
-        :returns: a list containing the updated document's ID
+        :returns: a list containing the updated documents' IDs
         """
 
         # Perform the update operation
