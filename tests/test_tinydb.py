@@ -291,6 +291,28 @@ def test_upsert(db: TinyDB):
     assert db.upsert({'int': 9, 'char': 'x'}, where('char') == 'x') == [4]
     assert db.count(where('int') == 9) == 1
 
+def test_upsert_by_id(db: TinyDB):
+    assert len(db) == 3
+
+    # Single document existing
+    extant_doc = Document({'char':'v'}, doc_id=1)
+    assert db.upsert(extant_doc) == [1]
+    assert db.get(where('char') == 'v').doc_id == 1
+    assert len(db) == 3
+
+    # Single document missing
+    missing_doc = Document({'int': 5, 'char': 'w'}, doc_id=5)
+    assert db.upsert(missing_doc) == [5]
+    assert db.get(where('char') == 'w').doc_id == 5
+    assert len(db) == 4
+
+    # Missing doc_id and condition
+    with pytest.raises(ValueError, match=r"(?=.*\bdoc_id\b)(?=.*\bquery\b)"):
+        db.upsert({'no_Document': 'no_query'})
+
+    # Make sure we didn't break anything
+    assert db.insert({'check': '_next_id'}) == 6
+
 
 def test_search(db: TinyDB):
     assert not db._query_cache
