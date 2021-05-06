@@ -441,19 +441,38 @@ class Table:
 
         return updated_ids
 
-    def upsert(self, document: Mapping, cond: Query) -> List[int]:
+    def upsert(self, document: Mapping, cond: Optional[Query] = None) -> List[int]:
         """
         Update documents, if they exist, insert them otherwise.
 
-        Note: This will update *all* documents matching the query.
+        Note: This will update *all* documents matching the query. Document
+        argument can be a tinydb.table.Document object if you want to specify a
+        doc_id.
 
         :param document: the document to insert or the fields to update
-        :param cond: which document to look for
+        :param cond: which document to look for, optional if you've passed a
+        Document with a doc_id
         :returns: a list containing the updated documents' IDs
         """
 
+        # Extract doc_id
+        if isinstance(document, Document) and hasattr(document, 'doc_id'):
+            doc_ids = [document.doc_id]
+        else:
+            doc_ids = None
+
+        # Make sure we can actually find a matching document
+        if doc_ids is None and cond is None:
+            raise ValueError("If you don't specify a search query, you must "
+                             "specify a doc_id. Hint: use a table.Document "
+                             "object.")
+
         # Perform the update operation
-        updated_docs = self.update(document, cond)
+        try:
+            updated_docs = self.update(document, cond, doc_ids)
+        except KeyError:
+            # This happens when a doc_id is specified, but it's missing
+            updated_docs = None
 
         # If documents have been updated: return their IDs
         if updated_docs:
