@@ -457,7 +457,7 @@ class Table:
 
         # Extract doc_id
         if isinstance(document, Document) and hasattr(document, 'doc_id'):
-            doc_ids = [document.doc_id]
+            doc_ids: Optional[List[int]] = [document.doc_id]
         else:
             doc_ids = None
 
@@ -469,7 +469,7 @@ class Table:
 
         # Perform the update operation
         try:
-            updated_docs = self.update(document, cond, doc_ids)
+            updated_docs: Optional[List[int]] = self.update(document, cond, doc_ids)
         except KeyError:
             # This happens when a doc_id is specified, but it's missing
             updated_docs = None
@@ -710,7 +710,7 @@ class Table:
 
         # Convert the document IDs back to strings.
         # This is required as some storages (most notably the JSON file format)
-        # don't require IDs other than strings.
+        # don't support IDs other than strings.
         tables[self.name] = {
             str(doc_id): doc
             for doc_id, doc in table.items()
