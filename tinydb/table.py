@@ -106,8 +106,8 @@ class Table:
 
         self._storage = storage
         self._name = name
-        self._query_cache = self.query_cache_class(capacity=cache_size) \
-            # type: LRUCache[Query, List[Document]]
+        self._query_cache: LRUCache[Query, List[Document]] \
+            = self.query_cache_class(capacity=cache_size)
 
         self._next_id = None
 
