@@ -267,3 +267,10 @@ class TinyDB:
         Return an iterater for the default table's documents.
         """
         return iter(self.table(self.default_table_name))
+
+    def table_name(self, tablename=default_table_name):
+        """
+        Updates default table name.
+        """
+        self.default_table_name = tablename
+        return self.default_table_name
