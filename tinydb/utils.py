@@ -89,7 +89,7 @@ class LRUCache(abc.MutableMapping, Generic[K, V]):
 
 class FrozenDict(dict):
     """
-    An immutable dictoinary.
+    An immutable dictionary.
 
     This is used to generate stable hashes for queries that contain dicts.
     Usually, Python dicts are not hashable because they are mutable. This
