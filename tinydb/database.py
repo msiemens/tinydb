@@ -1,14 +1,19 @@
 """
 This module contains the main component of TinyDB: the database.
 """
-from typing import Dict, Iterator, Set
+from typing import Dict, Iterator, Set, Type
 
 from . import JSONStorage
 from .storages import Storage
 from .table import Table, Document
+from .utils import with_typehint
+
+# The table's base class. This is used to add type hinting from the Table
+# class to TinyDB. Currently this supports PyCharm, Pyright/VS Code and MyPy.
+TableBase: Type[Table] = with_typehint(Table)
 
 
-class TinyDB:
+class TinyDB(TableBase):
     """
     The main class of TinyDB.
 

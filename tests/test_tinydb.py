@@ -110,7 +110,8 @@ def test_insert_multiple_with_ids(db: TinyDB):
 
 def test_insert_invalid_type_raises_error(db: TinyDB):
     with pytest.raises(ValueError, match='Document is not a Mapping'):
-        db.insert(object())  # object() as an example of a non-mapping-type
+        # object() as an example of a non-mapping-type
+        db.insert(object())  # type: ignore
 
 
 def test_insert_valid_mapping_type(db: TinyDB):
@@ -295,15 +296,19 @@ def test_upsert_by_id(db: TinyDB):
     assert len(db) == 3
 
     # Single document existing
-    extant_doc = Document({'char':'v'}, doc_id=1)
+    extant_doc = Document({'char': 'v'}, doc_id=1)
     assert db.upsert(extant_doc) == [1]
-    assert db.get(where('char') == 'v').doc_id == 1
+    doc = db.get(where('char') == 'v')
+    assert doc is not None
+    assert doc.doc_id == 1
     assert len(db) == 3
 
     # Single document missing
     missing_doc = Document({'int': 5, 'char': 'w'}, doc_id=5)
     assert db.upsert(missing_doc) == [5]
-    assert db.get(where('char') == 'w').doc_id == 5
+    doc = db.get(where('char') == 'w')
+    assert doc is not None
+    assert doc.doc_id == 5
     assert len(db) == 4
 
     # Missing doc_id and condition
@@ -338,13 +343,14 @@ def test_search_no_results_cache(db: TinyDB):
 
 def test_get(db: TinyDB):
     item = db.get(where('char') == 'b')
+    assert item is not None
     assert item['char'] == 'b'
 
 
 def test_get_ids(db: TinyDB):
     el = db.all()[0]
     assert db.get(doc_id=el.doc_id) == el
-    assert db.get(doc_id=float('NaN')) is None
+    assert db.get(doc_id=float('NaN')) is None  # type: ignore
 
 
 def test_get_invalid(db: TinyDB):
@@ -638,7 +644,7 @@ def test_delete(tmpdir):
 def test_insert_multiple_with_single_dict(db: TinyDB):
     with pytest.raises(ValueError):
         d = {'first': 'John', 'last': 'smith'}
-        db.insert_multiple(d)
+        db.insert_multiple(d)  # type: ignore
         db.close()
 
 

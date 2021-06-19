@@ -17,15 +17,35 @@ False
 """
 
 import re
-from typing import Mapping, Tuple, Callable, Any, Union, List
+from typing import Mapping, Tuple, Callable, Any, Union, List, Protocol
 
 from .utils import freeze
 
-__all__ = ('Query', 'where')
+__all__ = ('Query', 'QueryLike', 'where')
 
 
 def is_sequence(obj):
     return hasattr(obj, '__iter__')
+
+
+class QueryLike(Protocol):
+    """
+    A typing protocol that acts like a query.
+
+    Something that we use as a query must have two properties:
+
+    1. It must be callable, accepting a `Mapping` object and returning a
+       boolean that indicates whether the value matches the query, and
+    2. it must have a stable hash that will be used for query caching.
+
+    This query protocol is used to make MyPy correctly support the query
+    pattern that TinyDB uses.
+
+    See also https://mypy.readthedocs.io/en/stable/protocols.html#simple-user-defined-protocols
+    """
+    def __call__(self, value: Mapping) -> bool: ...
+
+    def __hash__(self): ...
 
 
 class QueryInstance:

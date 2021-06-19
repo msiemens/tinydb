@@ -51,6 +51,8 @@ sphinx = "^2.2.1"
 coveralls = "^1.8.2"
 pyyaml = "^5.1.2"
 pytest-mypy = { version = "^0.4.1", markers = "platform_python_implementation != 'PyPy'" }
+typing-extensions = "^3.10.0"
+types-PyYAML = "^5.4.3"
 
 [build-system]
 requires = ["poetry-core"]

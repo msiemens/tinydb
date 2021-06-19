@@ -16,8 +16,8 @@ from typing import (
     Tuple
 )
 
+from .queries import QueryLike
 from .storages import Storage
-from .queries import Query
 from .utils import LRUCache
 
 __all__ = ('Document', 'Table')
@@ -106,7 +106,7 @@ class Table:
 
         self._storage = storage
         self._name = name
-        self._query_cache: LRUCache[Query, List[Document]] \
+        self._query_cache: LRUCache[QueryLike, List[Document]] \
             = self.query_cache_class(capacity=cache_size)
 
         self._next_id = None
@@ -215,7 +215,7 @@ class Table:
 
         return list(iter(self))
 
-    def search(self, cond: Query) -> List[Document]:
+    def search(self, cond: QueryLike) -> List[Document]:
         """
         Search for all documents matching a 'where' cond.
 
@@ -239,7 +239,7 @@ class Table:
 
     def get(
         self,
-        cond: Optional[Query] = None,
+        cond: Optional[QueryLike] = None,
         doc_id: Optional[int] = None,
     ) -> Optional[Document]:
         """
@@ -276,7 +276,7 @@ class Table:
 
     def contains(
         self,
-        cond: Optional[Query] = None,
+        cond: Optional[QueryLike] = None,
         doc_id: Optional[int] = None
     ) -> bool:
         """
@@ -301,7 +301,7 @@ class Table:
     def update(
         self,
         fields: Union[Mapping, Callable[[Mapping], None]],
-        cond: Optional[Query] = None,
+        cond: Optional[QueryLike] = None,
         doc_ids: Optional[Iterable[int]] = None,
     ) -> List[int]:
         """
@@ -348,7 +348,7 @@ class Table:
             updated_ids = []
 
             def updater(table: dict):
-                _cond = cast('Query', cond)
+                _cond = cast(QueryLike, cond)
 
                 # We need to convert the keys iterator to a list because
                 # we may remove entries from the ``table`` dict during
@@ -392,7 +392,7 @@ class Table:
     def update_multiple(
         self,
         updates: Iterable[
-            Tuple[Union[Mapping, Callable[[Mapping], None]], Query]
+            Tuple[Union[Mapping, Callable[[Mapping], None]], QueryLike]
         ],
     ) -> List[int]:
         """
@@ -425,7 +425,7 @@ class Table:
             # during iteration)
             for doc_id in list(table.keys()):
                 for fields, cond in updates:
-                    _cond = cast('Query', cond)
+                    _cond = cast(QueryLike, cond)
 
                     # Pass through all documents to find documents matching the
                     # query. Call the processing callback with the document ID
@@ -441,7 +441,7 @@ class Table:
 
         return updated_ids
 
-    def upsert(self, document: Mapping, cond: Optional[Query] = None) -> List[int]:
+    def upsert(self, document: Mapping, cond: Optional[QueryLike] = None) -> List[int]:
         """
         Update documents, if they exist, insert them otherwise.
 
@@ -484,7 +484,7 @@ class Table:
 
     def remove(
         self,
-        cond: Optional[Query] = None,
+        cond: Optional[QueryLike] = None,
         doc_ids: Optional[Iterable[int]] = None,
     ) -> List[int]:
         """
@@ -504,7 +504,7 @@ class Table:
                 # We need to convince MyPy (the static type checker) that
                 # the ``cond is not None`` invariant still holds true when
                 # the updater function is called
-                _cond = cast('Query', cond)
+                _cond = cast(QueryLike, cond)
 
                 # We need to convert the keys iterator to a list because
                 # we may remove entries from the ``table`` dict during
@@ -556,7 +556,7 @@ class Table:
         # Reset document ID counter
         self._next_id = None
 
-    def count(self, cond: Query) -> int:
+    def count(self, cond: QueryLike) -> int:
         """
         Count the documents matching a query.
 
