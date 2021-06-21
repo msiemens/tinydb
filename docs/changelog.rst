@@ -10,7 +10,10 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-- *nothing here yet*
+- Feature: Better type hinting/IntelliSense for PyCharm, VS Code and MyPy
+  (see `issue 372 <https://github.com/msiemens/tinydb/issues/372>`__).
+  PyCharm and VS Code should work out of the box, for MyPy see
+  :ref:`MyPy Type Checking <mypy_type_checking>`
 
 v4.4.0 (2021-02-11)
 ^^^^^^^^^^^^^^^^^^^

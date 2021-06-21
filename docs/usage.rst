@@ -619,6 +619,24 @@ of these ways:
     # Using the close function
     db.close()
 
+.. _mypy_type_checking:
+
+MyPy Type Checking
+^^^^^^^^^^^^^^^^^^
+
+TinyDB comes with type annotations that MyPy can use to make sure you're using
+the API correctly. Unfortunately, MyPy doesn't understand all code patterns
+that TinyDB uses. For that reason TinyDB ships a MyPy plugin that helps
+correctly type checking code that uses TinyDB. To use it, add it to the
+plugins list in the `MyPy configuration file
+<https://mypy.readthedocs.io/en/latest/config_file.html>`_
+(typically located in ``setup.cfg`` or ``mypy.ini``):
+
+.. code-block:: ini
+
+    [mypy]
+    plugins = tinydb.mypy_plugin
+
 What's next
 -----------
 
