@@ -10,6 +10,11 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
+- *nothing yet*
+
+v4.5.0 (2021-06-25)
+^^^^^^^^^^^^^^^^^^^
+
 - Feature: Better type hinting/IntelliSense for PyCharm, VS Code and MyPy
   (see `issue 372 <https://github.com/msiemens/tinydb/issues/372>`__).
   PyCharm and VS Code should work out of the box, for MyPy see
