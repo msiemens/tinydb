@@ -622,7 +622,7 @@ of these ways:
 .. _mypy_type_checking:
 
 MyPy Type Checking
-^^^^^^^^^^^^^^^^^^
+------------------
 
 TinyDB comes with type annotations that MyPy can use to make sure you're using
 the API correctly. Unfortunately, MyPy doesn't understand all code patterns
