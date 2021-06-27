@@ -42,4 +42,6 @@ jobs:
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
-        poetry run coveralls
+         if [ -n "${COVERALLS_REPO_TOKEN}" ]; then
+            poetry run coveralls
+         fi
