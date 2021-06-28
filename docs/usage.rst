@@ -501,20 +501,14 @@ Default Table
 
 TinyDB uses a table named ``_default`` as the default table. All operations
 on the database object (like ``db.insert(...)``) operate on this table.
-The name of this table can be modified by either passing ``default_table``
-to the ``TinyDB`` constructor or by setting the ``DEFAULT_TABLE`` class
-variable to modify the default table name for all instances:
+The name of this table can be modified by setting the ``default_table_name``
+class variable to modify the default table name for all instances:
 
 >>> #1: for a single instance only
->>> TinyDB(storage=SomeStorage, default_table='my-default')
+>>> db = TinyDB(storage=SomeStorage)
+>>> db.default_table_name = 'my-default'
 >>> #2: for all instances
->>> TinyDB.DEFAULT_TABLE = 'my-default'
-
-You also can modify the keyword arguments that are passed to the default
-table by setting ``TinyDB.DEFAULT_TABLE_KWARGS``. For example, you can
-disable the query cache for the default table by setting like this:
-
->>> TinyDB.DEFAULT_TABLE_KWARGS = {'cache_size': 0}
+>>> TinyDB.default_table_name = 'my-default'
 
 .. _query_caching:
 
@@ -570,9 +564,9 @@ To use the in-memory storage, use:
     >>> db = TinyDB('db.json', sort_keys=True, indent=4, separators=(',', ': '))
 
 To modify the default storage for all ``TinyDB`` instances, set the
-``DEFAULT_STORAGE`` class variable:
+``default_storage_class`` class variable:
 
->>> TinyDB.DEFAULT_STORAGE = MemoryStorage
+>>> TinyDB.default_storage_class = MemoryStorage
 
 In case you need to access the storage instance directly, you can use the
 ``storage`` property of your TinyDB instance. This may be useful to call
