@@ -328,6 +328,11 @@ This will update all users with the name John to have ``logged-in`` set to ``Tru
 If no matching user is found, a new document is inserted with both the name set
 and the ``logged-in`` flag.
 
+To use the ID of the document as matching criterion a :class:`~tinydb.table.Document`
+with ``doc_id`` is passed instead of a query:
+
+>>> db.upsert(Document({'name': 'John', 'logged-in': True}, doc_id=12))
+
 Retrieving data
 ...............
 
