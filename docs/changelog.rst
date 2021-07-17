@@ -12,6 +12,12 @@ unreleased
 
 - *nothing yet*
 
+v4.5.1 (2021-07-17)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix: Correctly install ``typing-extensions`` on Python 3.7
+  (see `issue 413 <https://github.com/msiemens/tinydb/issues/413>`__)
+
 v4.5.0 (2021-06-25)
 ^^^^^^^^^^^^^^^^^^^
 
