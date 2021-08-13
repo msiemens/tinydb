@@ -10,7 +10,8 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-- *nothing yet*
+- Feature: Enable storing database on Google Cloud Storage, by using
+  GCSStorage class
 
 v4.5.1 (2021-07-17)
 ^^^^^^^^^^^^^^^^^^^

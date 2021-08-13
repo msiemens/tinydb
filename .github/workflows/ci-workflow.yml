@@ -24,7 +24,7 @@ jobs:
         python -m pip install --upgrade pip twine
         pip install poetry
         poetry config experimental.new-installer false
-        poetry install
+        poetry install --extras "google-cloud-storage"
     - name: Run test suite
       run: |
         poetry run py.test -v --cov=tinydb

@@ -546,7 +546,7 @@ Storage & Middleware
 Storage Types
 .............
 
-TinyDB comes with two storage types: JSON and in-memory. By
+TinyDB comes with three storage types: JSON, in-memory, GCSStorage. By
 default TinyDB stores its data in JSON files so you have to specify the path
 where to store it:
 
@@ -557,6 +557,11 @@ To use the in-memory storage, use:
 
 >>> from tinydb.storages import MemoryStorage
 >>> db = TinyDB(storage=MemoryStorage)
+
+To use GCSStorage remember to prefix path with ``gs://``
+
+>>> from tinydb.storages import GCSStorage
+>>> db = TinyDB('gs://your_bucket/path/to/db.json',storage=GCSStorage)
 
 .. hint::
     All arguments except for the ``storage`` argument are forwarded to the

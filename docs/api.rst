@@ -60,7 +60,7 @@ API Documentation
 ------------------
 
 .. automodule:: tinydb.storages
-    :members: JSONStorage, MemoryStorage
+    :members: JSONStorage, MemoryStorage, GCSStorage
     :special-members:
     :exclude-members: __weakref__
 

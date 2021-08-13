@@ -10,6 +10,10 @@ To install TinyDB from PyPI, run::
 
     $ pip install tinydb
 
+If you want to use TinyDB with Google Cloud Storage then do::
+
+    $ pip install tinydb[google-cloud-storage]
+
 You can also grab the latest development version from GitHub_. After downloading
 and unpacking it, you can install it using::
 

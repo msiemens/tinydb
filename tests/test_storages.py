@@ -2,12 +2,16 @@ import os
 import random
 import tempfile
 import json
+from typing import Union
+from unittest.mock import MagicMock, patch
 
 import pytest  # type: ignore
 
 from tinydb import TinyDB, where
-from tinydb.storages import JSONStorage, MemoryStorage, Storage, touch
+from tinydb.storages import JSONStorage, MemoryStorage, Storage, touch, GCSStorage, GCSBucketDoesntExists
 from tinydb.table import Document
+
+from google.cloud.storage import Client as GCSClient, Bucket as GCSBucket
 
 random.seed()
 
@@ -279,3 +283,64 @@ def test_encoding(tmpdir):
 
     jap_storage = JSONStorage(path, encoding="cp936")
     assert japanese_doc == jap_storage.read()
+
+
+@patch("google.cloud.storage.Client", autospec=True)
+def test_gcs_storage_get_blob(client_mock: Union[GCSClient, MagicMock]):
+    path = "gs://temporary-bucket/test/tiny_db.db"
+    storage = GCSStorage(path, client_mock)
+    blob = storage.get_blob()
+    assert blob.name == "test/tiny_db.db"
+
+
+@patch("google.cloud.storage.Client", autospec=True)
+def test_gcs_storage_get_bucket(client_mock: Union[GCSClient, MagicMock]):
+    path = "gs://temporary-bucket/tiny_db.db"
+    storage = GCSStorage(path, client_mock)
+    bucket = storage.get_bucket()
+    assert bucket.name == "temporary-bucket"
+
+
+@patch("google.cloud.storage.Client", autospec=True)
+def test_gcs_storage_read_bucket_doesnt_exists(client_mock: Union[GCSClient, MagicMock]):
+    path = "gs://temporary-bucket/tiny_db.db"
+    with patch("tinydb.storages.GCSStorage.bucket_exists", MagicMock(return_value=False)):
+        with pytest.raises(GCSBucketDoesntExists):
+            storage = GCSStorage(path, client_mock)
+            storage.read()
+
+
+@patch("google.cloud.storage.Client", autospec=True)
+def test_gcs_storage_write_bucket_doesnt_exists(client_mock: Union[GCSClient, MagicMock]):
+    path = "gs://temporary-bucket/tiny_db.db"
+    with patch("tinydb.storages.GCSStorage.bucket_exists", MagicMock(return_value=False)):
+        with pytest.raises(GCSBucketDoesntExists):
+            storage = GCSStorage(path, client_mock)
+            storage.write(doc)
+
+
+@patch("google.cloud.storage.Client", autospec=True)
+def test_gcs_storage_read_bucket_blob_doesnt_exists(client_mock: Union[GCSClient, MagicMock]):
+    path = "gs://temporary-bucket/tiny_db.db"
+
+    with patch("tinydb.storages.GCSStorage.get_blob", MagicMock()):
+        storage = GCSStorage(path, client_mock)
+
+        # Mock exists method of blob
+        storage.get_blob.return_value.exists.return_value = False
+
+        result = storage.read()
+        assert result is None
+
+@patch("google.cloud.storage.Client", autospec=True)
+def test_gcs_storage_read_bucket(client_mock: Union[GCSClient, MagicMock]):
+    path = "gs://temporary-bucket/tiny_db.db"
+
+    with patch("tinydb.storages.GCSStorage.get_blob", MagicMock()):
+        storage = GCSStorage(path, client_mock)
+
+        # Return value from blob
+        storage.get_blob.return_value.download_as_string.return_value = "{}"
+
+        result = storage.read()
+        assert result == {}

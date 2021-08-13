@@ -11,6 +11,13 @@ from typing import Dict, Any, Optional
 
 __all__ = ('Storage', 'JSONStorage', 'MemoryStorage')
 
+try:
+    from google.cloud.storage import Blob, Bucket, Client
+except ImportError as e:
+    Blob, Bucket, Client = None, None, None
+
+KeyValueDB = Dict[str, Dict[str, Any]]
+
 
 def touch(path: str, create_dirs: bool):
     """
@@ -44,7 +51,7 @@ class Storage(ABC):
     # implemented read and write
 
     @abstractmethod
-    def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
+    def read(self) -> Optional[KeyValueDB]:
         """
         Read the current state.
 
@@ -56,7 +63,7 @@ class Storage(ABC):
         raise NotImplementedError('To be overridden!')
 
     @abstractmethod
-    def write(self, data: Dict[str, Dict[str, Any]]) -> None:
+    def write(self, data: KeyValueDB) -> None:
         """
         Write the current state of the database to the storage.
 
@@ -80,13 +87,22 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path: str, create_dirs=False, encoding=None, access_mode='r+', **kwargs):
+    def __init__(self,
+                 path: str,
+                 create_dirs: bool = False,
+                 encoding: Optional[str] = None,
+                 access_mode: str = 'r+',
+                 **kwargs):
         """
         Create a new instance.
 
         Also creates the storage file, if it doesn't exist and the access mode is appropriate for writing.
 
         :param path: Where to store the JSON data.
+        :param create_dirs: Flag if un-existing directories in the path should be created .
+        :type create_dirs: bool
+        :param encoding: It is the name of the encoding used to decode or encode the file.
+        :type encoding: str, None
         :param access_mode: mode in which the file is opened (r, r+, w, a, x, b, t, +, U)
         :type access_mode: str
         """
@@ -164,3 +180,51 @@ class MemoryStorage(Storage):
 
     def write(self, data: Dict[str, Dict[str, Any]]):
         self.memory = data
+
+
+class GCSBucketDoesntExists(Exception):
+    """
+    Exception thrown when Google Cloud Storage bucket doesn't exists
+    """
+    pass
+
+
+class GCSStorage(Storage):
+    """
+    Store the data in Google Cloud Storage (aka. Object Storage from Google Cloud)
+    """
+
+    def __init__(self, path: str, client: Optional[Client] = None, **kwargs):
+        """
+        :param path: this should indicate bucket storage
+        """
+        super().__init__()
+        self.path = path
+        self.client = client or Client()
+        self.kwargs = kwargs
+
+    def read(self) -> Optional[KeyValueDB]:
+        if not self.bucket_exists():
+            raise GCSBucketDoesntExists
+        blob = self.get_blob()
+        if not blob.exists():
+            return None
+        else:
+            data = blob.download_as_string()
+            return json.loads(data)
+
+    def write(self, data: KeyValueDB) -> None:
+        if not self.bucket_exists():
+            raise GCSBucketDoesntExists
+        blob = self.get_blob()
+        serialized = json.dumps(data, **self.kwargs)
+        blob.upload_from_string(serialized)
+
+    def get_blob(self) -> Blob:
+        return Blob.from_string(self.path, self.client)
+
+    def get_bucket(self) -> Bucket:
+        return Bucket.from_string(self.path, self.client)
+
+    def bucket_exists(self) -> bool:
+        return self.get_bucket().exists()

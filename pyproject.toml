@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tinydb"
-version = "4.5.1"
+version = "4.6.0"
 description = "TinyDB is a tiny, document oriented database optimized for your happiness :)"
 authors = ["Markus Siemens <markus@m-siemens.de>"]
 license = "MIT"
@@ -40,8 +40,11 @@ packages = [
 "Issues" = "https://github.com/msiemens/tinydb/issues"
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = "^3.6"
 typing-extensions = { version = "^3.10.0", python = "<=3.7" }
+
+# Optional dependencies
+google-cloud-storage = { version = "^1.42.0", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2.2"
@@ -54,6 +57,9 @@ pyyaml = "^5.1.2"
 pytest-mypy = { version = "^0.4.1", markers = "platform_python_implementation != 'PyPy'" }
 types-PyYAML = "^5.4.3"
 typing-extensions = { version = "^3.10.0" }
+
+[tool.poetry.extras]
+google-cloud-storage = ["google-cloud-storage"]
 
 [build-system]
 requires = ["poetry-core"]
