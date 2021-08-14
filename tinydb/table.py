@@ -494,6 +494,25 @@ class Table:
         :param doc_ids: a list of document IDs
         :returns: a list containing the removed documents' ID
         """
+        if doc_ids is not None:
+            # This function returns the list of IDs for the documents that have
+            # been removed. When removing documents identified by a set of
+            # document IDs, it's this list of document IDs we need to return
+            # later.
+            # We convert the document ID iterator into a list so we can both
+            # use the document IDs to remove the specified documents as well as
+            # to return the list of affected document IDs
+            removed_ids = list(doc_ids)
+
+            def updater(table: dict):
+                for doc_id in removed_ids:
+                    table.pop(doc_id)
+
+            # Perform the remove operation
+            self._update_table(updater)
+
+            return removed_ids
+
         if cond is not None:
             removed_ids = []
 
@@ -518,25 +537,6 @@ class Table:
 
                         # Remove document from the table
                         table.pop(doc_id)
-
-            # Perform the remove operation
-            self._update_table(updater)
-
-            return removed_ids
-
-        if doc_ids is not None:
-            # This function returns the list of IDs for the documents that have
-            # been removed. When removing documents identified by a set of
-            # document IDs, it's this list of document IDs we need to return
-            # later.
-            # We convert the document ID iterator into a list so we can both
-            # use the document IDs to remove the specified documents as well as
-            # to return the list of affected document IDs
-            removed_ids = list(doc_ids)
-
-            def updater(table: dict):
-                for doc_id in removed_ids:
-                    table.pop(doc_id)
 
             # Perform the remove operation
             self._update_table(updater)
