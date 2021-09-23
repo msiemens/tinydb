@@ -12,6 +12,14 @@ unreleased
 
 - *nothing yet*
 
+v4.5.2 (2021-09-23)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix: Make ``Table.delete()``'s argument priorities consistent with
+  other table methods. This means that if you pass both ``cond`` as
+  well as ``doc_ids`` to ``Table.delete()``, the latter will be prefered
+  (see `issue 424 <https://github.com/msiemens/tinydb/issues/424>`__)
+
 v4.5.1 (2021-07-17)
 ^^^^^^^^^^^^^^^^^^^
 
