@@ -52,7 +52,7 @@ pycodestyle = "^2.5.0"
 sphinx = "^2.2.1"
 coveralls = "^1.8.2"
 pyyaml = "^5.1.2"
-pytest-mypy = { version = "^0.4.1", markers = "platform_python_implementation != 'PyPy'" }
+pytest-mypy = { version = "^0.8.1", markers = "platform_python_implementation != 'PyPy'" }
 types-PyYAML = "^5.4.3"
 typing-extensions = { version = "^3.10.0" }
 
