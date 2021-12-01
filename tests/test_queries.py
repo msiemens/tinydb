@@ -42,6 +42,12 @@ def test_callable_in_path_with_map():
     assert not query({'value': 10})
 
 
+def test_callable_in_path_with_chain():
+    rekey = lambda x: {'y': x['a'], 'z': x['b']}
+    query = Query().map(rekey).z == 10
+    assert query({'a': 5, 'b': 10})
+
+
 def test_eq():
     query = Query().value == 1
     assert query({'value': 1})
