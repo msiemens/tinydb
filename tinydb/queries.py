@@ -218,7 +218,10 @@ class Query(QueryInstance):
             try:
                 # Resolve the path
                 for part in self._path:
-                    value = value[part]
+                    if isinstance(part, str):
+                        value = value[part]
+                    else:
+                        value = part(value)
             except (KeyError, TypeError):
                 return False
             else:
@@ -487,6 +490,20 @@ class Query(QueryInstance):
             ()
         )
 
+    def map(self, fn: Callable[[Any], Any]) -> 'Query':
+        """
+        Add a function to the query path. Similar to __getattr__ but for
+        arbitrary functions.
+        """
+        query = type(self)()
+
+        # Now we add the callable to the query path ...
+        query._path = self._path + (fn,)
+
+        # ... and update the query hash
+        query._hash = ('path', query._path)
+
+        return query
 
 def where(key: str) -> Query:
     """
