@@ -52,6 +52,13 @@ identifier. In this case, you can switch to array indexing notation:
 >>> # Use this instead:
 >>> db.search(User['country-code'] == 'foo')
 
+In addition, you can use arbitrary transform function where a field would be,
+for example:
+
+>>> from unidecode import unidecode
+>>> db.search(User.name.map(unidecode) == 'Jose')
+>>> # will match 'José' etc.
+
 The second, traditional way of constructing queries is as follows:
 
 >>> from tinydb import where
