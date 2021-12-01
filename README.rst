@@ -52,7 +52,7 @@ projects on the `discussion forum <http://forum.m-siemens.de/.>`_.
 Supported Python Versions
 *************************
 
-TinyDB has been tested with Python 3.6 - 3.9 and PyPy3.
+TinyDB has been tested with Python 3.6 - 3.10 and PyPy3.
 
 Example Code
 ************
