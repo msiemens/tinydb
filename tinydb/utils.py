@@ -41,13 +41,13 @@ class LRUCache(abc.MutableMapping, Generic[K, V]):
     A least-recently used (LRU) cache with a fixed cache size.
 
     This class acts as a dictionary but has a limited size. If the number of
-    entries in the cache exeeds the cache size, the leat-recently accessed
-    entry will be discareded.
+    entries in the cache exceeds the cache size, the least-recently accessed
+    entry will be discarded.
 
     This is implemented using an ``OrderedDict``. On every access the accessed
     entry is moved to the front by re-inserting it into the ``OrderedDict``.
     When adding an entry and the cache size is exceeded, the last entry will
-    be discareded.
+    be discarded.
     """
 
     def __init__(self, capacity=None):
