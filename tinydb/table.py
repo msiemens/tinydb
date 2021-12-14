@@ -232,8 +232,9 @@ class Table:
         # Perform the search by applying the query to all documents
         docs = [doc for doc in self if cond(doc)]
 
-        # Update the query cache
-        self._query_cache[cond] = docs[:]
+        if cond.is_cacheable():
+            # Update the query cache
+            self._query_cache[cond] = docs[:]
 
         return docs
 

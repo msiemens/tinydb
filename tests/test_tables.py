@@ -73,6 +73,27 @@ def test_query_cache(db):
     assert query2 in db._query_cache
 
 
+def test_query_cache_with_mutable_callable(db):
+    table = db.table('table')
+    table.insert({'val': 5})
+
+    mutable = 5
+    increase = lambda x: x + mutable
+
+    assert where('val').is_cacheable()
+    assert not where('val').map(increase).is_cacheable()
+    assert not (where('val').map(increase) == 10).is_cacheable()
+
+    search = where('val').map(increase) == 10
+    assert table.count(search) == 1
+
+    # now `increase` would yield 15, not 10
+    mutable = 10
+
+    assert table.count(search) == 0
+    assert len(table._query_cache) == 0
+
+
 def test_zero_cache_size(db):
     table = db.table('table3', cache_size=0)
     query = where('int') == 1

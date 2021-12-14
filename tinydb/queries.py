@@ -38,11 +38,12 @@ class QueryLike(Protocol):
     """
     A typing protocol that acts like a query.
 
-    Something that we use as a query must have two properties:
+    Something that we use as a query must have three properties:
 
     1. It must be callable, accepting a `Mapping` object and returning a
        boolean that indicates whether the value matches the query, and
     2. it must have a stable hash that will be used for query caching.
+    3. it must declare whether it is cacheable (that is, whether it is immutable).
 
     This query protocol is used to make MyPy correctly support the query
     pattern that TinyDB uses.
@@ -52,6 +53,8 @@ class QueryLike(Protocol):
     def __call__(self, value: Mapping) -> bool: ...
 
     def __hash__(self): ...
+
+    def is_cacheable(self) -> bool: ...
 
 
 class QueryInstance:
@@ -74,6 +77,9 @@ class QueryInstance:
     def __init__(self, test: Callable[[Mapping], bool], hashval: Tuple):
         self._test = test
         self._hash = hashval
+
+    def is_cacheable(self) -> bool:
+        return self._hash is not None
 
     def __call__(self, value: Mapping) -> bool:
         """
@@ -105,19 +111,25 @@ class QueryInstance:
         # We use a frozenset for the hash as the AND operation is commutative
         # (a & b == b & a) and the frozenset does not consider the order of
         # elements
-        return QueryInstance(lambda value: self(value) and other(value),
-                             ('and', frozenset([self._hash, other._hash])))
+        if self.is_cacheable() and other.is_cacheable():
+            hashval = ('and', frozenset([self._hash, other._hash]))
+        else:
+            hashval = None
+        return QueryInstance(lambda value: self(value) and other(value), hashval)
 
     def __or__(self, other: 'QueryInstance') -> 'QueryInstance':
         # We use a frozenset for the hash as the OR operation is commutative
         # (a | b == b | a) and the frozenset does not consider the order of
         # elements
-        return QueryInstance(lambda value: self(value) or other(value),
-                             ('or', frozenset([self._hash, other._hash])))
+        if self.is_cacheable() and other.is_cacheable():
+            hashval = ('or', frozenset([self._hash, other._hash]))
+        else:
+            hashval = None
+        return QueryInstance(lambda value: self(value) or other(value), hashval)
 
     def __invert__(self) -> 'QueryInstance':
-        return QueryInstance(lambda value: not self(value),
-                             ('not', self._hash))
+        hashval = ('not', self._hash) if self.is_cacheable() else None
+        return QueryInstance(lambda value: not self(value), hashval)
 
 
 class Query(QueryInstance):
@@ -182,7 +194,7 @@ class Query(QueryInstance):
         query._path = self._path + (item,)
 
         # ... and update the query hash
-        query._hash = ('path', query._path)
+        query._hash = ('path', query._path) if self.is_cacheable() else None
 
         return query
 
@@ -230,7 +242,7 @@ class Query(QueryInstance):
 
         return QueryInstance(
             lambda value: runner(value),
-            hashval
+            (hashval if self.is_cacheable() else None)
         )
 
     def __eq__(self, rhs: Any):
@@ -500,8 +512,9 @@ class Query(QueryInstance):
         # Now we add the callable to the query path ...
         query._path = self._path + (fn,)
 
-        # ... and update the query hash
-        query._hash = ('path', query._path)
+        # ... and kill the hash - callable objects can be mutable so it's
+        # harmful to cache their results.
+        query._hash = None
 
         return query
 
