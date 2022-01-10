@@ -18,7 +18,7 @@ False
 
 import re
 import sys
-from typing import Mapping, Tuple, Callable, Any, Union, List
+from typing import Mapping, Tuple, Callable, Any, Union, List, Optional
 
 from .utils import freeze
 
@@ -74,7 +74,7 @@ class QueryInstance:
     instance can be used as a key in a dictionary.
     """
 
-    def __init__(self, test: Callable[[Mapping], bool], hashval: Tuple):
+    def __init__(self, test: Callable[[Mapping], bool], hashval: Optional[Tuple]):
         self._test = test
         self._hash = hashval
 
@@ -167,7 +167,7 @@ class Query(QueryInstance):
 
     def __init__(self) -> None:
         # The current path of fields to access when evaluating the object
-        self._path = ()  # type: Tuple[str, ...]
+        self._path = ()  # type: Tuple[Union[str, Callable], ...]
 
         # Prevent empty queries to be evaluated
         def notest(_):
