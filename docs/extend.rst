@@ -157,7 +157,7 @@ Use hooks and overrides
 .. _extend_hooks:
 
 There are cases when neither creating a custom storage nor using a custom
-middlware will allow you to adapt TinyDB in the way you need. In this case
+middleware will allow you to adapt TinyDB in the way you need. In this case
 you can modify TinyDB's behavior by using predefined hooks and override points.
 For example you can configure the name of the default table by setting
 ``TinyDB.default_table_name``:
