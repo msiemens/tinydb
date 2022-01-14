@@ -50,7 +50,7 @@ class Table:
         once a threshold is reached.
 
         The query cache is updated on every search operation. When writing
-        data, the whole cache is discareded as the query results may have
+        data, the whole cache is discarded as the query results may have
         changed.
 
     .. admonition:: Customization
