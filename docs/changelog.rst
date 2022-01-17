@@ -24,6 +24,21 @@ unreleased
 
 - *nothing yet*
 
+v4.6.0 (2022-01-17)
+^^^^^^^^^^^^^^^^^^^
+
+- Feature: Add `map()` query operation to apply a transformation
+  to a document or field when evaluating a query
+  (see `pull request 445 <https://github.com/msiemens/tinydb/pull/445>`_).
+  **Note**: This may break code that queries for a field named ``map``
+  using the ``Query`` APIs property access syntax
+- Feature: Add support for `typing-extensions <https://pypi.org/project/typing-extensions/>`_
+  v4
+- Documentation: Fix a couple of typos in the documentation (see
+  `pull request 446 <https://github.com/msiemens/tinydb/pull/446>`_,
+  `pull request 449 <https://github.com/msiemens/tinydb/pull/449>`_ and
+  `pull request 453 <https://github.com/msiemens/tinydb/pull/453>`_)
+
 v4.5.2 (2021-09-23)
 ^^^^^^^^^^^^^^^^^^^
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tinydb"
-version = "4.5.2"
+version = "4.6.0"
 description = "TinyDB is a tiny, document oriented database optimized for your happiness :)"
 authors = ["Markus Siemens <markus@m-siemens.de>"]
 license = "MIT"
