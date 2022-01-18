@@ -232,7 +232,22 @@ class Table:
         # Perform the search by applying the query to all documents
         docs = [doc for doc in self if cond(doc)]
 
-        if cond.is_cacheable():
+        # Only cache cacheable queries.
+        #
+        # This weird `getattr` dance is needed to make MyPy happy as
+        # it doesn't know that a query might have a `is_cacheable` method
+        # that is not declared in the `QueryLike` protocol due to it being
+        # optional.
+        # See: https://github.com/python/mypy/issues/1424
+        #
+        # Note also that by default we expect custom query objects to be
+        # cacheable (which means they need to have a stable hash value).
+        # This is to keep consistency with TinyDB's behavior before
+        # `is_cacheable` was introduced which assumed that all queries
+        # are cacheable.
+        is_cacheable: Callable[[], bool] = getattr(cond, 'is_cacheable',
+                                                   lambda: True)
+        if is_cacheable():
             # Update the query cache
             self._query_cache[cond] = docs[:]
 

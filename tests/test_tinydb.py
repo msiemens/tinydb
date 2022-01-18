@@ -681,3 +681,13 @@ def test_storage_access():
     db = TinyDB(storage=MemoryStorage)
 
     assert isinstance(db.storage, MemoryStorage)
+
+
+def test_lambda_query():
+    db = TinyDB(storage=MemoryStorage)
+    db.insert({'foo': 'bar'})
+
+    query = lambda doc: doc.get('foo') == 'bar'
+    query.is_cacheable = lambda: False
+    assert db.search(query) == [{'foo': 'bar'}]
+    assert not db._query_cache

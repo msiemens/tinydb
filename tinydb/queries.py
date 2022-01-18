@@ -38,12 +38,15 @@ class QueryLike(Protocol):
     """
     A typing protocol that acts like a query.
 
-    Something that we use as a query must have three properties:
+    Something that we use as a query must have two properties:
 
     1. It must be callable, accepting a `Mapping` object and returning a
        boolean that indicates whether the value matches the query, and
     2. it must have a stable hash that will be used for query caching.
-    3. it must declare whether it is cacheable (that is, whether it is immutable).
+
+    In addition, to mark a query as non-cacheable (e.g. if it involves
+    some remote lookup) it needs to have a method called ``is_cacheable``
+    that returns ``False``.
 
     This query protocol is used to make MyPy correctly support the query
     pattern that TinyDB uses.
@@ -53,8 +56,6 @@ class QueryLike(Protocol):
     def __call__(self, value: Mapping) -> bool: ...
 
     def __hash__(self): ...
-
-    def is_cacheable(self) -> bool: ...
 
 
 class QueryInstance:
