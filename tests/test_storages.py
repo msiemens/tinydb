@@ -1,7 +1,7 @@
+import json
 import os
 import random
 import tempfile
-import json
 
 import pytest
 
