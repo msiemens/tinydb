@@ -24,6 +24,12 @@ unreleased
 
 - *nothing yet*
 
+v4.6.1 (2022-01-18)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix: Make using callables as queries work again
+  (see `issue 454 <https://github.com/msiemens/tinydb/issues/454>`__)
+
 v4.6.0 (2022-01-17)
 ^^^^^^^^^^^^^^^^^^^
 
