@@ -168,7 +168,7 @@ class Query(QueryInstance):
 
     def __init__(self) -> None:
         # The current path of fields to access when evaluating the object
-        self._path = ()  # type: Tuple[Union[str, Callable], ...]
+        self._path: Tuple[Union[str, Callable], ...] = ()
 
         # Prevent empty queries to be evaluated
         def notest(_):

@@ -91,10 +91,10 @@ class TinyDB(TableBase):
         storage = kwargs.pop('storage', self.default_storage_class)
 
         # Prepare the storage
-        self._storage = storage(*args, **kwargs)  # type: Storage
+        self._storage: Storage = storage(*args, **kwargs)
 
         self._opened = True
-        self._tables = {}  # type: Dict[str, Table]
+        self._tables: Dict[str, Table] = {}
 
     def __repr__(self):
         args = [
