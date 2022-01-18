@@ -1,4 +1,4 @@
-import pytest  # type: ignore
+import pytest
 
 from tinydb.utils import LRUCache, freeze, FrozenDict
 

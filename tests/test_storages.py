@@ -3,7 +3,7 @@ import random
 import tempfile
 import json
 
-import pytest  # type: ignore
+import pytest
 
 from tinydb import TinyDB, where
 from tinydb.storages import JSONStorage, MemoryStorage, Storage, touch
