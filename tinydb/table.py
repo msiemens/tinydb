@@ -198,6 +198,7 @@ class Table:
                     # store the doc_id so we can return all document IDs later
                     # then save the document with it's doc_id
                     # and skip the rest of the current loop
+                    doc_id = document.doc_id
                     doc_ids.append(doc_id)
                     table[doc_id] = dict(document)
                     continue
