@@ -84,3 +84,12 @@ Here are some extensions that might be useful to you:
 | **Status:**      *experimental*
 | **Description:** Automatically add create at/ update at timestamps to TinyDB
                    documents.
+
+``BetterJSONStorage``
+*********************
+
+| **Repo:**        https://github.com/MrPigss/BetterJSONStorage
+| **Status:**      *stable*
+| **Description:** BetterJSONStorage is a faster 'Storage Type' for TinyDB. It
+                   uses the faster Orjson library for parsing the JSON and BLOSC
+                   for compression.
