@@ -136,7 +136,8 @@ class Table:
 
     def insert(self, document: Mapping) -> int:
         """
-        Insert a new document into the table.
+        //Insert a new single document 
+        Insert a new document into the table. 
 
         :param document: the document to insert
         :returns: the inserted document's ID
@@ -174,7 +175,7 @@ class Table:
 
     def insert_multiple(self, documents: Iterable[Mapping]) -> List[int]:
         """
-        Insert multiple documents into the table.
+        Insert multiple documents into the table. 
 
         :param documents: a Iterable of documents to insert
         :returns: a list containing the inserted documents' IDs
