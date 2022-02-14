@@ -160,9 +160,9 @@ class Table:
 
         # Now, we update the table and add the document
         def updater(table: dict):
-            
             if doc_id in table:
-                raise ValueError(f'doc_id {str(doc_id)} already exists')
+                raise ValueError(f'Document with ID {str(doc_id)} '
+                                 f'already exists')
                 
             # By calling ``dict(document)`` we convert the data we got to a
             # ``dict`` instance even if it was a different class that
@@ -183,7 +183,7 @@ class Table:
         """
         doc_ids = []
 
-       def updater(table: dict):
+        def updater(table: dict):
             for document in documents:
 
                 # Make sure the document implements the ``Mapping`` interface
@@ -191,21 +191,24 @@ class Table:
                     raise ValueError('Document is not a Mapping')
 
                 if isinstance(document, Document):
-                    # check if document does not override an existing document
+                    # Check if document does not override an existing document
                     if document.doc_id in table:
-                        raise ValueError(f'doc_id {str(document.doc_id)} already exists')
+                        raise ValueError(
+                            f'Document with ID {str(document.doc_id)} '
+                            f'already exists'
+                        )
 
-                    # store the doc_id so we can return all document IDs later
-                    # then save the document with it's doc_id
-                    # and skip the rest of the current loop
+                    # Store the doc_id, so we can return all document IDs
+                    # later. Then save the document with its doc_id and
+                    # skip the rest of the current loop
                     doc_id = document.doc_id
                     doc_ids.append(doc_id)
                     table[doc_id] = dict(document)
                     continue
 
-                # generate new document ID for this document
-                # store the doc_id so we can return all document IDs later
-                # then save the document with the new doc_id
+                # Generate new document ID for this document
+                # Store the doc_id, so we can return all document IDs
+                # later, then save the document with the new doc_id
                 doc_id = self._get_next_id()
                 doc_ids.append(doc_id)
                 table[doc_id] = dict(document)
