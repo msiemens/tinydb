@@ -266,6 +266,18 @@ class:
 >>> db.insert(Document({'name': 'John', 'age': 22}, doc_id=12))
 12
 
+The same is possible when using ``db.insert_multiple(...)``:
+
+>>> db.insert_multiple([
+    Document({'name': 'John', 'age': 22}, doc_id=12),
+    Document({'name': 'Jane', 'age': 24}, doc_id=14),
+])
+[12, 14]
+
+.. note::
+    Inserting a ``Document`` with an ID that already exists will result
+    in a ``ValueError`` being raised.
+
 Updating data
 .............
 
