@@ -61,7 +61,7 @@ def test_insert_with_duplicate_doc_id(db: TinyDB):
     db.drop_tables()
     assert db.insert({'int': 1, 'char': 'a'}) == 1
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         db.insert(Document({'int': 1, 'char': 'a'}, 1))
 
 
@@ -106,6 +106,17 @@ def test_insert_multiple_with_ids(db: TinyDB):
     assert db.insert_multiple([{'int': 1, 'char': 'a'},
                                {'int': 1, 'char': 'b'},
                                {'int': 1, 'char': 'c'}]) == [1, 2, 3]
+
+
+def test_insert_multiple_with_doc_ids(db: TinyDB):
+    db.drop_tables()
+
+    assert db.insert_multiple([
+        Document({'int': 1, 'char': 'a'}, 12),
+        Document({'int': 1, 'char': 'b'}, 77)
+    ]) == [12, 77]
+    assert db.get(doc_id=12) == {'int': 1, 'char': 'a'}
+    assert db.get(doc_id=77) == {'int': 1, 'char': 'b'}
 
 
 def test_insert_invalid_type_raises_error(db: TinyDB):
