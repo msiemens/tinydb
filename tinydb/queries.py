@@ -93,8 +93,8 @@ class QueryInstance:
 
     def __hash__(self):
         # We calculate the query hash by using the ``hashval`` object which
-        # describes this query uniquely so we can calculate a stable hash value
-        # by simply hashing it
+        # describes this query uniquely, so we can calculate a stable hash
+        # value by simply hashing it
         return hash(self._hash)
 
     def __repr__(self):
@@ -137,7 +137,7 @@ class Query(QueryInstance):
     """
     TinyDB Queries.
 
-    Allows to build queries for TinyDB databases. There are two main ways of
+    Allows building queries for TinyDB databases. There are two main ways of
     using queries:
 
     1) ORM-like usage:
@@ -163,7 +163,7 @@ class Query(QueryInstance):
 
     Queries are executed by calling the resulting object. They expect to get
     the document to test as the first argument and return ``True`` or
-    ``False`` depending on whether the documents matches the query or not.
+    ``False`` depending on whether the documents match the query or not.
     """
 
     def __init__(self) -> None:
@@ -513,7 +513,7 @@ class Query(QueryInstance):
         # Now we add the callable to the query path ...
         query._path = self._path + (fn,)
 
-        # ... and kill the hash - callable objects can be mutable so it's
+        # ... and kill the hash - callable objects can be mutable, so it's
         # harmful to cache their results.
         query._hash = None
 

@@ -9,7 +9,7 @@ from .table import Table, Document
 from .utils import with_typehint
 
 # The table's base class. This is used to add type hinting from the Table
-# class to TinyDB. Currently this supports PyCharm, Pyright/VS Code and MyPy.
+# class to TinyDB. Currently, this supports PyCharm, Pyright/VS Code and MyPy.
 TableBase: Type[Table] = with_typehint(Table)
 
 
@@ -116,7 +116,7 @@ class TinyDB(TableBase):
         created using the :attr:`~tinydb.database.TinyDB.table_class` class.
         Otherwise, the previously created table instance wil be returned.
 
-        All futher options besides the name are passed to the table class which
+        All further options besides the name are passed to the table class which
         by default is :class:`~tinydb.table.Table`. Check its documentation
         for further parameters you can pass.
 
@@ -154,7 +154,7 @@ class TinyDB(TableBase):
         # To get a set of table names, we thus construct a set of this main
         # dict which returns a set of the dict keys which are the table names.
         #
-        # Storage.read() may return ``None`` if the database file is empty
+        # Storage.read() may return ``None`` if the database file is empty,
         # so we need to consider this case to and return an empty set in this
         # case.
 
@@ -169,7 +169,7 @@ class TinyDB(TableBase):
         # to the storage thereby returning to the initial state with no tables.
         self.storage.write({})
 
-        # After that we need to remeber to empty the ``_tables`` dict so we'll
+        # After that we need to remember to empty the ``_tables`` dict, so we'll
         # create new table instances when a table is accessed again.
         self._tables.clear()
 
@@ -269,6 +269,6 @@ class TinyDB(TableBase):
 
     def __iter__(self) -> Iterator[Document]:
         """
-        Return an iterater for the default table's documents.
+        Return an iterator for the default table's documents.
         """
         return iter(self.table(self.default_table_name))

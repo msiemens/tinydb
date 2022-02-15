@@ -100,6 +100,6 @@ def test_caching_json_write(tmpdir):
 
     del db
 
-    # Repoen database
+    # Reopen database
     with TinyDB(path, storage=CachingMiddleware(JSONStorage)) as db:
         assert db.all() == [{'key': 'value'}]

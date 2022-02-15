@@ -27,7 +27,7 @@ class Document(dict):
     """
     A document stored in the database.
 
-    This class provides a way to access both a document's content as well as
+    This class provides a way to access both a document's content and
     its ID using ``doc.doc_id``.
     """
 
@@ -178,7 +178,7 @@ class Table:
         """
         Insert multiple documents into the table.
 
-        :param documents: a Iterable of documents to insert
+        :param documents: an Iterable of documents to insert
         :returns: a list containing the inserted documents' IDs
         """
         doc_ids = []
@@ -545,8 +545,8 @@ class Table:
             # been removed. When removing documents identified by a set of
             # document IDs, it's this list of document IDs we need to return
             # later.
-            # We convert the document ID iterator into a list so we can both
-            # use the document IDs to remove the specified documents as well as
+            # We convert the document ID iterator into a list, so we can both
+            # use the document IDs to remove the specified documents and
             # to return the list of affected document IDs
             removed_ids = list(doc_ids)
 
@@ -699,10 +699,10 @@ class Table:
 
     def _update_table(self, updater: Callable[[Dict[int, Mapping]], None]):
         """
-        Perform an table update operation.
+        Perform a table update operation.
 
         The storage interface used by TinyDB only allows to read/write the
-        complete database data, but not modifying only portions of it. Thus
+        complete database data, but not modifying only portions of it. Thus,
         to only update portions of the table data, we first perform a read
         operation, perform the update on the table data and then write
         the updated data back to the storage.

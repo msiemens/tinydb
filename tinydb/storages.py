@@ -114,7 +114,7 @@ class JSONStorage(Storage):
         size = self._handle.tell()
 
         if not size:
-            # File is empty so we return ``None`` so TinyDB can properly
+            # File is empty, so we return ``None`` so TinyDB can properly
             # initialize the database
             return None
         else:
@@ -137,7 +137,7 @@ class JSONStorage(Storage):
         except io.UnsupportedOperation:
             raise IOError('Cannot write to the database. Access mode is "{0}"'.format(self._mode))
 
-        # Ensure the file has been writtens
+        # Ensure the file has been written
         self._handle.flush()
         os.fsync(self._handle.fileno())
 

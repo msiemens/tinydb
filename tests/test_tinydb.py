@@ -147,7 +147,7 @@ def test_insert_valid_mapping_type(db: TinyDB):
     assert db.count(where('int') == 1) == 1
 
 
-def test_cutom_mapping_type_with_json(tmpdir):
+def test_custom_mapping_type_with_json(tmpdir):
     class CustomDocument(Mapping):
         def __init__(self, data):
             self.data = data
