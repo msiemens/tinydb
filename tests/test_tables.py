@@ -162,7 +162,7 @@ def test_table_repr(db):
 
     assert re.match(
         r"<Table name=\'table4\', total=0, "
-        r"storage=<tinydb\.storages\.MemoryStorage object at [a-zA-Z0-9]+>>",
+        r"storage=<tinydb\.storages\.(MemoryStorage|JSONStorage) object at [a-zA-Z0-9]+>>",
         repr(table))
 
 
