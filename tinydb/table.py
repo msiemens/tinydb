@@ -246,8 +246,14 @@ class Table:
         if cached_results is not None:
             return cached_results[:]
 
-        # Perform the search by applying the query to all documents
-        docs = [doc for doc in self if cond(doc)]
+        # Perform the search by applying the query to all documents.
+        # Then, only if the document matches the query, convert it
+        # to the document class and document ID class.
+        docs = [
+            self.document_class(doc, self.document_id_class(doc_id))
+            for doc_id, doc in self._read_table().items()
+            if cond(doc)
+        ]
 
         # Only cache cacheable queries.
         #
@@ -299,9 +305,16 @@ class Table:
 
         elif cond is not None:
             # Find a document specified by a query
-            for doc in self:
+            # The trailing underscore in doc_id_ is needed so MyPy
+            # doesn't think that `doc_id_` (which is a string) needs
+            # to have the same type as `doc_id` which is this function's
+            # parameter and is an optional `int`.
+            for doc_id_, doc in self._read_table().items():
                 if cond(doc):
-                    return doc
+                    return self.document_class(
+                        doc,
+                        self.document_id_class(doc_id_)
+                    )
 
             return None
 
