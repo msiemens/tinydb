@@ -24,6 +24,18 @@ unreleased
 
 - *nothing yet*
 
+v4.7.0 (2022-02-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Feature: Allow inserting ``Document`` instances using ``Table.insert_multiple``
+  (see `pull request 455 <https://github.com/msiemens/tinydb/pull/455>`_).
+- Performance: Only convert document IDs of a table when returning documents.
+  This improves performance the ``Table.count`` and ``Table.get`` operations
+  and also for ``Table.search`` when only returning a few documents
+  (see `pull request 460 <https://github.com/msiemens/tinydb/pull/460>`_).
+- Internal change: Run all ``Table`` tests ``JSONStorage`` in addition to
+  ``MemoryStorage``.
+
 v4.6.1 (2022-01-18)
 ^^^^^^^^^^^^^^^^^^^
 
