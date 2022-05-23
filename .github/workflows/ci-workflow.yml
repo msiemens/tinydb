@@ -16,6 +16,8 @@ jobs:
         exclude:
         - os: windows-latest
           python-version: "pypy3"
+        - os: macos-latest
+          python-version: "pypy3"
 
     steps:
     - uses: actions/checkout@v2
