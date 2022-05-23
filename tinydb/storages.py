@@ -6,53 +6,10 @@ implementations.
 import io
 import json
 import os
-import tempfile
-import sys
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
 __all__ = ('Storage', 'JSONStorage', 'MemoryStorage')
-
-# Adapted from https://github.com/untitaker/python-atomicwrites/blob/c35cd32eb364d5a4210e64bf38fd1a55f329f316/atomicwrites/__init__.py
-if sys.platform != 'win32':
-    def _sync_directory(directory):
-        # Ensure that filenames are written to disk
-        fd = os.open(directory, 0)
-        try:
-            os.fsync(fd)
-        finally:
-            os.close(fd)
-
-
-    def _replace_atomic(src, dst):
-        os.rename(src, dst)
-        _sync_directory(os.path.normpath(os.path.dirname(dst)))
-
-else:
-    from ctypes import windll, WinError
-
-    _MOVEFILE_REPLACE_EXISTING = 0x1
-    _MOVEFILE_WRITE_THROUGH = 0x8
-    _windows_default_flags = _MOVEFILE_WRITE_THROUGH
-
-
-    def _path_to_unicode(x):
-        if not isinstance(x, str):
-            return x.decode(sys.getfilesystemencoding())
-
-        return x
-
-
-    def _handle_errors(rv):
-        if not rv:
-            raise WinError()
-
-
-    def _replace_atomic(src, dst):
-        _handle_errors(windll.kernel32.MoveFileExW(
-            _path_to_unicode(src), _path_to_unicode(dst),
-            _windows_default_flags | _MOVEFILE_REPLACE_EXISTING
-        ))
 
 
 def touch(path: str, create_dirs: bool):
@@ -123,8 +80,7 @@ class JSONStorage(Storage):
     Store the data in a JSON file.
     """
 
-    def __init__(self, path: str, create_dirs=False, encoding=None,
-                 access_mode='r+', **kwargs):
+    def __init__(self, path: str, create_dirs=False, encoding=None, access_mode='r+', **kwargs):
         """
         Create a new instance.
 
@@ -142,8 +98,7 @@ class JSONStorage(Storage):
 
         # Create the file if it doesn't exist and creating is allowed by the
         # access mode
-        if any([character in self._mode for character in
-                ('+', 'w', 'a')]):  # any of the writing modes
+        if any([character in self._mode for character in ('+', 'w', 'a')]):  # any of the writing modes
             touch(path, create_dirs=create_dirs)
 
         # Open the file for reading/writing
@@ -170,35 +125,25 @@ class JSONStorage(Storage):
             return json.load(self._handle)
 
     def write(self, data: Dict[str, Dict[str, Any]]):
-        file_name = self._handle.name
-
-        # Create a temporary file in the same folder
-        temp_file = tempfile.NamedTemporaryFile(mode=self._mode,
-                                                prefix=file_name, delete=False)
+        # Move the cursor to the beginning of the file just in case
+        self._handle.seek(0)
 
         # Serialize the database state using the user-provided arguments
         serialized = json.dumps(data, **self.kwargs)
 
         # Write the serialized data to the file
         try:
-            temp_file.write(serialized)
+            self._handle.write(serialized)
         except io.UnsupportedOperation:
-            raise IOError(
-                'Cannot write to the database. Access mode is "{0}"'.format(
-                    self._mode))
+            raise IOError('Cannot write to the database. Access mode is "{0}"'.format(self._mode))
 
         # Ensure the file has been written
-        temp_file.flush()
-        os.fsync(temp_file.fileno())
+        self._handle.flush()
+        os.fsync(self._handle.fileno())
 
-        # Replace the current file with the temporary file
-        temp_file.close()
-        _replace_atomic(temp_file.name, file_name)
-
-        # Reopen the file
-        self._handle.close()
-        self._handle = open(file_name, mode=self._mode,
-                            encoding=self._handle.encoding)
+        # Remove data that is behind the new cursor in case the file has
+        # gotten shorter
+        self._handle.truncate()
 
 
 class MemoryStorage(Storage):
