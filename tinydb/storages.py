@@ -6,6 +6,7 @@ implementations.
 import io
 import json
 import os
+import tempfile
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
@@ -125,25 +126,31 @@ class JSONStorage(Storage):
             return json.load(self._handle)
 
     def write(self, data: Dict[str, Dict[str, Any]]):
-        # Move the cursor to the beginning of the file just in case
-        self._handle.seek(0)
+        file_name = self._handle.name
+
+        # Create a temporary file in the same folder
+        temp_file = tempfile.NamedTemporaryFile(mode=self._mode, prefix=file_name, delete=False)
 
         # Serialize the database state using the user-provided arguments
         serialized = json.dumps(data, **self.kwargs)
 
         # Write the serialized data to the file
         try:
-            self._handle.write(serialized)
+            temp_file.write(serialized)
         except io.UnsupportedOperation:
             raise IOError('Cannot write to the database. Access mode is "{0}"'.format(self._mode))
 
         # Ensure the file has been written
-        self._handle.flush()
-        os.fsync(self._handle.fileno())
+        temp_file.flush()
+        os.fsync(temp_file.fileno())
 
-        # Remove data that is behind the new cursor in case the file has
-        # gotten shorter
-        self._handle.truncate()
+        # Replace the current file with the temporary file
+        temp_file.close()
+        os.rename(temp_file.name, file_name)
+
+        # Reopen the file
+        self._handle.close()
+        self._handle = open(file_name, mode=self._mode, encoding=self._handle.encoding)
 
 
 class MemoryStorage(Storage):
