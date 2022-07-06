@@ -9,7 +9,7 @@ Version 4.0
 - API changes:
     - Replace ``TinyDB.purge_tables(...)`` with ``TinyDB.drop_tables(...)``
     - Replace ``TinyDB.purge_table(...)`` with ``TinyDB.drop_table(...)``
-    - Replace ``Table.purge()`` with ``Table.trunacte()``
+    - Replace ``Table.purge()`` with ``Table.truncate()``
     - Replace ``TinyDB(default_table='name')`` with ``TinyDB.default_table_name = 'name'``
     - Replace ``TinyDB(table_class=Class)`` with ``TinyDB.table_class = Class``
     - If you were using ``TinyDB.DEFAULT_TABLE``, ``TinyDB.DEFAULT_TABLE_KWARGS``,
@@ -35,7 +35,7 @@ Breaking API Changes
          notation can be used: ``where('a.b.c')`` is now
          ``Query()['a.b.c']``.
 
-  -  Checking for the existence of a key has to be done explicitely:
+  -  Checking for the existence of a key has to be done explicitly:
      ``where('foo').exists()``.
 
 -  ``SmartCacheTable`` has been moved to `msiemens/tinydb-smartcache`_.

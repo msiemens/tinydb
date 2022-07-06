@@ -382,7 +382,7 @@ class Query(QueryInstance):
 
         .. warning::
 
-            The test fuction provided needs to be deterministic (returning the
+            The test function provided needs to be deterministic (returning the
             same value when provided with the same arguments), otherwise this
             may mess up the query cache that :class:`~tinydb.table.Table`
             implements.

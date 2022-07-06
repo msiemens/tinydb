@@ -9,7 +9,7 @@ Here are some extensions that might be useful to you:
 | **Repo:**        https://github.com/ASMfreaK/aiotinydb
 | **Status:**      *stable*
 | **Description:** asyncio compatibility shim for TinyDB. Enables usage of
-                   TinyDB in asyncio-aware contexts without slow syncronous
+                   TinyDB in asyncio-aware contexts without slow synchronous
                    IO.
 
 
