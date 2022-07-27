@@ -146,10 +146,10 @@ class JSONStorage(Storage):
 
         # Replace the current file with the temporary file
         temp_file.close()
-        os.rename(temp_file.name, file_name)
+        self._handle.close()
+        os.replace(temp_file.name, file_name)
 
         # Reopen the file
-        self._handle.close()
         self._handle = open(file_name, mode=self._mode, encoding=self._handle.encoding)
 
 

@@ -19,7 +19,8 @@ def db(request):
         db_.drop_tables()
         db_.insert_multiple({'int': 1, 'char': c} for c in 'abc')
 
-        yield db_
+        with db_:
+            yield db_
 
 
 @pytest.fixture
