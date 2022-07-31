@@ -126,6 +126,10 @@ class JSONStorage(Storage):
             return json.load(self._handle)
 
     def write(self, data: Dict[str, Dict[str, Any]]):
+        if self._handle.closed:
+            # imitate what would be raised by calling `write()` on a closed file
+            raise ValueError("I/O operation on a closed file.")
+
         file_name = self._handle.name
 
         # Create a temporary file in the same folder
