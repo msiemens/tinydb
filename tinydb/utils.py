@@ -50,7 +50,7 @@ class LRUCache(abc.MutableMapping, Generic[K, V]):
     be discarded.
     """
 
-    def __init__(self, capacity=None):
+    def __init__(self, capacity=None) -> None:
         self.capacity = capacity
         self.cache: OrderedDict[K, V] = OrderedDict()
 
@@ -87,7 +87,7 @@ class LRUCache(abc.MutableMapping, Generic[K, V]):
     def __iter__(self) -> Iterator[K]:
         return iter(self.cache)
 
-    def get(self, key: K, default: D = None) -> Optional[Union[V, D]]:
+    def get(self, key: K, default: Optional[D] = None) -> Optional[Union[V, D]]:
         value = self.cache.get(key)
 
         if value is not None:
@@ -131,7 +131,7 @@ class FrozenDict(dict):
     __setitem__ = _immutable
     __delitem__ = _immutable
     clear = _immutable
-    setdefault = _immutable
+    setdefault = _immutable  # type: ignore
     popitem = _immutable
 
     def update(self, e=None, **f):

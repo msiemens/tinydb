@@ -2,6 +2,9 @@
 Contains the :class:`base class <tinydb.middlewares.Middleware>` for
 middlewares and implementations.
 """
+from typing import Optional
+
+from tinydb import Storage
 
 
 class Middleware:
@@ -15,9 +18,9 @@ class Middleware:
     constructor so the middleware chain can be configured properly.
     """
 
-    def __init__(self, storage_cls):
+    def __init__(self, storage_cls) -> None:
         self._storage_cls = storage_cls
-        self.storage = None
+        self.storage: Storage = None  # type: ignore
 
     def __call__(self, *args, **kwargs):
         """
