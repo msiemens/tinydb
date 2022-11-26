@@ -91,7 +91,7 @@ class QueryInstance:
         """
         return self._test(value)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # We calculate the query hash by using the ``hashval`` object which
         # describes this query uniquely, so we can calculate a stable hash
         # value by simply hashing it
