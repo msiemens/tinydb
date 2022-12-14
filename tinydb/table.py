@@ -666,7 +666,7 @@ class Table:
         max_id = max(self.document_id_class(i) for i in table.keys())
         next_id = max_id + 1
 
-        # The next ID we wil return AFTER this call needs to be larger than
+        # The next ID we will return AFTER this call needs to be larger than
         # the current next ID we calculated
         self._next_id = next_id + 1
 

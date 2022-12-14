@@ -62,7 +62,7 @@ v4.5.2 (2021-09-23)
 
 - Fix: Make ``Table.delete()``'s argument priorities consistent with
   other table methods. This means that if you pass both ``cond`` as
-  well as ``doc_ids`` to ``Table.delete()``, the latter will be prefered
+  well as ``doc_ids`` to ``Table.delete()``, the latter will be preferred
   (see `issue 424 <https://github.com/msiemens/tinydb/issues/424>`__)
 
 v4.5.1 (2021-07-17)
@@ -329,7 +329,7 @@ v3.4.1 (2017-08-23)
 v3.4.0 (2017-08-08)
 ^^^^^^^^^^^^^^^^^^^
 
-- Add new update operations: ``add(key, value)``, ``substract(key, value)``,
+- Add new update operations: ``add(key, value)``, ``subtract(key, value)``,
   and ``set(key, value)``
   (see `pull request #145 <https://github.com/msiemens/tinydb/pull/145>`_).
 
@@ -425,7 +425,7 @@ v3.0.0 (2015-11-13)
          notation can be used: ``where('a.b.c')`` is now
          ``Query()['a.b.c']``.
 
-   -  Checking for the existence of a key has to be done explicitely:
+   -  Checking for the existence of a key has to be done explicitly:
       ``where('foo').exists()``.
 
 -  Migrations from v1 to v2 have been removed.
