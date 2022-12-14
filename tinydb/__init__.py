@@ -1,7 +1,7 @@
 """
 TinyDB is a tiny, document oriented database optimized for your happiness :)
 
-TinyDB stores differrent types of Python data types using a configurable
+TinyDB stores different types of Python data types using a configurable
 storage mechanism. It comes with a syntax for querying data and storing
 data in multiple tables.
 

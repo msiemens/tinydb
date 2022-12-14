@@ -114,7 +114,7 @@ class TinyDB(TableBase):
 
         If the table hasn't been accessed yet, a new table instance will be
         created using the :attr:`~tinydb.database.TinyDB.table_class` class.
-        Otherwise, the previously created table instance wil be returned.
+        Otherwise, the previously created table instance will be returned.
 
         All further options besides the name are passed to the table class which
         by default is :class:`~tinydb.table.Table`. Check its documentation
