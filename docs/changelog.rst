@@ -28,8 +28,7 @@ v4.7.1 (2023-01-14)
 ^^^^^^^^^^^^^^^^^^^
 
 - Improvement: Improve typing annotations
-  (see `pull request 477 <https://github.com/msiemens/tinydb/pull/477>`_
-  and `pull request 496 <https://github.com/msiemens/tinydb/pull/496>`_).
+  (see `pull request 477 <https://github.com/msiemens/tinydb/pull/477>`_).
 - Improvement: Fix some typos in the documentation
   (see `pull request 479 <https://github.com/msiemens/tinydb/pull/479>`_
   and `pull request 498 <https://github.com/msiemens/tinydb/pull/498>`_).
