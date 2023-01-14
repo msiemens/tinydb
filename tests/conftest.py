@@ -21,5 +21,11 @@ def db(request, tmp_path: Path):
 
 
 @pytest.fixture
+def db_empty(db: TinyDB):
+    db.drop_tables()
+    return db
+
+
+@pytest.fixture
 def storage():
     return CachingMiddleware(MemoryStorage)()
