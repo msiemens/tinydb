@@ -1,5 +1,3 @@
-import os.path
-import tempfile
 from pathlib import Path
 
 import pytest  # type: ignore
