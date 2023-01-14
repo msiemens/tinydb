@@ -33,7 +33,8 @@ classifiers = [
 ]
 
 packages = [
-    { include = "tinydb" }
+    { include = "tinydb" },
+    { include = "tests", format = "sdist" }
 ]
 
 [tool.poetry.urls]
