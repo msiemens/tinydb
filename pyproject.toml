@@ -38,7 +38,7 @@ packages = [
 ]
 
 [tool.poetry.urls]
-"Changelog" = "https://github.com/msiemens/tinydb/en/latest/changelog.html"
+"Changelog" = "https://tinydb.readthedocs.io/en/latest/changelog.html"
 "Issues" = "https://github.com/msiemens/tinydb/issues"
 
 [tool.poetry.dependencies]
