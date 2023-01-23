@@ -279,30 +279,43 @@ class Table:
     def get(
         self,
         cond: Optional[QueryLike] = None,
-        doc_id: Optional[int] = None,
-    ) -> Optional[Document]:
+        doc_id: Optional[Union[int , List]] = None,
+    ) -> Optional[Union[Document , List[Document]]]:
         """
         Get exactly one document specified by a query or a document ID.
-
+        However if muliple document IDs are given then reurns all docu-
+        ments in a list.
+        
         Returns ``None`` if the document doesn't exist.
 
         :param cond: the condition to check against
         :param doc_id: the document's ID
 
-        :returns: the document or ``None``
+        :returns: the document(s) or ``None``
         """
-
+        
         if doc_id is not None:
-            # Retrieve a document specified by its ID
             table = self._read_table()
-            raw_doc = table.get(str(doc_id), None)
+            if isinstance(doc_id , int):
+                # Retrieve a document specified by its ID
+                raw_doc = table.get(str(doc_id), None)
 
-            if raw_doc is None:
-                return None
+                if raw_doc is None:
+                    return None
 
-            # Convert the raw data to the document class
-            return self.document_class(raw_doc, doc_id)
+                # Convert the raw data to the document class
+                return self.document_class(raw_doc, doc_id)
+            elif isinstance(doc_id , list):
+                # Filter the table by extracting out all those documents which have doc id
+                # specified in the doc_id list.
+                raw_docs = dict(filter(lambda item: int(item[0]) in doc_id, table.items()))
+                if raw_docs is None:
+                    return None
 
+                ## Now return the filtered documents in form of list
+                return list(map(lambda x:self.document_class(raw_docs[str(x)] , int(x)) , raw_docs.keys()))
+            
+            return None
         elif cond is not None:
             # Find a document specified by a query
             # The trailing underscore in doc_id_ is needed so MyPy
