@@ -366,7 +366,10 @@ def test_get_ids(db: TinyDB):
     assert db.get(doc_id=el.doc_id) == el
     assert db.get(doc_id=float('NaN')) is None  # type: ignore
 
-
+def test_get_multiple_ids(db: TinyDB):
+    el = db.all()
+    assert db.get(doc_id=[x.doc_id for x in el]) == el
+    
 def test_get_invalid(db: TinyDB):
     with pytest.raises(RuntimeError):
         db.get()
