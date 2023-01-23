@@ -283,7 +283,7 @@ class Table:
     ) -> Optional[Union[Document , List[Document]]]:
         """
         Get exactly one document specified by a query or a document ID.
-        However if muliple document IDs are given then reurns all docu-
+        However if muliple document IDs are given then returns all docu-
         ments in a list.
         
         Returns ``None`` if the document doesn't exist.
@@ -292,8 +292,7 @@ class Table:
         :param doc_id: the document's ID
 
         :returns: the document(s) or ``None``
-        """
-        
+        """      
         if doc_id is not None:
             table = self._read_table()
             if isinstance(doc_id , int):
