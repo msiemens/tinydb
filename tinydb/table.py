@@ -2,7 +2,7 @@
 This module implements tables, the central place for accessing and manipulating
 data in TinyDB.
 """
-
+from itertools import islice
 from typing import (
     Callable,
     Dict,
@@ -218,10 +218,11 @@ class Table:
 
         return doc_ids
 
-    def all(self) -> List[Document]:
+    def all(self, limit: int = 0) -> List[Document]:
         """
         Get all documents stored in the table.
 
+        :param limit: limit the query result.
         :returns: a list with all documents.
         """
 
@@ -230,12 +231,16 @@ class Table:
         # of all documents by using the ``list`` constructor to perform the
         # conversion.
 
+        if limit > 0:
+            return list(islice(iter(self), limit))
+
         return list(iter(self))
 
-    def search(self, cond: QueryLike) -> List[Document]:
+    def search(self, cond: QueryLike, limit: int = 0) -> List[Document]:
         """
         Search for all documents matching a 'where' cond.
 
+        :param limit: limit the query result.
         :param cond: the condition to check against
         :returns: list of matching documents
         """
@@ -243,7 +248,10 @@ class Table:
         # First, we check the query cache to see if it has results for this
         # query
         cached_results = self._query_cache.get(cond)
-        if cached_results is not None:
+        if cached_results and limit > 0:
+            return cached_results[:limit]
+
+        if cached_results:
             return cached_results[:]
 
         # Perform the search by applying the query to all documents.
@@ -273,6 +281,9 @@ class Table:
         if is_cacheable():
             # Update the query cache
             self._query_cache[cond] = docs[:]
+
+        if limit > 0:
+            return docs[:limit]
 
         return docs
 

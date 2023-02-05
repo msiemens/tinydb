@@ -1,3 +1,4 @@
+from random import randint
 import re
 from collections.abc import Mapping
 
@@ -25,6 +26,16 @@ def test_all(db: TinyDB):
         db.insert({})
 
     assert len(db.all()) == 10
+
+
+def test_all_with_limit(db: TinyDB):
+    db.drop_tables()
+    limit = randint(1, 10)
+
+    for i in range(limit):
+        db.insert({})
+
+    assert len(db.all(limit)) == limit
 
 
 def test_insert(db: TinyDB):
@@ -341,6 +352,26 @@ def test_search(db: TinyDB):
     assert len(db.search(where('int') == 1)) == 3  # Query result from cache
 
 
+def test_search_with_limit(db: TinyDB):
+    limit = randint(1, 2)
+
+    assert not db._query_cache
+    assert len(db.search(where('int') == 1, limit)) == limit
+
+    assert len(db._query_cache) == 1
+    assert len(db.search(where('int') == 1, limit)) == limit  # Query result from cache
+
+
+def test_search_with_limit_negative(db: TinyDB):
+    limit = randint(-8, -1)
+
+    assert not db._query_cache
+    assert len(db.search(where('int') == 1, limit)) == 3
+
+    assert len(db._query_cache) == 1
+    assert len(db.search(where('int') == 1, limit)) == 3  # Query result from cache
+
+
 def test_search_path(db: TinyDB):
     assert not db._query_cache
     assert len(db.search(where('int').exists())) == 3
@@ -353,6 +384,12 @@ def test_search_path(db: TinyDB):
 def test_search_no_results_cache(db: TinyDB):
     assert len(db.search(where('missing').exists())) == 0
     assert len(db.search(where('missing').exists())) == 0
+
+
+def test_search_no_results_cache_with_limit(db: TinyDB):
+    limit = randint(1, 4)
+    assert len(db.search(where('missing').exists(), limit)) == 0
+    assert len(db.search(where('missing').exists(), limit)) == 0
 
 
 def test_get(db: TinyDB):

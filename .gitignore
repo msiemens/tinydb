@@ -42,3 +42,6 @@ nosetests.xml
 *.db.yml
 
 .DS_Store
+
+venv
+.vscode
