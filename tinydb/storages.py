@@ -6,6 +6,7 @@ implementations.
 import io
 import json
 import os
+import warnings
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
@@ -99,6 +100,12 @@ class JSONStorage(Storage):
 
         self._mode = access_mode
         self.kwargs = kwargs
+
+        if access_mode not in ('r', 'rb', 'r+', 'rb+'):
+            warnings.warn(
+                'Using an `access_mode` other than \'r\', \'rb\', \'r+\' '
+                'or \'rb+\' can cause data loss or corruption'
+            )
 
         # Create the file if it doesn't exist and creating is allowed by the
         # access mode
