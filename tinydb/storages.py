@@ -84,10 +84,14 @@ class JSONStorage(Storage):
         """
         Create a new instance.
 
-        Also creates the storage file, if it doesn't exist and the access mode is appropriate for writing.
+        Also creates the storage file, if it doesn't exist and the access mode
+        is appropriate for writing.
+
+        Note: Using an access mode other than `r` or `r+` will probably lead to
+        data loss or data corruption!
 
         :param path: Where to store the JSON data.
-        :param access_mode: mode in which the file is opened (r, r+, w, a, x, b, t, +, U)
+        :param access_mode: mode in which the file is opened (r, r+)
         :type access_mode: str
         """
 
