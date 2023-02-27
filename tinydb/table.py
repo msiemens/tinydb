@@ -72,6 +72,7 @@ class Table:
     :param storage: The storage instance to use for this table
     :param name: The table name
     :param cache_size: Maximum capacity of query cache
+    :param persist_empty: Store new table even with no operations on it
     """
 
     #: The class used to represent documents
