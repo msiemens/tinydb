@@ -169,3 +169,11 @@ def test_table_repr(db):
 def test_truncate_table(db):
     db.truncate()
     assert db._get_next_id() == 1
+
+
+def test_persist_table(db):
+    db.table("persisted", persist_empty=True)
+    assert "persisted" in db.tables()
+
+    db.table("nonpersisted", persist_empty=False)
+    assert "nonpersisted" not in db.tables()

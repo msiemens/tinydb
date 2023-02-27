@@ -98,7 +98,8 @@ class Table:
         self,
         storage: Storage,
         name: str,
-        cache_size: int = default_query_cache_capacity
+        cache_size: int = default_query_cache_capacity,
+        persist_empty: bool = False
     ):
         """
         Create a table instance.
@@ -110,6 +111,8 @@ class Table:
             = self.query_cache_class(capacity=cache_size)
 
         self._next_id = None
+        if persist_empty:
+            self._update_table(lambda table: table.clear())
 
     def __repr__(self):
         args = [
@@ -163,7 +166,7 @@ class Table:
             if doc_id in table:
                 raise ValueError(f'Document with ID {str(doc_id)} '
                                  f'already exists')
-                
+
             # By calling ``dict(document)`` we convert the data we got to a
             # ``dict`` instance even if it was a different class that
             # implemented the ``Mapping`` interface
@@ -676,7 +679,7 @@ class Table:
         """
         Read the table data from the underlying storage.
 
-        Documents and doc_ids are NOT yet transformed, as 
+        Documents and doc_ids are NOT yet transformed, as
         we may not want to convert *all* documents when returning
         only one document for example.
         """
