@@ -4,8 +4,9 @@ implementations.
 """
 
 import io
-import json
 import os
+import json
+import orjson
 import warnings
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
@@ -118,6 +119,16 @@ class JSONStorage(Storage):
     def close(self) -> None:
         self._handle.close()
 
+    def _uniform(self, kwargs):
+        option = {}
+        if 'sort_keys' in kwargs and kwargs['sort_keys'] == True:
+            option['option'] = orjson.OPT_SORT_KEYS
+        if 'indent' in kwargs:
+            temp = "OPT_INDENT_" + str(kwargs['indent'])
+            option['option'] |= getattr(orjson, temp)
+        return option
+        
+
     def read(self) -> Optional[Dict[str, Dict[str, Any]]]:
         # Get the file size by moving the cursor to the file end and reading
         # its location
@@ -133,14 +144,17 @@ class JSONStorage(Storage):
             self._handle.seek(0)
 
             # Load the JSON contents of the file
-            return json.load(self._handle)
+            return orjson.loads(self._handle.read())
 
     def write(self, data: Dict[str, Dict[str, Any]]):
         # Move the cursor to the beginning of the file just in case
         self._handle.seek(0)
 
         # Serialize the database state using the user-provided arguments
-        serialized = json.dumps(data, **self.kwargs)
+        if 'indent' in self.kwargs and self.kwargs['indent'] != 2:
+            serialized = json.dumps(data, **self.kwargs)
+        else:
+            serialized = orjson.dumps(data, **self._uniform(self.kwargs)).decode()
 
         # Write the serialized data to the file
         try:

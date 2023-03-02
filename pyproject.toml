@@ -44,6 +44,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.7"
 typing-extensions = { version = "^3.10.0 || ^4.0.0", python = "<=3.7" }
+orjson = "^3.8.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.0"
