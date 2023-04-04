@@ -85,7 +85,7 @@ Here are some extensions that might be useful to you:
 *************
 
 | **Repo:**        https://github.com/alshapton/TinyMP
-| **Status:**      *stable*
+| **Status:**      *no longer maintained*
 | **Description:** A MessagePack-based storage extension to tinydb using
                    http://msgpack.org
 
