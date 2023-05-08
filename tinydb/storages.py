@@ -6,6 +6,7 @@ implementations.
 import io
 import json
 import os
+import warnings
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
@@ -84,10 +85,14 @@ class JSONStorage(Storage):
         """
         Create a new instance.
 
-        Also creates the storage file, if it doesn't exist and the access mode is appropriate for writing.
+        Also creates the storage file, if it doesn't exist and the access mode
+        is appropriate for writing.
+
+        Note: Using an access mode other than `r` or `r+` will probably lead to
+        data loss or data corruption!
 
         :param path: Where to store the JSON data.
-        :param access_mode: mode in which the file is opened (r, r+, w, a, x, b, t, +, U)
+        :param access_mode: mode in which the file is opened (r, r+)
         :type access_mode: str
         """
 
@@ -95,6 +100,12 @@ class JSONStorage(Storage):
 
         self._mode = access_mode
         self.kwargs = kwargs
+
+        if access_mode not in ('r', 'rb', 'r+', 'rb+'):
+            warnings.warn(
+                'Using an `access_mode` other than \'r\', \'rb\', \'r+\' '
+                'or \'rb+\' can cause data loss or corruption'
+            )
 
         # Create the file if it doesn't exist and creating is allowed by the
         # access mode
