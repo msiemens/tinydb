@@ -280,6 +280,7 @@ class Table:
         self,
         cond: Optional[QueryLike] = None,
         doc_id: Optional[Union[int , List]] = None,
+        doc_ids: Optional[List] = None
     ) -> Optional[Union[Document , List[Document]]]:
         """
         Get exactly one document specified by a query or a document ID.
@@ -290,31 +291,31 @@ class Table:
 
         :param cond: the condition to check against
         :param doc_id: the document's ID
+        :param doc_ids: the document's IDs(multiple)
 
         :returns: the document(s) or ``None``
         """      
+        table = self._read_table()
         if doc_id is not None:
-            table = self._read_table()
-            if isinstance(doc_id , int):
-                # Retrieve a document specified by its ID
-                raw_doc = table.get(str(doc_id), None)
+            # Retrieve a document specified by its ID
+            raw_doc = table.get(str(doc_id), None)
 
-                if raw_doc is None:
-                    return None
+            if raw_doc is None:
+                return None
 
-                # Convert the raw data to the document class
-                return self.document_class(raw_doc, doc_id)
-            elif isinstance(doc_id , list):
-                # Filter the table by extracting out all those documents which have doc id
-                # specified in the doc_id list.
-                raw_docs = dict(filter(lambda item: int(item[0]) in doc_id, table.items()))
-                if raw_docs is None:
-                    return None
+            # Convert the raw data to the document class
+            return self.document_class(raw_doc, doc_id)
+        elif doc_ids is not None:
+            # Filter the table by extracting out all those documents which have doc id
+            # specified in the doc_id list.
+            set_doc_id = set(doc_ids) # Since Doc Ids will be unique, making it a set to make sure constant lookup
+            raw_docs = dict(filter(lambda item: int(item[0]) in set_doc_id, table.items()))
+            if raw_docs is None:
+                return None
 
-                ## Now return the filtered documents in form of list
-                return list(map(lambda x:self.document_class(raw_docs[str(x)] , int(x)) , raw_docs.keys()))
+            ## Now return the filtered documents in form of list
+            return list(map(lambda x:self.document_class(raw_docs[str(x)] , int(x)) , raw_docs.keys()))
             
-            return None
         elif cond is not None:
             # Find a document specified by a query
             # The trailing underscore in doc_id_ is needed so MyPy
@@ -330,7 +331,7 @@ class Table:
 
             return None
 
-        raise RuntimeError('You have to pass either cond or doc_id')
+        raise RuntimeError('You have to pass either cond or doc_id or doc_ids')
 
     def contains(
         self,
