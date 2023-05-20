@@ -306,6 +306,7 @@ def test_upsert(db: TinyDB):
     assert db.upsert({'int': 9, 'char': 'x'}, where('char') == 'x') == [4]
     assert db.count(where('int') == 9) == 1
 
+
 def test_upsert_by_id(db: TinyDB):
     assert len(db) == 3
 
@@ -313,6 +314,7 @@ def test_upsert_by_id(db: TinyDB):
     extant_doc = Document({'char': 'v'}, doc_id=1)
     assert db.upsert(extant_doc) == [1]
     doc = db.get(where('char') == 'v')
+    assert isinstance(doc, Document)
     assert doc is not None
     assert doc.doc_id == 1
     assert len(db) == 3
@@ -321,6 +323,7 @@ def test_upsert_by_id(db: TinyDB):
     missing_doc = Document({'int': 5, 'char': 'w'}, doc_id=5)
     assert db.upsert(missing_doc) == [5]
     doc = db.get(where('char') == 'w')
+    assert isinstance(doc, Document)
     assert doc is not None
     assert doc.doc_id == 5
     assert len(db) == 4
@@ -357,6 +360,7 @@ def test_search_no_results_cache(db: TinyDB):
 
 def test_get(db: TinyDB):
     item = db.get(where('char') == 'b')
+    assert isinstance(item, Document)
     assert item is not None
     assert item['char'] == 'b'
 
@@ -366,10 +370,12 @@ def test_get_ids(db: TinyDB):
     assert db.get(doc_id=el.doc_id) == el
     assert db.get(doc_id=float('NaN')) is None  # type: ignore
 
+
 def test_get_multiple_ids(db: TinyDB):
     el = db.all()
-    assert db.get(doc_id=[x.doc_id for x in el]) == el
-    
+    assert db.get(doc_ids=[x.doc_id for x in el]) == el
+
+
 def test_get_invalid(db: TinyDB):
     with pytest.raises(RuntimeError):
         db.get()

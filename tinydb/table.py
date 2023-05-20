@@ -279,13 +279,13 @@ class Table:
     def get(
         self,
         cond: Optional[QueryLike] = None,
-        doc_id: Optional[Union[int , List]] = None,
+        doc_id: Optional[int] = None,
         doc_ids: Optional[List] = None
-    ) -> Optional[Union[Document , List[Document]]]:
+    ) -> Optional[Union[Document, List[Document]]]:
         """
         Get exactly one document specified by a query or a document ID.
-        However if muliple document IDs are given then returns all docu-
-        ments in a list.
+        However, if multiple document IDs are given then returns all
+        documents in a list.
         
         Returns ``None`` if the document doesn't exist.
 
@@ -294,8 +294,9 @@ class Table:
         :param doc_ids: the document's IDs(multiple)
 
         :returns: the document(s) or ``None``
-        """      
+        """
         table = self._read_table()
+
         if doc_id is not None:
             # Retrieve a document specified by its ID
             raw_doc = table.get(str(doc_id), None)
@@ -305,17 +306,22 @@ class Table:
 
             # Convert the raw data to the document class
             return self.document_class(raw_doc, doc_id)
-        elif doc_ids is not None:
-            # Filter the table by extracting out all those documents which have doc id
-            # specified in the doc_id list.
-            set_doc_id = set(doc_ids) # Since Doc Ids will be unique, making it a set to make sure constant lookup
-            raw_docs = dict(filter(lambda item: int(item[0]) in set_doc_id, table.items()))
-            if raw_docs is None:
-                return None
 
-            ## Now return the filtered documents in form of list
-            return list(map(lambda x:self.document_class(raw_docs[str(x)] , int(x)) , raw_docs.keys()))
-            
+        elif doc_ids is not None:
+            # Filter the table by extracting out all those documents which
+            # have doc id specified in the doc_id list.
+
+            # Since document IDs will be unique, we make it a set to ensure
+            # constant time lookup
+            doc_ids_set = set(str(doc_id) for doc_id in doc_ids)
+
+            # Now return the filtered documents in form of list
+            return [
+                self.document_class(doc, self.document_id_class(doc_id))
+                for doc_id, doc in table.items()
+                if doc_id in doc_ids_set
+            ]
+
         elif cond is not None:
             # Find a document specified by a query
             # The trailing underscore in doc_id_ is needed so MyPy
