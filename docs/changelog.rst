@@ -24,6 +24,13 @@ unreleased
 
 - *nothing yet*
 
+v4.8.0 (2023-06-12)
+^^^^^^^^^^^^^^^^^^^
+
+- Feature: Allow retrieve multiple documents by document ID using
+  ``Table.get(doc_ids=[...])``
+  (see `pull request 504 <https://github.com/msiemens/tinydb/pull/504>`_).
+
 v4.7.1 (2023-01-14)
 ^^^^^^^^^^^^^^^^^^^
 
