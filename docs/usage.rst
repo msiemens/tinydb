@@ -461,8 +461,11 @@ True
 >>> db.remove(doc_ids=[1, 2])
 >>> db.get(doc_id=3)
 {...}
+>>> db.get(doc_ids=[1, 2])
+[{...}, {...}]
 
-Using ``doc_id`` instead of ``Query()`` again is slightly faster in operation.
+Using ``doc_id``/``doc_ids`` instead of ``Query()`` again is slightly faster
+in operation.
 
 Recap
 .....
