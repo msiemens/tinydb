@@ -21,7 +21,6 @@ classifiers = [
     "Topic :: Database :: Database Engines/Servers",
     "Topic :: Utilities",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -42,19 +41,18 @@ packages = [
 "Issues" = "https://github.com/msiemens/tinydb/issues"
 
 [tool.poetry.dependencies]
-python = "^3.7"
-typing-extensions = { version = "^3.10.0 || ^4.0.0", python = "<=3.7" }
+python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.0"
 pytest-pycodestyle = "^2.3.1"
 pytest-cov = "^4.0.0"
 pycodestyle = "^2.10.0"
-sphinx = "^5.3.0"
+sphinx = "^7.0.0"
 coveralls = "^3.3.1"
 pyyaml = "^6.0"
 pytest-mypy = { version = "^0.10.2", markers = "platform_python_implementation != 'PyPy'" }
-types-PyYAML = "^5.4.3"
+types-PyYAML = "^6.0.0"
 typing-extensions = { version = "^4.4.0" }
 
 [build-system]
