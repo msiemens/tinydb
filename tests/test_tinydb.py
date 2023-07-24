@@ -18,13 +18,11 @@ def test_drop_tables(db: TinyDB):
     assert len(db) == 0
 
 
-def test_all(db: TinyDB):
-    db.drop_tables()
+def test_all(db_empty: TinyDB):
+    for _ in range(10):
+        db_empty.insert({})
 
-    for i in range(10):
-        db.insert({})
-
-    assert len(db.all()) == 10
+    assert len(db_empty.all()) == 10
 
 
 def test_insert(db: TinyDB):

@@ -1,5 +1,3 @@
-import os.path
-import tempfile
 from pathlib import Path
 
 import pytest  # type: ignore
@@ -20,6 +18,12 @@ def db(request, tmp_path: Path):
     db_.insert_multiple({'int': 1, 'char': c} for c in 'abc')
 
     yield db_
+
+
+@pytest.fixture
+def db_empty(db: TinyDB):
+    db.drop_tables()
+    return db
 
 
 @pytest.fixture
