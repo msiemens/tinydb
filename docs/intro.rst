@@ -37,7 +37,7 @@ Why **Not** Use TinyDB?
 -----------------------
 
 - You need **advanced features** like:
-    - access from multiple processes or threads,
+    - access from multiple processes or threads (e.g. when using Flask!),
     - creating indexes for tables,
     - an HTTP server,
     - managing relationships between tables or similar,
