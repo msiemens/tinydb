@@ -17,15 +17,9 @@ False
 """
 
 import re
-import sys
-from typing import Mapping, Tuple, Callable, Any, Union, List, Optional
+from typing import Mapping, Tuple, Callable, Any, Union, List, Optional, Protocol
 
 from .utils import freeze
-
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
 
 __all__ = ('Query', 'QueryLike', 'where')
 
