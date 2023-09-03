@@ -54,7 +54,6 @@ coveralls = "^3.3.1"
 pyyaml = "^6.0"
 pytest-mypy = { version = "^0.10.2", markers = "platform_python_implementation != 'PyPy'" }
 types-PyYAML = "^6.0.0"
-typing-extensions = { version = "^4.4.0" }
 
 [build-system]
 requires = ["poetry-core"]
