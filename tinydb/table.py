@@ -147,7 +147,7 @@ class Table:
             raise ValueError('Document is not a Mapping')
 
         # First, we get the document ID for the new document
-        if isinstance(document, Document):
+        if isinstance(document, self.document_class):
             # For a `Document` object we use the specified ID
             doc_id = document.doc_id
 
@@ -190,7 +190,7 @@ class Table:
                 if not isinstance(document, Mapping):
                     raise ValueError('Document is not a Mapping')
 
-                if isinstance(document, Document):
+                if isinstance(document, self.document_class):
                     # Check if document does not override an existing document
                     if document.doc_id in table:
                         raise ValueError(
@@ -521,7 +521,7 @@ class Table:
         """
 
         # Extract doc_id
-        if isinstance(document, Document) and hasattr(document, 'doc_id'):
+        if isinstance(document, self.document_class) and hasattr(document, 'doc_id'):
             doc_ids: Optional[List[int]] = [document.doc_id]
         else:
             doc_ids = None
