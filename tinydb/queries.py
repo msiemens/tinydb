@@ -245,8 +245,25 @@ class Query(QueryInstance):
             lambda value: runner(value),
             (hashval if self.is_cacheable() else None)
         )
+    
+    def _generate_comparison_query(self, operator: str, rhs: Any) -> QueryInstance:
+        """
+        Generates a comparison query based on the given operator and right-hand side value.
 
-    def __eq__(self, rhs: Any):
+        Args:
+            operator (str): The comparison operator to use.
+            rhs (Any): The right-hand side value to compare against.
+
+        Returns:
+            QueryInstance: The generated comparison query.
+
+        """
+        return self._generate_test(
+            lambda value, rhs=rhs: eval(f'value {operator} rhs'),(operator, self._path, rhs)
+        )
+        
+        
+    def __eq__(self, rhs: Any) -> QueryInstance:
         """
         Test a dict value for equality.
 
@@ -254,12 +271,9 @@ class Query(QueryInstance):
 
         :param rhs: The value to compare against
         """
-        return self._generate_test(
-            lambda value: value == rhs,
-            ('==', self._path, freeze(rhs))
-        )
+        return self._generate_comparison_query('==', rhs)
 
-    def __ne__(self, rhs: Any):
+    def __ne__(self, rhs: Any) -> QueryInstance:
         """
         Test a dict value for inequality.
 
@@ -267,10 +281,7 @@ class Query(QueryInstance):
 
         :param rhs: The value to compare against
         """
-        return self._generate_test(
-            lambda value: value != rhs,
-            ('!=', self._path, freeze(rhs))
-        )
+        return self._generate_comparison_query('!=', rhs)
 
     def __lt__(self, rhs: Any) -> QueryInstance:
         """
@@ -280,11 +291,7 @@ class Query(QueryInstance):
 
         :param rhs: The value to compare against
         """
-        return self._generate_test(
-            lambda value: value < rhs,
-            ('<', self._path, rhs)
-        )
-
+        return self._generate_comparison_query('<', rhs)
     def __le__(self, rhs: Any) -> QueryInstance:
         """
         Test a dict value for being lower than or equal to another value.
@@ -293,11 +300,7 @@ class Query(QueryInstance):
 
         :param rhs: The value to compare against
         """
-        return self._generate_test(
-            lambda value: value <= rhs,
-            ('<=', self._path, rhs)
-        )
-
+        return self._generate_comparison_query('<=', rhs)
     def __gt__(self, rhs: Any) -> QueryInstance:
         """
         Test a dict value for being greater than another value.
@@ -306,10 +309,7 @@ class Query(QueryInstance):
 
         :param rhs: The value to compare against
         """
-        return self._generate_test(
-            lambda value: value > rhs,
-            ('>', self._path, rhs)
-        )
+        return self._generate_comparison_query('>', rhs)
 
     def __ge__(self, rhs: Any) -> QueryInstance:
         """
@@ -319,10 +319,7 @@ class Query(QueryInstance):
 
         :param rhs: The value to compare against
         """
-        return self._generate_test(
-            lambda value: value >= rhs,
-            ('>=', self._path, rhs)
-        )
+        return self._generate_comparison_query('>=', rhs)
 
     def exists(self) -> QueryInstance:
         """
