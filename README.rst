@@ -82,6 +82,10 @@ Query Language
     >>> db.search((User.name == 'John') | (User.name == 'Bob'))
     [{'name': 'John', 'age': 22}, {'name': 'John', 'age': 37}, {'name': 'Bob', 'age': 42}]
 
+    >>> # Negate a query with logical not
+    >>> db.search(~(User.name == 'John'))
+    [{'name': 'Megan', 'age': 27}, {'name': 'Bob', 'age': 42}]
+
     >>> # Apply transformation to field with `map`
     >>> db.search((User.age.map(lambda x: x + x) == 44))
     >>> [{'name': 'John', 'age': 22}]
