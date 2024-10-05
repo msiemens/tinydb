@@ -201,6 +201,8 @@ queries:
     <https://docs.python.org/3/reference/expressions.html#operator-precedence>`_
     for details.
 
+    You can compose queries dynamically by using the no-op query ``Query().noop()``.
+
 Recap
 .....
 
@@ -322,7 +324,7 @@ In order to perform multiple update operations at once, you can use the
 ...     ({'int': 4}, where('char') == 'b'),
 ... ])
 
-You also can use mix normal updates with update operations:
+You also can mix normal updates with update operations:
 
 >>> db.update_multiple([
 ...     ({'int': 2}, where('char') == 'a'),
