@@ -127,7 +127,7 @@ Now let's implement that:
             for table_name in data:
                 table_data = data[table_name]
 
-                for doc_id in table:
+                for doc_id in table_data:
                     item = table_data[doc_id]
 
                     if item == {}:
