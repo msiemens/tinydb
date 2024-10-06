@@ -12,7 +12,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version:
+        - "3.8"
+        - "3.9"
+        - "3.10"
+        - "3.11"
+        - "3.12"
+        - "3.13"
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
         - python-version: "pypy-3.9"
@@ -43,7 +49,7 @@ jobs:
       run: |
         poetry build
         twine check dist/*
-      if: ${{ contains(matrix.python-version, '3.10') }}
+      if: ${{ contains(matrix.python-version, '3.12') }}
     - name: Upload coverage result
       if: ${{ env.COVERALLS_REPO_TOKEN != 'windows-latest' }}
       env:
