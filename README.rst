@@ -1,5 +1,4 @@
 .. image:: https://raw.githubusercontent.com/msiemens/tinydb/master/artwork/logo.png
-    :scale: 100%
     :height: 150px
 
 |Build Status| |Coverage| |Version|
