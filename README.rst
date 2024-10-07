@@ -53,6 +53,15 @@ Supported Python Versions
 
 TinyDB has been tested with Python 3.8 - 3.13 and PyPy3.
 
+Project Status
+**************
+
+This project is in maintenance mode. It has reached a mature, stable state
+where significant new features or architectural changes are not planned. That
+said, there will still be releases for bugfixes or features contributed by
+the community. Read more about what this means in particular
+`here <https://github.com/msiemens/tinydb/discussions/572>`_.
+
 Example Code
 ************
 
