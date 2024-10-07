@@ -24,7 +24,7 @@ unreleased
 
 - *nothing yet*
 
-v4.8.0 (2024-10-07)
+v4.8.1
 ^^^^^^^^^^^^^^^^^^^
 
 - Feature: Allow persisting empty tables
