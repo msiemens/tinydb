@@ -29,6 +29,14 @@ def test_lru_cache_set_multiple():
     assert cache.lru == ["a"]
 
 
+def test_lru_cache_set_update():
+    cache = LRUCache(capacity=3)
+    cache["a"] = 1
+    cache["a"] = 2
+
+    assert cache["a"] == 2
+
+
 def test_lru_cache_get():
     cache = LRUCache(capacity=3)
     cache["a"] = 1
