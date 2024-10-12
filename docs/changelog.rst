@@ -24,7 +24,13 @@ unreleased
 
 - *nothing yet*
 
-v4.8.1
+v4.8.2 (2024-10-12)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix: Correctly update query cache when search results have changed
+  (see `issue 560 <https://github.com/msiemens/tinydb/issues/560>`_).
+
+v4.8.1 (2024-10-07)
 ^^^^^^^^^^^^^^^^^^^
 
 - Feature: Allow persisting empty tables
