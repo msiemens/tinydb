@@ -21,6 +21,15 @@ User's Guide
    getting-started
    usage
 
+How-To's and Tutorials
+------------
+
+.. toctree::
+   :maxdepth: 2
+
+   how-to
+   tutorials
+
 Extending TinyDB
 ----------------
 
