@@ -145,15 +145,11 @@ def freeze(obj):
     """
     Freeze an object by making it immutable and thus hashable.
     """
-    if isinstance(obj, dict):
-        # Transform dicts into ``FrozenDict``s
-        return FrozenDict((k, freeze(v)) for k, v in obj.items())
-    elif isinstance(obj, list):
-        # Transform lists into tuples
-        return tuple(freeze(el) for el in obj)
-    elif isinstance(obj, set):
-        # Transform sets into ``frozenset``s
-        return frozenset(obj)
-    else:
-        # Don't handle all other objects
-        return obj
+    type_to_function = {
+        dict: lambda d: FrozenDict((k, freeze(v)) for k, v in d.items()),
+        list: lambda l: tuple(freeze(el) for el in l),
+        set: lambda s: frozenset(s),
+    }
+    
+    transform = type_to_function.get(type(obj), lambda x: x)
+    return transform(obj)
