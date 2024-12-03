@@ -89,7 +89,7 @@ class TinyDB(TableBase):
         Create a new instance of TinyDB.
         """
 
-        storage = kwargs.pop("storage", self.default_storage_class)
+        storage = kwargs.pop('storage', self.default_storage_class)
 
         # Prepare the storage
         self._storage: Storage = storage(*args, **kwargs)
@@ -100,13 +100,13 @@ class TinyDB(TableBase):
     def __repr__(self):
 
         args = [
-            f"tables={list(self.tables())}",
-            f"tables_count={len(self.tables())}",
-            f"default_table_documents_count={self.__len__()}",
+            f'tables={list(self.tables())}',
+            f'tables_count={len(self.tables())}',
+            f'default_table_documents_count={self.__len__()}',
             f'all_tables_documents_count={[f"{table}={len(self.table(table))}" for table in self.tables()]}',
         ]
 
-        return "<{} {}>".format(type(self).__name__, ", ".join(args))
+        return '<{} {}>'.format(type(self).__name__, ', '.join(args))
 
     def table(self, name: str, **kwargs) -> Table:
         """
