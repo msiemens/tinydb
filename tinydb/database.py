@@ -77,7 +77,7 @@ class TinyDB(TableBase):
     #: The name of the default table
     #:
     #: .. versionadded:: 4.0
-    default_table_name = "_default"
+    default_table_name = '_default'
 
     #: The class that will be used by default to create storage instances
     #:
