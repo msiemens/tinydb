@@ -4,7 +4,7 @@ implementations.
 """
 
 import io
-import json
+import orjson
 import os
 import warnings
 from abc import ABC, abstractmethod
@@ -133,14 +133,14 @@ class JSONStorage(Storage):
             self._handle.seek(0)
 
             # Load the JSON contents of the file
-            return json.load(self._handle)
+            return orjson.loads(self._handle.read())
 
     def write(self, data: Dict[str, Dict[str, Any]]):
         # Move the cursor to the beginning of the file just in case
         self._handle.seek(0)
 
         # Serialize the database state using the user-provided arguments
-        serialized = json.dumps(data, **self.kwargs)
+        serialized = orjson.dumps(data, **self.kwargs).decode("utf-8")
 
         # Write the serialized data to the file
         try:
