@@ -646,6 +646,28 @@ of these ways:
     # Using the close function
     db.close()
 
+TTLMiddleware
+-------------
+
+The `TTLMiddleware` provides automatic expiration of documents by using
+a `_ttl` field (expires in N seconds) or `_expires_at` field (Unix timestamp).
+
+Example usage::
+
+    from tinydb import TinyDB, TTLMiddleware
+
+    db = TinyDB('db.json')
+    db = TTLMiddleware(db)
+    db.insert({'data': 5, '_ttl': 3600})  # expires in 1 hour
+
+To manually purge expired documents::
+
+    db.purge_expired()
+
+.. note::
+   Due to caching, expired documents may not be immediately excluded from queries.
+   Clearing the query cache or reopening the database will reflect changes.
+
 .. _mypy_type_checking:
 
 MyPy Type Checking
