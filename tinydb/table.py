@@ -304,17 +304,17 @@ class Table:
     @overload
     def get(
         self, cond: Optional[QueryLike], doc_id: None, doc_ids: List
-    ) -> Optional[List[Document]]: ...
+    ) -> List[Document]: ...
 
     @overload
     def get(
         self, cond: Optional[QueryLike], *, doc_id: None = ..., doc_ids: List
-    ) -> Optional[List[Document]]: ...
+    ) -> List[Document]: ...
 
     @overload
     def get(
         self, *, cond: Optional[QueryLike] = ..., doc_id: None = ..., doc_ids: List
-    ) -> Optional[List[Document]]: ...
+    ) -> List[Document]: ...
 
     def get(
         self,
