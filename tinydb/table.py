@@ -13,7 +13,8 @@ from typing import (
     Optional,
     Union,
     cast,
-    Tuple
+    Tuple,
+    overload
 )
 
 from .queries import QueryLike
@@ -280,12 +281,47 @@ class Table:
 
         return docs
 
+    @overload
+    def get(
+        self, cond: QueryLike, doc_id: None = ..., doc_ids: None = ...
+    ) -> Optional[Document]: ...
+
+    @overload
+    def get(
+        self, *, cond: QueryLike, doc_id: None = ..., doc_ids: None = ...
+    ) -> Optional[Document]: ...
+
+    @overload
+    def get(
+        self, cond: Optional[QueryLike], doc_id: int, doc_ids: Optional[List] = ...
+    ) -> Optional[Document]: ...
+
+    @overload
+    def get(
+        self, *, cond: Optional[QueryLike] = ..., doc_id: int, doc_ids: Optional[List] = ...,
+    ) -> Optional[Document]: ...
+
+    @overload
+    def get(
+        self, cond: Optional[QueryLike], doc_id: None, doc_ids: List
+    ) -> Optional[List[Document]]: ...
+
+    @overload
+    def get(
+        self, cond: Optional[QueryLike], *, doc_id: None = ..., doc_ids: List
+    ) -> Optional[List[Document]]: ...
+
+    @overload
+    def get(
+        self, *, cond: Optional[QueryLike] = ..., doc_id: None = ..., doc_ids: List
+    ) -> Optional[List[Document]]: ...
+
     def get(
         self,
         cond: Optional[QueryLike] = None,
         doc_id: Optional[int] = None,
         doc_ids: Optional[List] = None
-    ) -> Optional[Union[Document, List[Document]]]:
+    ):
         """
         Get exactly one document specified by a query or a document ID.
         However, if multiple document IDs are given then returns all
