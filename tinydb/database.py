@@ -1,6 +1,7 @@
 """
 This module contains the main component of TinyDB: the database.
 """
+
 from typing import Dict, Iterator, Set, Type
 
 from . import JSONStorage
@@ -97,13 +98,12 @@ class TinyDB(TableBase):
         self._tables: Dict[str, Table] = {}
 
     def __repr__(self):
+
         args = [
-            'tables={}'.format(list(self.tables())),
-            'tables_count={}'.format(len(self.tables())),
-            'default_table_documents_count={}'.format(self.__len__()),
-            'all_tables_documents_count={}'.format(
-                ['{}={}'.format(table, len(self.table(table)))
-                 for table in self.tables()]),
+            f'tables={list(self.tables())}',
+            f'tables_count={len(self.tables())}',
+            f'default_table_documents_count={self.__len__()}',
+            f'all_tables_documents_count={[f"{table}={len(self.table(table))}" for table in self.tables()]}',
         ]
 
         return '<{} {}>'.format(type(self).__name__, ', '.join(args))
