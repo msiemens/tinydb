@@ -203,6 +203,11 @@ queries:
 
     You can compose queries dynamically by using the no-op query ``Query().noop()``.
 
+    Comparisons only support literal values on the right-hand side. Field-to-field
+    comparisons like ``Query().a == Query().b`` are not supported. Use a callable
+    predicate like ``db.search(lambda doc: doc.get('a') == doc.get('b'))`` for
+    custom logic.
+
 Recap
 .....
 
