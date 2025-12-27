@@ -96,6 +96,32 @@ def test_lru_cache_iteration_works():
     assert count == 0
 
 
+def test_lru_cache_falsy_values_bug():
+    """
+    Test for GitHub issue #596: LRU cache should handle falsy values correctly.
+    
+    Bug: `if self.cache.get(key):` treated falsy values as non-existent keys,
+    breaking LRU ordering when updating existing keys with falsy values.
+    """
+    cache = LRUCache(capacity=3)
+    
+    # Set up cache with falsy value
+    cache["a"] = 0      # Falsy value
+    cache["b"] = 1
+    cache["c"] = 2
+
+    assert cache.lru == ["a", "b", "c"]
+    
+    # Update existing key with falsy value - should move to end
+    cache.set("a", 3)
+    assert cache.lru == ["b", "c", "a"]
+    
+    # Add new item - should evict oldest ("b"), not "a"
+    cache.set("d", 4)
+    assert cache.lru == ["c", "a", "d"]
+    assert "b" not in cache
+    assert cache["a"] == 3
+
 def test_freeze():
     frozen = freeze([0, 1, 2, {'a': [1, 2, 3]}, {1, 2}])
     assert isinstance(frozen, tuple)
