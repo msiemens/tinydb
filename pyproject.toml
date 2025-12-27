@@ -1,17 +1,15 @@
-[tool.poetry]
+[project]
 name = "tinydb"
 version = "4.8.2"
 description = "TinyDB is a tiny, document oriented database optimized for your happiness :)"
-authors = ["Markus Siemens <markus@m-siemens.de>"]
-license = "MIT"
-
+authors = [{ name = "Markus Siemens", email = "markus@m-siemens.de" }]
+requires-python = ">=3.10,<4"
 readme = "README.rst"
-
-homepage = "https://github.com/msiemens/tinydb"
-documentation = "https://tinydb.readthedocs.org/"
-
-keywords = ["database", "nosql"]
-
+license = "MIT"
+keywords = [
+    "database",
+    "nosql",
+]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -21,41 +19,45 @@ classifiers = [
     "Topic :: Database :: Database Engines/Servers",
     "Topic :: Utilities",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Operating System :: OS Independent",
     "Typing :: Typed",
 ]
 
-packages = [
-    { include = "tinydb" },
-    { include = "tests", format = "sdist" }
+[project.urls]
+Homepage = "https://github.com/msiemens/tinydb"
+Documentation = "https://tinydb.readthedocs.org/"
+Changelog = "https://tinydb.readthedocs.io/en/latest/changelog.html"
+Issues = "https://github.com/msiemens/tinydb/issues"
+
+[dependency-groups]
+dev = [
+    "pytest~=9.0",
+    "pytest-pycodestyle~=2.3",
+    "pytest-cov~=7.0",
+    "pycodestyle~=2.10",
+    "sphinx~=8.1",
+    "coveralls~=4.0",
+    "pyyaml~=6.0",
+    "pytest-mypy~=1.0 ; platform_python_implementation != 'PyPy'",
+    "types-PyYAML~=6.0",
 ]
 
-[tool.poetry.urls]
-"Changelog" = "https://tinydb.readthedocs.io/en/latest/changelog.html"
-"Issues" = "https://github.com/msiemens/tinydb/issues"
+[tool.hatch.build.targets.sdist]
+include = [
+    "tinydb",
+    "tests",
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.2.0"
-pytest-pycodestyle = "^2.3.1"
-pytest-cov = "^4.0.0"
-pycodestyle = "^2.10.0"
-sphinx = "^7.0.0"
-coveralls = "^3.3.1"
-pyyaml = "^6.0"
-pytest-mypy = { version = "^0.10.2", markers = "platform_python_implementation != 'PyPy'" }
-types-PyYAML = "^6.0.0"
+[tool.hatch.build.targets.wheel]
+include = ["tinydb"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

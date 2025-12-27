@@ -13,12 +13,11 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - "3.8"
-        - "3.9"
         - "3.10"
         - "3.11"
         - "3.12"
         - "3.13"
+        - "3.14"
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
         - python-version: "pypy-3.9"
@@ -33,27 +32,28 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v5
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip twine
-        pip install poetry
-        poetry install
+        python -m pip install --upgrade pip
+        uv sync --group dev
     - name: Run test suite
       run: |
-        poetry run py.test -v --cov=tinydb
+        uv run py.test -v --cov=tinydb
     - name: Perform type check
       run: |
-        poetry run pip install pytest-mypy
-        poetry run pytest --mypy -m mypy tinydb tests
+        uv run pytest --mypy -m mypy tinydb tests
+      if: ${{ contains(matrix.python-version, '3.14') }}
     - name: Verify dist package format
       run: |
-        poetry build
-        twine check dist/*
-      if: ${{ contains(matrix.python-version, '3.12') }}
+        uv build
+        uv run --with twine twine check dist/*
+      if: ${{ contains(matrix.python-version, '3.14') }}
     - name: Upload coverage result
       if: ${{ env.COVERALLS_REPO_TOKEN != 'windows-latest' }}
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-         poetry run coveralls
+         uv run coveralls
