@@ -8,8 +8,8 @@ Here are some extensions that might be useful to you:
 
 | **Repo:**        https://github.com/itsmorninghao/tinydb-rust/
 | **Status:**      *beta*
-| **Description:** High-performance Rust reimplementation of TinyDB that
-                   maintains API compatibility with the original Python version.
+| **Description:** A drop-in reimplementation of TinyDB that uses Rust for
+                   better performance.
 
 ``aiotinydb``
 *************
