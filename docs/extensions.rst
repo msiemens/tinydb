@@ -3,6 +3,14 @@ Extensions
 
 Here are some extensions that might be useful to you:
 
+``tinydb-rust``
+**************
+
+| **Repo:**        https://github.com/itsmorninghao/tinydb-rust/
+| **Status:**      *beta*
+| **Description:** High-performance Rust reimplementation of TinyDB that
+                   maintains API compatibility with the original Python version.
+
 ``aiotinydb``
 *************
 
@@ -21,15 +29,6 @@ Here are some extensions that might be useful to you:
 | **Description:** BetterJSONStorage is a faster 'Storage Type' for TinyDB. It
                    uses the faster Orjson library for parsing the JSON and BLOSC
                    for compression.
-
-
-``tinydb-appengine``
-********************
-
-| **Repo:**        https://github.com/imalento/tinydb-appengine
-| **Status:**      *stable*
-| **Description:** ``tinydb-appengine`` provides TinyDB storage for
-                   App Engine. You can use JSON readonly.
 
 
 ``tinydb-serialization``
@@ -53,42 +52,6 @@ Here are some extensions that might be useful to you:
                    while the data changes only little.
 
 
-``TinyDBTimestamps``
-********************
-
-| **Repo:**        https://github.com/pachacamac/TinyDBTimestamps
-| **Status:**      *experimental*
-| **Description:** Automatically add create at/ update at timestamps to TinyDB
-                   documents.
-
-
-``tinyindex``
-*************
-
-| **Repo:**        https://github.com/eugene-eeo/tinyindex
-| **Status:**      *experimental*
-| **Description:** Document indexing for TinyDB. Basically ensures deterministic
-                   (as long as there aren't any changes to the table) yielding
-                   of documents.
-
-
-``tinymongo``
-*************
-
-| **Repo:**        https://github.com/schapman1974/tinymongo
-| **Status:**      *experimental*
-| **Description:** A simple wrapper that allows to use TinyDB as a flat file
-                   drop-in replacement for MongoDB.
-
-
-``TinyMP``
-*************
-
-| **Repo:**        https://github.com/alshapton/TinyMP
-| **Status:**      *no longer maintained*
-| **Description:** A MessagePack-based storage extension to tinydb using
-                   http://msgpack.org
-
 .. _tinyrecord:
 
 ``tinyrecord``
@@ -100,3 +63,49 @@ Here are some extensions that might be useful to you:
                    transaction support for the TinyDB NoSQL database. It uses a
                    record-first then execute architecture which allows us to
                    minimize the time that we are within a thread lock.
+
+
+``tinydb-appengine``
+********************
+
+| **Repo:**        https://github.com/imalento/tinydb-appengine
+| **Status:**      *inactive*
+| **Description:** ``tinydb-appengine`` provides TinyDB storage for
+                   App Engine. You can use JSON readonly.
+
+
+``TinyDBTimestamps``
+********************
+
+| **Repo:**        https://github.com/pachacamac/TinyDBTimestamps
+| **Status:**      *inactive*
+| **Description:** Automatically add create at/ update at timestamps to TinyDB
+                   documents.
+
+
+``tinyindex``
+*************
+
+| **Repo:**        https://github.com/eugene-eeo/tinyindex
+| **Status:**      *inactive*
+| **Description:** Document indexing for TinyDB. Basically ensures deterministic
+                   (as long as there aren't any changes to the table) yielding
+                   of documents.
+
+
+``tinymongo``
+*************
+
+| **Repo:**        https://github.com/schapman1974/tinymongo
+| **Status:**      *inactive*
+| **Description:** A simple wrapper that allows to use TinyDB as a flat file
+                   drop-in replacement for MongoDB.
+
+
+``TinyMP``
+*************
+
+| **Repo:**        https://github.com/alshapton/TinyMP
+| **Status:**      *inactive*
+| **Description:** A MessagePack-based storage extension to tinydb using
+                   http://msgpack.org
