@@ -10,6 +10,7 @@ from typing import (
     Iterator,
     List,
     Mapping,
+    NoReturn,
     Optional,
     Union,
     cast,
@@ -280,6 +281,9 @@ class Table:
             self._query_cache[cond] = docs[:]
 
         return docs
+
+    @overload
+    def get(self) -> NoReturn: ...
 
     @overload
     def get(
