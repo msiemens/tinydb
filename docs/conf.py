@@ -15,7 +15,7 @@
 import os
 import sys
 
-import pkg_resources
+from importlib import metadata
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -54,14 +54,13 @@ copyright = u'2021, Markus Siemens'
 # built documents.
 
 try:
-    release = pkg_resources.get_distribution('tinydb').version
-except pkg_resources.DistributionNotFound:
+    release = metadata.version('tinydb')
+except metadata.PackageNotFoundError:
     print('To build the documentation, The distribution information of TinyDB')
     print('has to be available. Either install the package into your')
     print('development environment or run "pip install -e ." to setup the')
     print('metadata. A virtualenv is recommended!')
     sys.exit(1)
-del pkg_resources
 
 if 'dev' in release:
     release = release.split('dev')[0] + 'dev'

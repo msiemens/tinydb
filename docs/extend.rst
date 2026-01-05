@@ -47,6 +47,9 @@ There are some things we should look closer at:
    the database instance (except ``storage`` which TinyDB itself consumes).
    In other words calling ``TinyDB('something', storage=YAMLStorage)`` will
    pass ``'something'`` as an argument to ``YAMLStorage``.
+   If you accept callables or other executable values in your storage
+   constructor (or elsewhere), do not derive them from untrusted or
+   user-controlled input.
 2. We use ``yaml.safe_load`` as recommended by the
    `PyYAML documentation <http://pyyaml.org/wiki/PyYAMLDocumentation#LoadingYAML>`_
    when processing data from a potentially untrusted source.
