@@ -51,9 +51,22 @@ jobs:
         uv run --with twine twine check dist/*
       if: ${{ contains(matrix.python-version, '3.14') }}
     - name: Upload coverage result
-      if: ${{ env.COVERALLS_REPO_TOKEN != 'windows-latest' }}
+      if: ${{ matrix.os != 'windows-latest' }}
       env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_FLAG_NAME: ${{ matrix.os }}-py${{ matrix.python-version }}
+        COVERALLS_PARALLEL: true
       run: |
          uv run coveralls
+
+  coveralls:
+    name: Indicate completion to coveralls.io
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install coveralls
+      run: pip3 install --upgrade coveralls
+    - name: Finished
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: coveralls --finish
