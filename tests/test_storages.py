@@ -279,3 +279,9 @@ def test_encoding(tmpdir):
 
     jap_storage = JSONStorage(path, encoding="cp936")
     assert japanese_doc == jap_storage.read()
+
+
+def test_json_invalid_mode_warning(tmpdir):
+    path = str(tmpdir.join('test.db'))
+    with pytest.warns(UserWarning, match='Using an `access_mode` other than'):
+        JSONStorage(path, access_mode='w')

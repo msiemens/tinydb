@@ -554,9 +554,12 @@ class Table:
         """
         Update documents, if they exist, insert them otherwise.
 
-        Note: This will update *all* documents matching the query. Document
-        argument can be a tinydb.table.Document object if you want to specify a
-        doc_id.
+        Note: This will update *all* documents matching the query.
+        For example, if the query matches 3 documents, all 3 will be updated
+        with the new data. If no documents match, a new one is inserted.
+
+        Document argument can be a tinydb.table.Document object if you want
+        to specify a doc_id.
 
         :param document: the document to insert or the fields to update
         :param cond: which document to look for, optional if you've passed a
