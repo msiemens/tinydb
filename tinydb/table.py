@@ -18,6 +18,7 @@ from typing import (
     overload
 )
 
+from .bloom_filter import BloomFilter
 from .queries import QueryLike
 from .storages import Storage
 from .utils import LRUCache
@@ -102,7 +103,10 @@ class Table:
         storage: Storage,
         name: str,
         cache_size: int = default_query_cache_capacity,
-        persist_empty: bool = False
+        persist_empty: bool = False,
+        bloom_filter: bool = False,
+        bloom_expected_items: int = 10_000,
+        bloom_fp_rate: float = 0.01,
     ):
         """
         Create a table instance.
@@ -114,6 +118,18 @@ class Table:
             = self.query_cache_class(capacity=cache_size)
 
         self._next_id = None
+
+        # Initialize the Bloom Filter for fast negative lookups on doc_ids
+        self._use_bloom = bloom_filter
+        if self._use_bloom:
+            self._bloom: Optional[BloomFilter] = BloomFilter(
+                expected_items=bloom_expected_items,
+                false_positive_rate=bloom_fp_rate,
+            )
+            self._rebuild_bloom_filter()
+        else:
+            self._bloom = None
+
         if persist_empty:
             self._update_table(lambda table: table.clear())
 
@@ -178,6 +194,10 @@ class Table:
         # See below for details on ``Table._update``
         self._update_table(updater)
 
+        # Update the Bloom Filter with the new document ID
+        if self._bloom is not None:
+            self._bloom.add(str(doc_id))
+
         return doc_id
 
     def insert_multiple(self, documents: Iterable[Mapping]) -> List[int]:
@@ -221,6 +241,11 @@ class Table:
 
         # See below for details on ``Table._update``
         self._update_table(updater)
+
+        # Update the Bloom Filter with all new document IDs
+        if self._bloom is not None:
+            for doc_id in doc_ids:
+                self._bloom.add(str(doc_id))
 
         return doc_ids
 
@@ -342,6 +367,11 @@ class Table:
         table = self._read_table()
 
         if doc_id is not None:
+            # Fast path: use the Bloom Filter to discard nonexistent IDs
+            # without reading from storage
+            if self._bloom is not None and not self._bloom.test(str(doc_id)):
+                return None
+
             # Retrieve a document specified by its ID
             raw_doc = table.get(str(doc_id), None)
 
@@ -398,6 +428,10 @@ class Table:
         :param doc_id: the document ID to look for
         """
         if doc_id is not None:
+            # Fast path: use the Bloom Filter to discard nonexistent IDs
+            if self._bloom is not None and not self._bloom.test(str(doc_id)):
+                return False
+
             # Documents specified by ID
             return self.get(doc_id=doc_id) is not None
 
@@ -620,6 +654,11 @@ class Table:
             # Perform the remove operation
             self._update_table(updater)
 
+            # Rebuild the Bloom Filter since standard filters don't support
+            # element deletion
+            if self._bloom is not None:
+                self._rebuild_bloom_filter()
+
             return removed_ids
 
         if cond is not None:
@@ -650,6 +689,11 @@ class Table:
             # Perform the remove operation
             self._update_table(updater)
 
+            # Rebuild the Bloom Filter since standard filters don't support
+            # element deletion
+            if self._bloom is not None:
+                self._rebuild_bloom_filter()
+
             return removed_ids
 
         raise RuntimeError('Use truncate() to remove all documents')
@@ -664,6 +708,10 @@ class Table:
 
         # Reset document ID counter
         self._next_id = None
+
+        # Clear the Bloom Filter
+        if self._bloom is not None:
+            self._bloom.rebuild([])
 
     def count(self, cond: QueryLike) -> int:
         """
@@ -811,3 +859,15 @@ class Table:
 
         # Clear the query cache, as the table contents have changed
         self.clear_cache()
+
+    def _rebuild_bloom_filter(self) -> None:
+        """
+        Rebuild the Bloom Filter from the current table contents.
+
+        This is called after operations that may invalidate the filter
+        (e.g. remove, truncate) since standard Bloom Filters do not support
+        element deletion.
+        """
+        if self._bloom is not None:
+            table = self._read_table()
+            self._bloom.rebuild(table.keys())
