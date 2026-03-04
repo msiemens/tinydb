@@ -104,7 +104,7 @@ class Table:
         name: str,
         cache_size: int = default_query_cache_capacity,
         persist_empty: bool = False,
-        bloom_filter: bool = False,
+        bloom_filter: bool = True,
         bloom_expected_items: int = 10_000,
         bloom_fp_rate: float = 0.01,
     ):
@@ -119,14 +119,16 @@ class Table:
 
         self._next_id = None
 
-        # Initialize the Bloom Filter for fast negative lookups on doc_ids
+        # Initialize the Bloom Filter for fast negative lookups on doc_ids.
+        # The filter is built lazily on first access to avoid an extra
+        # storage read during table construction.
         self._use_bloom = bloom_filter
+        self._bloom_initialized = False
         if self._use_bloom:
             self._bloom: Optional[BloomFilter] = BloomFilter(
                 expected_items=bloom_expected_items,
                 false_positive_rate=bloom_fp_rate,
             )
-            self._rebuild_bloom_filter()
         else:
             self._bloom = None
 
@@ -194,8 +196,10 @@ class Table:
         # See below for details on ``Table._update``
         self._update_table(updater)
 
-        # Update the Bloom Filter with the new document ID
-        if self._bloom is not None:
+        # Update the Bloom Filter with the new document ID.
+        # If the filter hasn't been initialized yet, the next _read_table()
+        # call will rebuild it from storage (which already includes this ID).
+        if self._bloom is not None and self._bloom_initialized:
             self._bloom.add(str(doc_id))
 
         return doc_id
@@ -242,8 +246,9 @@ class Table:
         # See below for details on ``Table._update``
         self._update_table(updater)
 
-        # Update the Bloom Filter with all new document IDs
-        if self._bloom is not None:
+        # Update the Bloom Filter with all new document IDs.
+        # See insert() for why we check _bloom_initialized.
+        if self._bloom is not None and self._bloom_initialized:
             for doc_id in doc_ids:
                 self._bloom.add(str(doc_id))
 
@@ -367,9 +372,12 @@ class Table:
         table = self._read_table()
 
         if doc_id is not None:
-            # Fast path: use the Bloom Filter to discard nonexistent IDs
-            # without reading from storage
-            if self._bloom is not None and not self._bloom.test(str(doc_id)):
+            # Fast path: use the Bloom Filter to discard nonexistent IDs.
+            # The filter is lazily initialized by _read_table() above,
+            # so it is guaranteed to be ready at this point.
+            if (self._bloom is not None
+                    and self._bloom_initialized
+                    and not self._bloom.test(str(doc_id))):
                 return None
 
             # Retrieve a document specified by its ID
@@ -428,8 +436,12 @@ class Table:
         :param doc_id: the document ID to look for
         """
         if doc_id is not None:
-            # Fast path: use the Bloom Filter to discard nonexistent IDs
-            if self._bloom is not None and not self._bloom.test(str(doc_id)):
+            # Fast path: use the Bloom Filter to discard nonexistent IDs.
+            # If the filter isn't initialized yet, we fall through to get()
+            # which calls _read_table() and initializes the filter.
+            if (self._bloom is not None
+                    and self._bloom_initialized
+                    and not self._bloom.test(str(doc_id))):
                 return False
 
             # Documents specified by ID
@@ -806,6 +818,12 @@ class Table:
             # The table does not exist yet, so it is empty
             return {}
 
+        # Lazily initialize the Bloom Filter from the data we just read,
+        # piggybacking on this storage read with zero extra I/O cost.
+        if self._bloom is not None and not self._bloom_initialized:
+            self._bloom.rebuild(table.keys())
+            self._bloom_initialized = True
+
         return table
 
     def _update_table(self, updater: Callable[[Dict[int, Mapping]], None]):
@@ -871,3 +889,4 @@ class Table:
         if self._bloom is not None:
             table = self._read_table()
             self._bloom.rebuild(table.keys())
+            self._bloom_initialized = True
