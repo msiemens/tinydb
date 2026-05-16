@@ -22,7 +22,14 @@ see `semver.org <http://semver.org/>`_
 unreleased
 ^^^^^^^^^^
 
-- *nothing yet*
+- Fix: Make ``Table.update(doc_ids=...)`` and ``Table.remove(doc_ids=...)``
+  behave consistently with ``Table.get(doc_id=...)`` when given document
+  IDs that don't exist: missing IDs are now silently skipped and the
+  returned list only contains IDs that were actually updated/removed.
+  Previously both methods raised ``KeyError``, and ``update`` could leave
+  the table in a partially-updated state when a mix of existing and
+  missing IDs was passed
+  (see `issue 591 <https://github.com/msiemens/tinydb/issues/591>`_).
 
 v4.8.2 (2024-10-12)
 ^^^^^^^^^^^^^^^^^^^

@@ -416,6 +416,10 @@ class Table:
         """
         Update all matching documents to have a given set of fields.
 
+        When ``doc_ids`` is given, IDs that don't refer to an existing
+        document are silently skipped, and the returned list only contains
+        the IDs that were actually updated.
+
         :param fields: the fields that the matching documents will have
                        or a method that will update the documents
         :param cond: which documents to update
@@ -436,12 +440,21 @@ class Table:
 
         if doc_ids is not None:
             # Perform the update operation for documents specified by a list
-            # of document IDs
-
-            updated_ids = list(doc_ids)
+            # of document IDs. Document IDs that don't exist in the table are
+            # silently skipped, mirroring the behaviour of ``get(doc_ids=...)``
+            # (see issue #591). The list of *actually* updated IDs is
+            # determined inside the updater so it reflects the table state at
+            # write time.
+            requested_ids = list(doc_ids)
+            updated_ids: List[int] = []
 
             def updater(table: dict):
-                # Call the processing callback with all document IDs
+                # Filter to IDs that exist *before* performing any updates,
+                # so the operation is atomic: either every existing target is
+                # updated, or none is.
+                updated_ids.extend(
+                    doc_id for doc_id in requested_ids if doc_id in table
+                )
                 for doc_id in updated_ids:
                     perform_update(table, doc_id)
 
@@ -576,12 +589,10 @@ class Table:
                              "specify a doc_id. Hint: use a table.Document "
                              "object.")
 
-        # Perform the update operation
-        try:
-            updated_docs: Optional[List[int]] = self.update(document, cond, doc_ids)
-        except KeyError:
-            # This happens when a doc_id is specified, but it's missing
-            updated_docs = None
+        # Perform the update operation. ``update`` returns an empty list
+        # when no existing document matches the doc_id / query, in which
+        # case we fall through to insert below.
+        updated_docs = self.update(document, cond, doc_ids)
 
         # If documents have been updated: return their IDs
         if updated_docs:
@@ -599,23 +610,33 @@ class Table:
         """
         Remove all matching documents.
 
+        When ``doc_ids`` is given, IDs that don't refer to an existing
+        document are silently skipped, and the returned list only contains
+        the IDs that were actually removed.
+
         :param cond: the condition to check against
         :param doc_ids: a list of document IDs
         :returns: a list containing the removed documents' ID
         """
         if doc_ids is not None:
-            # This function returns the list of IDs for the documents that have
-            # been removed. When removing documents identified by a set of
-            # document IDs, it's this list of document IDs we need to return
-            # later.
-            # We convert the document ID iterator into a list, so we can both
-            # use the document IDs to remove the specified documents and
-            # to return the list of affected document IDs
-            removed_ids = list(doc_ids)
+            # This function returns the list of IDs for the documents that
+            # have been removed. Document IDs that don't exist in the table
+            # are silently skipped, mirroring the behaviour of
+            # ``get(doc_ids=...)`` (see issue #591). The list of *actually*
+            # removed IDs is determined inside the updater so it reflects the
+            # table state at write time.
+            requested_ids = list(doc_ids)
+            removed_ids: List[int] = []
 
             def updater(table: dict):
+                # Filter to IDs that exist *before* performing any removals,
+                # so the operation is atomic: either every existing target is
+                # removed, or none is.
+                removed_ids.extend(
+                    doc_id for doc_id in requested_ids if doc_id in table
+                )
                 for doc_id in removed_ids:
-                    table.pop(doc_id)
+                    del table[doc_id]
 
             # Perform the remove operation
             self._update_table(updater)

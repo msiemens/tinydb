@@ -211,6 +211,25 @@ def test_remove_returns_ids(db: TinyDB):
     assert db.remove(where('char') == 'b') == [2]
 
 
+def test_remove_ids_missing(db: TinyDB):
+    # Removing by a non-existent doc_id should not raise; the returned list
+    # only contains IDs that were actually removed. This mirrors the silent
+    # behaviour of ``get(doc_id=N)`` / ``get(doc_ids=[N])``.
+    assert db.remove(doc_ids=[99]) == []
+    assert len(db) == 3
+
+
+def test_remove_ids_mixed(db: TinyDB):
+    # When a mix of existing and missing IDs is passed, only the existing
+    # documents should be removed and the missing IDs ignored. The removal
+    # must be atomic - either every existing target is removed or none is
+    # (no partial state on failure).
+    assert sorted(db.remove(doc_ids=[1, 99])) == [1]
+    assert len(db) == 2
+    assert db.get(doc_id=1) is None
+    assert db.get(doc_id=2) is not None
+
+
 def test_update(db: TinyDB):
     assert len(db) == 3
 
@@ -263,6 +282,34 @@ def test_update_ids(db: TinyDB):
     db.update({'int': 2}, doc_ids=[1, 2])
 
     assert db.count(where('int') == 2) == 2
+
+
+def test_update_ids_missing(db: TinyDB):
+    # Updating by a non-existent doc_id should not raise; the returned list
+    # only contains IDs that were actually updated. This mirrors the silent
+    # behaviour of ``get(doc_id=N)`` / ``get(doc_ids=[N])``.
+    assert db.update({'int': 9}, doc_ids=[99]) == []
+    assert db.count(where('int') == 9) == 0
+    assert db.count(where('int') == 1) == 3
+
+
+def test_update_ids_mixed(db: TinyDB):
+    # When a mix of existing and missing IDs is passed, only the existing
+    # documents should be updated and the missing IDs ignored. The update
+    # must be atomic - either every existing target is updated or none is
+    # (no partial state on failure).
+    assert sorted(db.update({'int': 9}, doc_ids=[1, 99])) == [1]
+    assert db.count(where('int') == 9) == 1
+    assert db.count(where('int') == 1) == 2
+
+
+def test_doc_id_missing_consistency(db: TinyDB):
+    # ``get``, ``update`` and ``remove`` must all behave consistently when
+    # given an ID that does not exist (see #591). None of them should raise.
+    assert db.get(doc_id=99) is None
+    assert db.get(doc_ids=[99]) == []
+    assert db.update({'int': 9}, doc_ids=[99]) == []
+    assert db.remove(doc_ids=[99]) == []
 
 
 def test_update_multiple(db: TinyDB):
