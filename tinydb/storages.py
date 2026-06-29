@@ -24,7 +24,7 @@ def touch(path: str, create_dirs: bool):
         base_dir = os.path.dirname(path)
 
         # Check if we need to create missing parent directories
-        if not os.path.exists(base_dir):
+        if base_dir and not os.path.exists(base_dir):
             os.makedirs(base_dir)
 
     # Create the file by opening it in 'a' mode which creates the file if it
