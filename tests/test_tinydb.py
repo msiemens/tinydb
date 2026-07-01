@@ -298,6 +298,25 @@ def test_update_custom_transform_callable(db: TinyDB):
     assert db.get(doc_id=doc_id) == {'name': 'John'}
 
 
+def test_move_document_between_tables(db: TinyDB):
+    source = db.table('source')
+    target = db.table('target')
+
+    doc_id = source.insert({'type': 'apple', 'count': 7})
+    target.insert({'placeholder': True})
+    document = source.get(doc_id=doc_id)
+
+    with pytest.raises(ValueError, match='already exists'):
+        target.insert(document)
+
+    new_id = target.insert(dict(document))
+    source.remove(doc_ids=[doc_id])
+
+    assert source.all() == []
+    assert target.get(doc_id=new_id) == {'type': 'apple', 'count': 7}
+    assert new_id == 2
+
+
 def test_update_ids(db: TinyDB):
     db.update({'int': 2}, doc_ids=[1, 2])
 

@@ -479,6 +479,32 @@ True
 Using ``doc_id``/``doc_ids`` instead of ``Query()`` again is slightly faster
 in operation.
 
+Moving documents between databases
+..................................
+
+Documents returned by TinyDB are :class:`~tinydb.table.Document` instances.
+They look like plain dicts, but they also carry the document ID assigned by
+the table they came from. If you insert such a ``Document`` into another
+table or database, TinyDB reuses that ID. When the target table already has
+a document with the same ID, insertion fails with ``ValueError: Document
+with ID ... already exists``.
+
+This often shows up when moving documents from one database to another:
+
+>>> db1 = TinyDB('db1.json')
+>>> db2 = TinyDB('db2.json')
+>>> document = db1.get(doc_id=1)
+>>> db2.insert(document)  # reuses doc_id=1 from db1
+>>> db1.remove(doc_ids=[1])
+
+To copy the document's data and let the target table assign a new ID, convert
+the ``Document`` to a plain dict first:
+
+>>> db2.insert(dict(document))
+
+The same applies when moving documents between named tables in a single
+database.
+
 Recap
 .....
 
