@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 520" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#555"/>
+    </marker>
+  </defs>
+
+  <style>
+    .box { fill: #f7f9fc; stroke: #4a6fa5; stroke-width: 1.5; rx: 6; }
+    .abstract { fill: #eef3fb; stroke-dasharray: 5 3; }
+    .title { font-size: 15px; font-weight: bold; fill: #1f2d3d; }
+    .label { fill: #334155; }
+    .note { fill: #64748b; font-size: 11px; }
+    .line { stroke: #64748b; stroke-width: 1.2; fill: none; marker-end: url(#arrow); }
+    .group { fill: none; stroke: #cbd5e1; stroke-width: 1.2; rx: 10; }
+  </style>
+
+  <text x="410" y="28" text-anchor="middle" class="title">TinyDB class relationships</text>
+
+  <rect x="30" y="50" width="360" height="210" class="group"/>
+  <text x="45" y="72" class="note">Core API</text>
+
+  <rect x="55" y="90" width="130" height="42" class="box"/>
+  <text x="120" y="116" text-anchor="middle" class="label">TinyDB</text>
+
+  <rect x="235" y="90" width="130" height="42" class="box"/>
+  <text x="300" y="116" text-anchor="middle" class="label">Table</text>
+
+  <rect x="235" y="170" width="130" height="42" class="box"/>
+  <text x="300" y="196" text-anchor="middle" class="label">Document</text>
+
+  <rect x="55" y="170" width="130" height="42" class="box"/>
+  <text x="120" y="196" text-anchor="middle" class="label">Query</text>
+
+  <rect x="55" y="250" width="130" height="42" class="box"/>
+  <text x="120" y="276" text-anchor="middle" class="label">QueryInstance</text>
+
+  <line x1="185" y1="111" x2="235" y2="111" class="line"/>
+  <text x="210" y="103" text-anchor="middle" class="note">manages</text>
+
+  <line x1="300" y1="132" x2="300" y2="170" class="line"/>
+  <text x="318" y="155" class="note">wraps</text>
+
+  <line x1="120" y1="212" x2="120" y2="250" class="line"/>
+  <text x="138" y="235" class="note">builds</text>
+
+  <line x1="185" y1="271" x2="235" y2="196" class="line"/>
+  <text x="205" y="228" class="note">filters</text>
+
+  <rect x="430" y="50" width="360" height="210" class="group"/>
+  <text x="445" y="72" class="note">Persistence layer</text>
+
+  <rect x="455" y="90" width="150" height="42" class="box abstract"/>
+  <text x="530" y="116" text-anchor="middle" class="label">Storage</text>
+
+  <rect x="640" y="90" width="130" height="42" class="box"/>
+  <text x="705" y="116" text-anchor="middle" class="label">JSONStorage</text>
+
+  <rect x="640" y="150" width="130" height="42" class="box"/>
+  <text x="705" y="176" text-anchor="middle" class="label">MemoryStorage</text>
+
+  <rect x="455" y="170" width="150" height="42" class="box abstract"/>
+  <text x="530" y="196" text-anchor="middle" class="label">Middleware</text>
+
+  <rect x="640" y="230" width="130" height="42" class="box"/>
+  <text x="705" y="256" text-anchor="middle" class="label">CachingMiddleware</text>
+
+  <line x1="705" y1="132" x2="620" y2="111" class="line"/>
+  <line x1="705" y1="150" x2="620" y2="111" class="line"/>
+  <line x1="705" y1="230" x2="605" y2="196" class="line"/>
+  <line x1="605" y1="196" x2="530" y2="132" class="line"/>
+
+  <rect x="30" y="290" width="760" height="200" class="group"/>
+  <text x="45" y="312" class="note">Supporting components</text>
+
+  <rect x="55" y="330" width="130" height="42" class="box"/>
+  <text x="120" y="356" text-anchor="middle" class="label">LRUCache</text>
+
+  <rect x="220" y="330" width="130" height="42" class="box"/>
+  <text x="285" y="356" text-anchor="middle" class="label">operations</text>
+
+  <rect x="385" y="330" width="130" height="42" class="box"/>
+  <text x="450" y="356" text-anchor="middle" class="label">FrozenDict</text>
+
+  <line x1="300" y1="132" x2="120" y2="330" class="line"/>
+  <text x="175" y="225" class="note">query cache</text>
+
+  <line x1="300" y1="132" x2="530" y2="132" class="line"/>
+  <text x="415" y="124" text-anchor="middle" class="note">read / write</text>
+
+  <line x1="350" y1="111" x2="285" y2="330" class="line"/>
+  <text x="330" y="215" class="note">update helpers</text>
+
+  <line x1="120" y1="250" x2="450" y2="330" class="line"/>
+  <text x="300" y="300" class="note">stable query hashes</text>
+</svg>
