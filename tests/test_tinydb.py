@@ -278,6 +278,26 @@ def test_update_transform(db: TinyDB):
     assert db.count(where('int') == 1) == 2
 
 
+def test_update_custom_transform_callable(db: TinyDB):
+    from collections.abc import MutableMapping
+
+    from tinydb.operations import delete as delete_field
+
+    doc_id = db.insert({'name': 'John', 'temp': True})
+
+    def remove_temp(doc: MutableMapping) -> None:
+        del doc['temp']
+
+    db.update(remove_temp, where('name') == 'John')
+
+    assert db.get(doc_id=doc_id) == {'name': 'John'}
+
+    db.update({'temp': True}, where('name') == 'John')
+    db.update(delete_field('temp'), where('name') == 'John')
+
+    assert db.get(doc_id=doc_id) == {'name': 'John'}
+
+
 def test_update_ids(db: TinyDB):
     db.update({'int': 2}, doc_ids=[1, 2])
 

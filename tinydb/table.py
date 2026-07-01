@@ -3,7 +3,7 @@ This module implements tables, the central place for accessing and manipulating
 data in TinyDB.
 """
 
-from collections.abc import Callable, Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMapping
 from typing import (
     NoReturn,
     Optional,
@@ -403,7 +403,7 @@ class Table:
 
     def update(
         self,
-        fields: Union[Mapping, Callable[[Mapping], None]],
+        fields: Union[Mapping, Callable[[MutableMapping], None]],
         cond: Optional[QueryLike] = None,
         doc_ids: Optional[Iterable[int]] = None,
     ) -> list[int]:
@@ -415,7 +415,7 @@ class Table:
         the IDs that were actually updated.
 
         :param fields: the fields that the matching documents will have
-                       or a method that will update the documents
+                       or a callable that mutates matching documents in place
         :param cond: which documents to update
         :param doc_ids: a list of document IDs
         :returns: a list containing the updated document's ID
@@ -508,7 +508,7 @@ class Table:
     def update_multiple(
         self,
         updates: Iterable[
-            tuple[Union[Mapping, Callable[[Mapping], None]], QueryLike]
+            tuple[Union[Mapping, Callable[[MutableMapping], None]], QueryLike]
         ],
     ) -> list[int]:
         """
