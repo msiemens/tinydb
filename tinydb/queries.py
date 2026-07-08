@@ -388,7 +388,7 @@ class Query(QueryInstance):
         """
         return self._generate_test(
             lambda value: func(value, *args),
-            ('test', self._path, func, args)
+            ('test', self._path, func, freeze(list(args)))
         )
 
     def any(self, cond: Union[QueryInstance, list[Any]]) -> QueryInstance:
