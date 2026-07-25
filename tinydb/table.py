@@ -726,7 +726,7 @@ class Table:
         # If we already know the next ID
         if self._next_id is not None:
             next_id = self._next_id
-            self._next_id = next_id + 1
+            self._next_id = next_id + 2
 
             return next_id
 
