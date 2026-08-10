@@ -1,0 +1,35 @@
+flowchart TB
+  subgraph core["Core API"]
+    TinyDB
+    Table
+    Document
+    Query
+    QueryInstance
+  end
+
+  subgraph persistence["Persistence layer"]
+    Storage
+    JSONStorage
+    MemoryStorage
+    Middleware
+    CachingMiddleware
+  end
+
+  subgraph support["Supporting components"]
+    LRUCache
+    operations
+    FrozenDict
+  end
+
+  TinyDB -->|manages| Table
+  Table -->|wraps| Document
+  Query -->|builds| QueryInstance
+  QueryInstance -->|filters| Document
+  TinyDB -->|read / write| Storage
+  JSONStorage -->|implements| Storage
+  MemoryStorage -->|implements| Storage
+  Middleware -->|wraps| Storage
+  CachingMiddleware -->|implements| Middleware
+  Table -->|query cache| LRUCache
+  Table -->|update helpers| operations
+  QueryInstance -->|stable query hashes| FrozenDict
