@@ -305,6 +305,7 @@ def test_move_document_between_tables(db: TinyDB):
     doc_id = source.insert({'type': 'apple', 'count': 7})
     target.insert({'placeholder': True})
     document = source.get(doc_id=doc_id)
+    assert document is not None
 
     with pytest.raises(ValueError, match='already exists'):
         target.insert(document)
