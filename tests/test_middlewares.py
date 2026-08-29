@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from tinydb import TinyDB
 from tinydb.middlewares import CachingMiddleware
 from tinydb.storages import MemoryStorage, JSONStorage
@@ -97,6 +99,19 @@ def test_caching_json_write(tmpdir):
 
     # Assert JSON file has been closed
     assert db._storage._handle.closed
+
+
+def test_caching_rejects_use_after_close(tmpdir):
+    path = str(tmpdir.join('closed.db'))
+    db = TinyDB(path, storage=CachingMiddleware(JSONStorage))
+    db.insert({'key': 'value'})
+    db.close()
+
+    with pytest.raises(ValueError, match='closed'):
+        db.insert({'key': 'again'})
+
+    with pytest.raises(ValueError, match='closed'):
+        db.all()
 
     del db
 
