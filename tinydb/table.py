@@ -204,11 +204,21 @@ class Table:
                     doc_id = document.doc_id
                     doc_ids.append(doc_id)
                     table[doc_id] = dict(document)
+                    # Same as insert(): don't reuse this ID for later
+                    # auto-assigned documents in this batch.
+                    self._next_id = None
                     continue
 
-                # Generate new document ID for this document
-                # Store the doc_id, so we can return all document IDs
-                # later, then save the document with the new doc_id
+                # Generate new document ID for this document.
+                # Allocate from the in-progress table, not storage, so a
+                # Document inserted earlier in this batch is visible.
+                if self._next_id is None:
+                    if table:
+                        self._next_id = max(
+                            self.document_id_class(i) for i in table.keys()
+                        ) + 1
+                    else:
+                        self._next_id = 1
                 doc_id = self._get_next_id()
                 doc_ids.append(doc_id)
                 table[doc_id] = dict(document)
