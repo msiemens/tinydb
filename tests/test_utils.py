@@ -48,6 +48,25 @@ def test_lru_cache_get():
     assert cache.lru == ["c", "a", "d"]
 
 
+def test_lru_cache_none_value():
+    cache = LRUCache(capacity=3)
+    cache["a"] = None
+
+    assert "a" in cache
+    assert cache["a"] is None
+    assert cache.get("a", "default") is None
+    assert cache.get("missing", "default") == "default"
+
+    with pytest.raises(KeyError):
+        cache["missing"]
+
+    # a None-valued entry should still count towards LRU ordering
+    cache["b"] = 1
+    cache["a"]
+
+    assert cache.lru == ["b", "a"]
+
+
 def test_lru_cache_delete():
     cache = LRUCache(capacity=3)
     cache["a"] = 1

@@ -4,7 +4,7 @@ Utility functions.
 
 from collections import OrderedDict, abc
 from collections.abc import Iterator
-from typing import TypeVar, Generic, Union, Optional, TYPE_CHECKING
+from typing import TypeVar, Generic, Union, Optional, TYPE_CHECKING, cast
 
 K = TypeVar('K')
 V = TypeVar('V')
@@ -12,6 +12,10 @@ D = TypeVar('D')
 T = TypeVar('T')
 
 __all__ = ('LRUCache', 'freeze', 'with_typehint')
+
+# Used internally by LRUCache to tell "key maps to None" apart from
+# "key isn't in the cache at all"
+_missing = object()
 
 
 def with_typehint(baseclass: type[T]):
@@ -78,22 +82,24 @@ class LRUCache(abc.MutableMapping, Generic[K, V]):
         del self.cache[key]
 
     def __getitem__(self, key) -> V:
-        value = self.get(key)
-        if value is None:
+        value = self.cache.get(key, _missing)
+        if value is _missing:
             raise KeyError(key)
 
-        return value
+        self.cache.move_to_end(key, last=True)
+
+        return cast(V, value)
 
     def __iter__(self) -> Iterator[K]:
         return iter(self.cache)
 
     def get(self, key: K, default: Optional[D] = None) -> Optional[Union[V, D]]:
-        value = self.cache.get(key)
+        value = self.cache.get(key, _missing)
 
-        if value is not None:
+        if value is not _missing:
             self.cache.move_to_end(key, last=True)
 
-            return value
+            return cast(V, value)
 
         return default
 
