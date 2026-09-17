@@ -100,6 +100,12 @@ def test_caching_json_write(tmpdir):
     # Assert JSON file has been closed
     assert db._storage._handle.closed
 
+    del db
+
+    # Reopen database
+    with TinyDB(path, storage=CachingMiddleware(JSONStorage)) as db:
+        assert db.all() == [{'key': 'value'}]
+
 
 def test_caching_rejects_use_after_close(tmpdir):
     path = str(tmpdir.join('closed.db'))
@@ -113,8 +119,5 @@ def test_caching_rejects_use_after_close(tmpdir):
     with pytest.raises(ValueError, match='closed'):
         db.all()
 
-    del db
-
-    # Reopen database
-    with TinyDB(path, storage=CachingMiddleware(JSONStorage)) as db:
-        assert db.all() == [{'key': 'value'}]
+    with TinyDB(path, storage=CachingMiddleware(JSONStorage)) as reopened:
+        assert reopened.all() == [{'key': 'value'}]
