@@ -107,7 +107,7 @@ class Table:
         self._query_cache: LRUCache[QueryLike, list[Document]] \
             = self.query_cache_class(capacity=cache_size)
 
-        self._next_id = None
+        self._next_id: Optional[int] = None
         if persist_empty:
             self._update_table(lambda table: table.clear())
 
@@ -212,13 +212,15 @@ class Table:
                 # Generate new document ID for this document.
                 # Allocate from the in-progress table, not storage, so a
                 # Document inserted earlier in this batch is visible.
-                if self._next_id is None:
+                next_id = self._next_id
+                if next_id is None:
                     if table:
-                        self._next_id = max(
+                        next_id = max(
                             self.document_id_class(i) for i in table.keys()
                         ) + 1
                     else:
-                        self._next_id = 1
+                        next_id = 1
+                self._next_id = next_id
                 doc_id = self._get_next_id()
                 doc_ids.append(doc_id)
                 table[doc_id] = dict(document)
