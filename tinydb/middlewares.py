@@ -92,8 +92,12 @@ class CachingMiddleware(Middleware):
         # Prepare the cache
         self.cache = None
         self._cache_modified_count = 0
+        self._closed = False
 
     def read(self):
+        if self._closed:
+            raise ValueError('I/O operation on closed storage')
+
         if self.cache is None:
             # Empty cache: read from the storage
             self.cache = self.storage.read()
@@ -102,6 +106,9 @@ class CachingMiddleware(Middleware):
         return self.cache
 
     def write(self, data):
+        if self._closed:
+            raise ValueError('I/O operation on closed storage')
+
         # Store data in cache
         self.cache = data
         self._cache_modified_count += 1
@@ -114,14 +121,22 @@ class CachingMiddleware(Middleware):
         """
         Flush all unwritten data to disk.
         """
+        if self._closed:
+            raise ValueError('I/O operation on closed storage')
+
         if self._cache_modified_count > 0:
             # Force-flush the cache by writing the data to the storage
             self.storage.write(self.cache)
             self._cache_modified_count = 0
 
     def close(self):
+        if self._closed:
+            return
+
         # Flush potentially unwritten data
         self.flush()
 
         # Let the storage clean up too
         self.storage.close()
+        self._closed = True
+        self.cache = None
