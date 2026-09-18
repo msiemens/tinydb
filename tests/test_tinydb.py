@@ -122,6 +122,18 @@ def test_insert_multiple_with_doc_ids(db: TinyDB):
         db.insert_multiple([Document({'int': 1, 'char': 'a'}, 12)])
 
 
+def test_insert_multiple_mixed_document_and_dict(db: TinyDB):
+    db.drop_tables()
+
+    ids = db.insert_multiple([
+        Document({'int': 1, 'char': 'explicit'}, 1),
+        {'int': 2, 'char': 'auto'},
+    ])
+    assert ids == [1, 2]
+    assert db.get(doc_id=1) == {'int': 1, 'char': 'explicit'}
+    assert db.get(doc_id=2) == {'int': 2, 'char': 'auto'}
+
+
 def test_insert_invalid_type_raises_error(db: TinyDB):
     with pytest.raises(ValueError, match='Document is not a Mapping'):
         # object() as an example of a non-mapping-type
