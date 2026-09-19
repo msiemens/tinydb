@@ -17,7 +17,7 @@ False
 """
 
 import re
-from collections.abc import Mapping, Callable
+from collections.abc import Mapping, Callable, Sequence
 from typing import Any, Union, Optional, Protocol
 
 from .utils import freeze
@@ -26,7 +26,10 @@ __all__ = ('Query', 'QueryLike', 'where')
 
 
 def is_sequence(obj):
-    return hasattr(obj, '__iter__')
+    # Exclude str/bytes: they are iterable Sequences but document fields that
+    # are strings should not match any/all as if they were char lists (#638).
+    return isinstance(obj, Sequence) and not isinstance(obj, (str, bytes,
+                                                              bytearray))
 
 
 class QueryLike(Protocol):
