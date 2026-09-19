@@ -295,6 +295,11 @@ def test_any():
     assert not query({'followers': [{'name': 'greg'}]})
     assert hash(query)
 
+    # String fields must not be treated as character sequences (issue #638)
+    query = Query().name.any(['a', 'b'])
+    assert not query({'name': 'abc'})
+    assert not query({'name': 'a'})
+
 
 def test_all():
     query = Query().followers.all(Query().name == 'don')
@@ -320,6 +325,10 @@ def test_all():
                                 {'name': 'bob'}]})
     assert not query({'followers': [{'name': 'john'}, {'name': 'bob'}]})
     assert hash(query)
+
+    # String fields must not be treated as character sequences (issue #638)
+    query = Query().name.all(['a', 'b'])
+    assert not query({'name': 'abc'})
 
 
 def test_has():
