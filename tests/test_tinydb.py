@@ -369,7 +369,9 @@ def test_doc_ids_string_coercion(db: TinyDB):
     # ``remove`` must accept the same string IDs (see #639).
     assert db.get(doc_id='1') is not None
     assert db.update({'int': 9}, doc_ids=['1']) == [1]
-    assert db.get(doc_id=1)['int'] == 9
+    doc = db.get(doc_id=1)
+    assert doc is not None
+    assert doc['int'] == 9
     assert db.remove(doc_ids=['1']) == [1]
     assert db.get(doc_id=1) is None
 
