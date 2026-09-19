@@ -352,7 +352,9 @@ class Query(QueryInstance):
 
             return re.match(regex, value, flags) is not None
 
-        return self._generate_test(test, ('matches', self._path, regex))
+        # Include flags in the hash so queries that differ only by flags do not
+        # share a Table query-cache entry (see issue #637).
+        return self._generate_test(test, ('matches', self._path, regex, flags))
 
     def search(self, regex: str, flags: int = 0) -> QueryInstance:
         """
@@ -362,7 +364,7 @@ class Query(QueryInstance):
         >>> Query().f1.search(r'^\\w+$')
 
         :param regex: The regular expression to use for matching
-        :param flags: regex flags to pass to ``re.match``
+        :param flags: regex flags to pass to ``re.search``
         """
 
         def test(value):
@@ -371,7 +373,9 @@ class Query(QueryInstance):
 
             return re.search(regex, value, flags) is not None
 
-        return self._generate_test(test, ('search', self._path, regex))
+        # Include flags in the hash so queries that differ only by flags do not
+        # share a Table query-cache entry (see issue #637).
+        return self._generate_test(test, ('search', self._path, regex, flags))
 
     def test(self, func: Callable[[Mapping], bool], *args) -> QueryInstance:
         """
