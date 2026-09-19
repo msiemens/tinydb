@@ -362,7 +362,7 @@ class Query(QueryInstance):
         >>> Query().f1.search(r'^\\w+$')
 
         :param regex: The regular expression to use for matching
-        :param flags: regex flags to pass to ``re.match``
+        :param flags: regex flags to pass to ``re.search``
         """
 
         def test(value):
@@ -373,9 +373,9 @@ class Query(QueryInstance):
 
         return self._generate_test(test, ('search', self._path, regex))
 
-    def test(self, func: Callable[[Mapping], bool], *args) -> QueryInstance:
+    def test(self, func: Callable[..., bool], *args) -> QueryInstance:
         """
-        Run a user-defined test function against a dict value.
+        Run a user-defined test function against a field value.
 
         >>> def test_func(val):
         ...     return val == 42
@@ -389,7 +389,7 @@ class Query(QueryInstance):
             may mess up the query cache that :class:`~tinydb.table.Table`
             implements.
 
-        :param func: The function to call, passing the dict as the first
+        :param func: The function to call, passing the field value as the first
                      argument
         :param args: Additional arguments to pass to the test function
         """
