@@ -309,12 +309,14 @@ class Table:
 
     @overload
     def get(
-        self, cond: Optional[QueryLike], doc_id: int, doc_ids: Optional[list] = ...
+        self, cond: Optional[QueryLike], doc_id: Union[int, str],
+        doc_ids: Optional[list] = ...
     ) -> Optional[Document]: ...
 
     @overload
     def get(
-        self, *, cond: Optional[QueryLike] = ..., doc_id: int, doc_ids: Optional[list] = ...,
+        self, *, cond: Optional[QueryLike] = ..., doc_id: Union[int, str],
+        doc_ids: Optional[list] = ...,
     ) -> Optional[Document]: ...
 
     @overload
@@ -335,7 +337,7 @@ class Table:
     def get(
         self,
         cond: Optional[QueryLike] = None,
-        doc_id: Optional[int] = None,
+        doc_id: Optional[Union[int, str]] = None,
         doc_ids: Optional[list] = None
     ):
         """
@@ -360,8 +362,9 @@ class Table:
             if raw_doc is None:
                 return None
 
-            # Convert the raw data to the document class
-            return self.document_class(raw_doc, doc_id)
+            # Convert the raw data to the document class. Coerce the ID the same
+            # way other read paths do so str IDs like '1' become document_id_class.
+            return self.document_class(raw_doc, self.document_id_class(doc_id))
 
         elif doc_ids is not None:
             # Filter the table by extracting out all those documents which
@@ -423,7 +426,7 @@ class Table:
         self,
         fields: Union[Mapping, Callable[[MutableMapping], None]],
         cond: Optional[QueryLike] = None,
-        doc_ids: Optional[Iterable[int]] = None,
+        doc_ids: Optional[Iterable[Union[int, str]]] = None,
     ) -> list[int]:
         """
         Update all matching documents to have a given set of fields.
@@ -457,7 +460,9 @@ class Table:
             # (see issue #591). The list of *actually* updated IDs is
             # determined inside the updater so it reflects the table state at
             # write time.
-            requested_ids = list(doc_ids)
+            # Coerce IDs with document_id_class so string IDs like '1' match
+            # table keys the same way get(doc_id='1') does (see issue #639).
+            requested_ids = [self.document_id_class(doc_id) for doc_id in doc_ids]
             updated_ids: list[int] = []
 
             def updater(table: dict):
@@ -620,7 +625,7 @@ class Table:
     def remove(
         self,
         cond: Optional[QueryLike] = None,
-        doc_ids: Optional[Iterable[int]] = None,
+        doc_ids: Optional[Iterable[Union[int, str]]] = None,
     ) -> list[int]:
         """
         Remove all matching documents.
@@ -640,7 +645,9 @@ class Table:
             # ``get(doc_ids=...)`` (see issue #591). The list of *actually*
             # removed IDs is determined inside the updater so it reflects the
             # table state at write time.
-            requested_ids = list(doc_ids)
+            # Coerce IDs with document_id_class so string IDs like '1' match
+            # table keys the same way get(doc_id='1') does (see issue #639).
+            requested_ids = [self.document_id_class(doc_id) for doc_id in doc_ids]
             removed_ids: list[int] = []
 
             def updater(table: dict):
