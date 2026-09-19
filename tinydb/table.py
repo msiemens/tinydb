@@ -339,17 +339,20 @@ class Table:
         doc_ids: Optional[list] = None
     ):
         """
-        Get exactly one document specified by a query or a document ID.
-        However, if multiple document IDs are given then returns all
-        documents in a list.
-        
-        Returns ``None`` if the document doesn't exist.
+        Get document(s) specified by a query or document ID(s).
+
+        - With ``cond`` or ``doc_id``: returns a single document, or ``None``
+          if no match exists. If multiple documents match ``cond``, the first
+          match in insertion order is returned.
+        - With ``doc_ids``: returns a list of matching documents (possibly
+          empty).
 
         :param cond: the condition to check against
         :param doc_id: the document's ID
-        :param doc_ids: the document's IDs(multiple)
+        :param doc_ids: the document's IDs (multiple)
 
-        :returns: the document(s) or ``None``
+        :returns: a document, ``None``, or a list of documents when
+                  ``doc_ids`` is used
         """
         table = self._read_table()
 
