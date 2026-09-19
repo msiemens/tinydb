@@ -364,6 +364,16 @@ def test_doc_id_missing_consistency(db: TinyDB):
     assert db.remove(doc_ids=[99]) == []
 
 
+def test_doc_ids_string_coercion(db: TinyDB):
+    # ``get(doc_id='1')`` already works via str coercion; ``update`` /
+    # ``remove`` must accept the same string IDs (see #639).
+    assert db.get(doc_id='1') is not None
+    assert db.update({'int': 9}, doc_ids=['1']) == [1]
+    assert db.get(doc_id=1)['int'] == 9
+    assert db.remove(doc_ids=['1']) == [1]
+    assert db.get(doc_id=1) is None
+
+
 def test_update_multiple(db: TinyDB):
     assert len(db) == 3
 

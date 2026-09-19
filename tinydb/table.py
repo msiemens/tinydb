@@ -457,7 +457,9 @@ class Table:
             # (see issue #591). The list of *actually* updated IDs is
             # determined inside the updater so it reflects the table state at
             # write time.
-            requested_ids = list(doc_ids)
+            # Coerce IDs with document_id_class so string IDs like '1' match
+            # table keys the same way get(doc_id='1') does (see issue #639).
+            requested_ids = [self.document_id_class(doc_id) for doc_id in doc_ids]
             updated_ids: list[int] = []
 
             def updater(table: dict):
@@ -640,7 +642,9 @@ class Table:
             # ``get(doc_ids=...)`` (see issue #591). The list of *actually*
             # removed IDs is determined inside the updater so it reflects the
             # table state at write time.
-            requested_ids = list(doc_ids)
+            # Coerce IDs with document_id_class so string IDs like '1' match
+            # table keys the same way get(doc_id='1') does (see issue #639).
+            requested_ids = [self.document_id_class(doc_id) for doc_id in doc_ids]
             removed_ids: list[int] = []
 
             def updater(table: dict):
