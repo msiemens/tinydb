@@ -177,3 +177,23 @@ def test_persist_table(db):
 
     db.table("nonpersisted", persist_empty=False)
     assert "nonpersisted" not in db.tables()
+
+
+def test_persist_empty_does_not_wipe_existing_data(tmpdir):
+    """persist_empty must not clear documents already stored for the table.
+
+    See https://github.com/msiemens/tinydb/issues/636
+    """
+    from tinydb import TinyDB
+
+    path = str(tmpdir.join('db.json'))
+    db = TinyDB(path)
+    db.table('t').insert({'a': 1})
+    db.close()
+
+    db = TinyDB(path)
+    assert 't' not in db._tables
+    table = db.table('t', persist_empty=True)
+    assert len(table) == 1
+    assert table.all() == [{'a': 1}]
+    db.close()

@@ -108,7 +108,9 @@ class Table:
             = self.query_cache_class(capacity=cache_size)
 
         self._next_id: Optional[int] = None
-        if persist_empty:
+        # Only persist a brand-new empty table. Never clear existing documents
+        # when reopen/construct with persist_empty=True (see issue #636).
+        if persist_empty and not self._read_table():
             self._update_table(lambda table: table.clear())
 
     def __repr__(self):
