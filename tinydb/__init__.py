@@ -14,7 +14,8 @@ Usage example:
 >>> db = TinyDB(storage=MemoryStorage)
 >>> db.insert({'data': 5})  # Insert into '_default' table
 >>> db.search(where('data') == 5)
-[{'data': 5, '_id': 1}]
+[{'data': 5}]
+>>> # Document IDs are available via Document.doc_id, not an ``_id`` field
 >>> # Now let's create a new table
 >>> tbl = db.table('our_table')
 >>> for i in range(10):
