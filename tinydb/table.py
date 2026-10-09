@@ -369,12 +369,28 @@ class Table:
             return self.document_class(raw_doc, doc_id)
 
         elif doc_ids is not None:
+            if not doc_ids:
+                return []
+
             # Filter the table by extracting out all those documents which
             # have doc id specified in the doc_id list.
 
             # Since document IDs will be unique, we make it a set to ensure
             # constant time lookup
             doc_ids_set = set(str(doc_id) for doc_id in doc_ids)
+
+            # Optimization by ARCHON EVO: O(K log K) direct key lookup instead
+            # of scanning all N items when K < len(table)
+            if len(doc_ids_set) < len(table):
+                existing_ids = [s for s in doc_ids_set if s in table]
+                try:
+                    existing_ids.sort(key=self.document_id_class)
+                except Exception:
+                    pass
+                return [
+                    self.document_class(table[s_id], self.document_id_class(s_id))
+                    for s_id in existing_ids
+                ]
 
             # Now return the filtered documents in form of list
             return [
@@ -415,8 +431,8 @@ class Table:
         :param doc_id: the document ID to look for
         """
         if doc_id is not None:
-            # Documents specified by ID
-            return self.get(doc_id=doc_id) is not None
+            # Documents specified by ID: O(1) presence check without document allocation
+            return str(doc_id) in self._read_table()
 
         elif cond is not None:
             # Document specified by condition
