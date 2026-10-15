@@ -11,6 +11,26 @@ Here are some extensions that might be useful to you:
 | **Description:** A drop-in reimplementation of TinyDB that uses Rust for
                    better performance.
 
+``tinydbjoin``
+**************
+
+| **Repo:**        https://github.com/FerdinaKusumah/tinydb-join
+| **Status:**      *beta*
+| **Description:** Joins between TinyDB tables, even when they live in
+                   different databases or storages: inner and left joins, and
+                   nesting related documents into their parent (one-to-many
+                   or belongs-to).
+
+``tinydbstorage``
+*****************
+
+| **Repo:**        https://github.com/FerdinaKusumah/tinydb-storage
+| **Status:**      *beta*
+| **Description:** Redis and S3 storages for TinyDB, including S3-compatible
+                   services such as MinIO and Cloudflare R2. A write that
+                   would overwrite a change made by another process fails
+                   instead.
+
 ``aiotinydb``
 *************
 
