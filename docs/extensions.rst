@@ -1,7 +1,16 @@
 Extensions
 ==========
 
-Here are some extensions that might be useful to you:
+Here are some extensions that might be useful to you.
+
+An extension is listed here if it
+
+* works with TinyDB 4 or newer,
+* supports Python 3,
+* is published on PyPI, and
+* has not been archived by its maintainers.
+
+Extensions that stop meeting these requirements are removed from the list.
 
 ``tinydb-rust``
 **************
@@ -92,40 +101,3 @@ Here are some extensions that might be useful to you:
 | **Status:**      *inactive*
 | **Description:** ``tinydb-appengine`` provides TinyDB storage for
                    App Engine. You can use JSON readonly.
-
-
-``TinyDBTimestamps``
-********************
-
-| **Repo:**        https://github.com/pachacamac/TinyDBTimestamps
-| **Status:**      *inactive*
-| **Description:** Automatically add create at/ update at timestamps to TinyDB
-                   documents.
-
-
-``tinyindex``
-*************
-
-| **Repo:**        https://github.com/eugene-eeo/tinyindex
-| **Status:**      *inactive*
-| **Description:** Document indexing for TinyDB. Basically ensures deterministic
-                   (as long as there aren't any changes to the table) yielding
-                   of documents.
-
-
-``tinymongo``
-*************
-
-| **Repo:**        https://github.com/schapman1974/tinymongo
-| **Status:**      *inactive*
-| **Description:** A simple wrapper that allows to use TinyDB as a flat file
-                   drop-in replacement for MongoDB.
-
-
-``TinyMP``
-*************
-
-| **Repo:**        https://github.com/alshapton/TinyMP
-| **Status:**      *inactive*
-| **Description:** A MessagePack-based storage extension to tinydb using
-                   http://msgpack.org
