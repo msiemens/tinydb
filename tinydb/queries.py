@@ -496,7 +496,7 @@ class Query(QueryInstance):
 
         return self._generate_test(
             lambda value: test(value),
-            ('fragment', freeze(document)),
+            ('fragment', self._path, freeze(document)),
             allow_empty_path=True
         )
 

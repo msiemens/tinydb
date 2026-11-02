@@ -74,6 +74,22 @@ def test_query_cache(db):
     assert query2 in db._query_cache
 
 
+def test_query_cache_fragment_with_different_paths(db):
+    table = db.table('table3')
+    table.insert({'home': {'city': 'Paris'}, 'work': {'city': 'Rome'}})
+    table.insert({'home': {'city': 'Rome'}, 'work': {'city': 'Paris'}})
+
+    fragment = {'city': 'Paris'}
+    home = where('home').fragment(fragment)
+    work = where('work').fragment(fragment)
+
+    # The cached result of one search must not be reused for the same
+    # fragment on a different field
+    assert [d.doc_id for d in table.search(home)] == [1]
+    assert [d.doc_id for d in table.search(work)] == [2]
+    assert [d.doc_id for d in table.search(home)] == [1]
+
+
 def test_query_cache_with_mutable_callable(db):
     table = db.table('table')
     table.insert({'val': 5})
