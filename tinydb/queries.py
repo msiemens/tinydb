@@ -32,6 +32,12 @@ def is_sequence(obj):
                                                               bytearray))
 
 
+def _is_cacheable(cond: Any) -> bool:
+    # A sub-query that is not cacheable has no hash to tell it apart from
+    # other queries, so a query built on top of it can't be cached either
+    return getattr(cond, 'is_cacheable', lambda: True)()
+
+
 class QueryLike(Protocol):
     """
     A typing protocol that acts like a query.
@@ -218,7 +224,7 @@ class Query(QueryInstance):
     def _generate_test(
             self,
             test: Callable[[Any], bool],
-            hashval: tuple,
+            hashval: Optional[tuple],
             allow_empty_path: bool = False
     ) -> QueryInstance:
         """
@@ -226,7 +232,8 @@ class Query(QueryInstance):
         path.
 
         :param test: The test the query executes.
-        :param hashval: The hash of the query.
+        :param hashval: The hash of the query or ``None`` if the query must
+                        not be cached.
         :return: A :class:`~tinydb.queries.QueryInstance` object
         """
         if not self._path and not allow_empty_path:
@@ -437,7 +444,7 @@ class Query(QueryInstance):
 
         return self._generate_test(
             lambda value: test(value),
-            ('any', self._path, freeze(cond))
+            ('any', self._path, freeze(cond)) if _is_cacheable(cond) else None
         )
 
     def all(self, cond: Union['QueryInstance', list[Any]]) -> QueryInstance:
@@ -470,7 +477,7 @@ class Query(QueryInstance):
 
         return self._generate_test(
             lambda value: test(value),
-            ('all', self._path, freeze(cond))
+            ('all', self._path, freeze(cond)) if _is_cacheable(cond) else None
         )
 
     def one_of(self, items: list[Any]) -> QueryInstance:
