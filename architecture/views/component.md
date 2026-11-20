@@ -6,13 +6,13 @@ The workflow is five Actions jobs with a fixed order: `gate`, `analyst`, `builde
 flowchart TD
   maintainer["Maintainer: label autose or comment /autose"]
   gate["gate job\nno model\nchecks the actor"]
-  analyst["analyst job\ngemini-2.5-flash\ntools: list_dir, read_file"]
+  analyst["analyst job\ngemini-3.8-flash\ntools: list_dir, read_file"]
   builder["builder job\nno shared token with the reviewer"]
-  implementer["implementer process\ngemini-2.5-flash\ntools: list_dir, read_file, write_file\nno shell, no push"]
-  tester["tester process\ngemini-2.5-flash\ntools: list_dir, read_file, write_file under tests/ only\nno implementer transcript"]
+  implementer["implementer process\ngemini-3.8-flash\ntools: list_dir, read_file, write_file\nno shell, no push"]
+  tester["tester process\ngemini-3.8-flash\ntools: list_dir, read_file, write_file under tests/ only\nno implementer transcript"]
   pytest["pytest\nworkflow step, not a model tool"]
   release["release job\nscript only, no model\ntools: git push, gh pr create\ncontents write, pull-requests write"]
-  reviewer["review job\ngemini-2.5-pro\ntools: list_dir, read_file, run_tests\nfresh checkout of the PR head\nno token in the model process"]
+  reviewer["review job\ngemini-3.8-flash\ntools: list_dir, read_file, run_tests\nfresh checkout of the PR head\nno token in the model process"]
   post["post step\nscript posts review.md"]
   human["Maintainer merges or closes"]
 
