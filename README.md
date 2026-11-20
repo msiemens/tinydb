@@ -1,7 +1,6 @@
 # A3 AutoSE
 
-Fork of TinyDB used for an agentic SDLC workflow. The workflow runner is not in this commit. This commit is the design: views, ADRs, and a map of TinyDB.
-
+Fork of TinyDB used for an agentic SDLC workflow that turns an issue into a tested, reviewed pull request. The repository holds the design (views, ADRs, a map of TinyDB), the workflow `.github/workflows/autose.yml`, and the agent code in `autose/`.
 Library usage remains in [README.rst](README.rst).
 
 ## Repository
