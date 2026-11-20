@@ -32,21 +32,44 @@ def _criteria(out):
     return match.group(1).strip() if match else "(see spec.md artifact)"
 
 
-def _wait_for_ci(pr):
+def judge_ci(checks, baseline_failed):
+    """Return (pending, new_failures, inherited_failures).
+
+    A check that already fails on the base branch is not the pull request's fault
+    (ADR-014). Only a check that is green on the base and red on the PR blocks stage 5.
+    """
+    pending = any(c["bucket"] == "pending" for c in checks)
+    failed = {c["name"] for c in checks if c["bucket"] in ("fail", "cancel")}
+    return pending, sorted(failed - set(baseline_failed)), sorted(failed & set(baseline_failed))
+
+
+def _baseline_failures(work):
+    """Names of the jobs that failed in the latest completed CI run on master."""
+    runs = json.loads(_run(["gh", "run", "list", "--workflow", "Python CI", "--branch", "master",
+                            "--status", "completed", "--limit", "1", "--json", "databaseId"],
+                           work) or "[]")
+    if not runs:
+        return set()
+    jobs = json.loads(_run(["gh", "run", "view", str(runs[0]["databaseId"]),
+                            "--json", "jobs"], work))["jobs"]
+    return {j["name"] for j in jobs if j["conclusion"] in ("failure", "cancelled")}
+
+
+def _wait_for_ci(pr, baseline):
     start = time.time()
     while True:
-        out = _run(["gh", "pr", "checks", pr, "--json", "name,bucket"])
-        checks = json.loads(out or "[]")
+        checks = json.loads(_run(["gh", "pr", "checks", pr, "--json", "name,bucket"]) or "[]")
         elapsed = time.time() - start
         if not checks and elapsed > CI_START_GRACE_S:
             return False, ("no CI check started. A pull request opened with GITHUB_TOKEN does "
                            "not trigger workflows; use the AUTOSE_PAT secret.")
-        buckets = {c["bucket"] for c in checks}
-        if checks and buckets <= {"pass", "skipping"}:
-            return True, f"{len(checks)} checks passed"
-        if buckets & {"fail", "cancel"}:
-            bad = [c["name"] for c in checks if c["bucket"] in ("fail", "cancel")]
-            return False, "CI failed: " + ", ".join(bad[:5])
+        pending, new, inherited = judge_ci(checks, baseline)
+        if new:
+            return False, "CI regression, red on the PR and green on master: " + ", ".join(new[:5])
+        if checks and not pending:
+            note = (f"; {len(inherited)} checks also fail on master and are not counted"
+                    if inherited else "")
+            return True, f"{len(checks)} checks, no regression{note}"
         if elapsed > CI_TIMEOUT_S:
             return False, "timed out waiting for CI"
         time.sleep(POLL_S)
@@ -66,6 +89,7 @@ def release(work, out, issue_number, round_no):
         raise StageFailed("pr.md", "patch touches protected paths: " + ", ".join(forbidden))
     branch = f"autose/issue-{int(issue_number)}"
     title = _title(out)
+    baseline = _baseline_failures(work)  # read before our push can change anything
 
     _run(["git", "config", "user.name", "autose-bot"], work)
     _run(["git", "config", "user.email", "autose-bot@users.noreply.github.com"], work)
@@ -111,7 +135,7 @@ def release(work, out, issue_number, round_no):
         with open(out_file, "a", encoding="utf-8") as fh:
             fh.write(f"pr={number}\n")
 
-    ok, msg = _wait_for_ci(number)
+    ok, msg = _wait_for_ci(number, baseline)
     with open(os.path.join(out, "pr.md"), "a", encoding="utf-8") as fh:
         fh.write(f"CI: {msg}\n")
     if not ok:
