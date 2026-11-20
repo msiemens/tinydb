@@ -158,6 +158,8 @@ def test_groq_translation_round_trip():
     assert out["messages"][3]["tool_call_id"] == call_id
     assert out["tools"][0]["function"]["parameters"]["type"] == "object"
     assert out["max_tokens"] == 100
+    body["generationConfig"]["maxOutputTokens"] = 8192
+    assert llm.to_openai(body, "g")["max_tokens"] == llm.GROQ_MAX_OUTPUT_TOKENS
     resp = llm.from_openai({"choices": [{"message": {"content": None, "tool_calls": [
         {"id": "x", "type": "function",
          "function": {"name": "read_file", "arguments": "{\"path\": \"b\"}"}}]}}],
@@ -173,13 +175,13 @@ def test_gemini_overload_falls_back_to_groq(monkeypatch):
     seen = []
 
     def fake_http(provider, url, headers, body, retries):
-        seen.append(provider)
+        seen.append(provider if provider == "Groq" else url.split("/")[-1].split(":")[0])
         if provider == "Gemini":
             raise llm.ProviderError(503, "Gemini HTTP 503: busy")
         return {"choices": [{"message": {"content": "done"}}]}
     monkeypatch.setattr(llm, "_http", fake_http)
     resp = llm._post("m", {"contents": [{"role": "user", "parts": [{"text": "hi"}]}]})
-    assert seen == ["Gemini", "Groq"]
+    assert seen == ["m", "gemini-3.1-flash-lite", "Groq"]
     assert resp["candidates"][0]["content"]["parts"][0]["text"] == "done"
 
 
@@ -192,3 +194,19 @@ def test_no_groq_key_keeps_gemini_error(monkeypatch):
     monkeypatch.setattr(llm, "_http", fake_http)
     with pytest.raises(llm.ProviderError):
         llm._post("m", {"contents": []})
+
+
+def test_second_gemini_model_answers_before_groq(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k1")
+    monkeypatch.setenv("GROQ_API_KEY", "k2")
+    seen = []
+
+    def fake_http(provider, url, headers, body, retries):
+        seen.append(url)
+        if "gemini-3.1-flash-lite" in url:
+            return {"candidates": [{"content": {"parts": [{"text": "ok"}]}}]}
+        raise llm.ProviderError(503, "busy")
+    monkeypatch.setattr(llm, "_http", fake_http)
+    resp = llm._post("gemini-3.5-flash-lite", {"contents": []})
+    assert resp["servedBy"] == "gemini-3.1-flash-lite"
+    assert len(seen) == 2

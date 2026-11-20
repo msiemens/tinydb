@@ -10,6 +10,10 @@ import urllib.request
 API = "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent"
 GROQ_API = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "openai/gpt-oss-120b"
+# Tried in order after the requested model stays unavailable (ADR-018).
+GEMINI_FALLBACKS = ("gemini-3.1-flash-lite",)
+# Groq free tier counts max_tokens against an 8000 tokens-per-minute limit.
+GROQ_MAX_OUTPUT_TOKENS = 2048
 RETRY_CODES = (429, 500, 502, 503)
 MAX_TOOL_ROUNDS = 8
 MAX_OUTPUT_TOKENS = 8192
@@ -51,19 +55,27 @@ def _http(provider, url, headers, body, retries):
 
 
 def _post(model, body, retries=3):
-    """Call Gemini. If Gemini stays overloaded or out of quota and GROQ_API_KEY
-    is set, send the same request to Groq once (ADR-017)."""
+    """Call Gemini. If the model stays overloaded or out of quota, try the
+    other Gemini lite model (ADR-018), then Groq if GROQ_API_KEY is set (ADR-017)."""
     key = os.environ["GEMINI_API_KEY"]
-    try:
-        return _http("Gemini", API.format(model),
-                     {"Content-Type": "application/json", "x-goog-api-key": key},
-                     body, retries)
-    except ProviderError as err:
-        if err.code not in RETRY_CODES or not os.environ.get("GROQ_API_KEY"):
-            raise
-        print(f"::warning::Gemini HTTP {err.code} after {retries} retries; "
-              f"falling back to Groq {GROQ_MODEL}", file=sys.stderr)
-        return _post_groq(body, retries)
+    headers = {"Content-Type": "application/json", "x-goog-api-key": key}
+    last = None
+    for name in (model,) + tuple(m for m in GEMINI_FALLBACKS if m != model):
+        try:
+            resp = _http("Gemini", API.format(name), headers, body, retries)
+            if name != model:
+                resp["servedBy"] = name
+            return resp
+        except ProviderError as err:
+            if err.code not in RETRY_CODES:
+                raise
+            last = err
+            print(f"::warning::Gemini {name} HTTP {err.code} after {retries} retries",
+                  file=sys.stderr)
+    if not os.environ.get("GROQ_API_KEY"):
+        raise last
+    print(f"::warning::falling back to Groq {GROQ_MODEL}", file=sys.stderr)
+    return _post_groq(body, retries)
 
 
 def _post_groq(body, retries=3):
@@ -120,8 +132,9 @@ def to_openai(body, model):
         if text:
             messages.append({"role": "user", "content": text})
     out = {"model": model, "messages": messages,
-           "max_tokens": body.get("generationConfig", {}).get("maxOutputTokens",
-                                                              MAX_OUTPUT_TOKENS)}
+           "max_tokens": min(GROQ_MAX_OUTPUT_TOKENS,
+                             body.get("generationConfig", {}).get("maxOutputTokens",
+                                                                  MAX_OUTPUT_TOKENS))}
     decls = [d for t in body.get("tools", []) for d in t.get("functionDeclarations", [])]
     if decls:
         out["tools"] = [{"type": "function", "function": _json_schema(d)} for d in decls]
