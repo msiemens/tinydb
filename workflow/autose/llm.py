@@ -36,7 +36,9 @@ def redact(text):
 def _http(provider, url, headers, body, retries):
     data = json.dumps(body).encode()
     for attempt in range(retries + 1):
-        req = urllib.request.Request(url, data=data, headers=headers)
+        # Groq sits behind Cloudflare, which rejects the default
+        # Python-urllib User-Agent with 403 "error code: 1010".
+        req = urllib.request.Request(url, data=data, headers={"User-Agent": "autose/1.0", **headers})
         try:
             with urllib.request.urlopen(req, timeout=300) as resp:
                 return json.load(resp)
