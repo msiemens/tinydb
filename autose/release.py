@@ -9,7 +9,7 @@ from . import checks
 from .stages import StageFailed, _read, _write
 
 UPSTREAM = "msiemens/tinydb"
-CI_TIMEOUT_S = 25 * 60
+CI_TIMEOUT_S = 30 * 60
 CI_START_GRACE_S = 5 * 60
 POLL_S = 30
 
@@ -58,7 +58,11 @@ def _baseline_failures(work):
 def _wait_for_ci(pr, baseline):
     start = time.time()
     while True:
-        checks = json.loads(_run(["gh", "pr", "checks", pr, "--json", "name,bucket"]) or "[]")
+        checks = json.loads(_run(["gh", "pr", "checks", pr, "--json", "name,bucket,event"])
+                            or "[]")
+        # Python CI runs on both push and pull_request. Only the pull_request run
+        # judges the PR; waiting on the push copies doubles the macOS queue (ADR-019).
+        checks = [c for c in checks if c.get("event") in (None, "", "pull_request")]
         elapsed = time.time() - start
         if not checks and elapsed > CI_START_GRACE_S:
             return False, ("no CI check started. A pull request opened with GITHUB_TOKEN does "
