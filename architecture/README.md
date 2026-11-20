@@ -16,7 +16,8 @@ Design for the AutoSE workflow. These files were committed before any agent runn
 | [ADR-004](decisions/ADR-004.md) | Artifacts for run state, the branch for code only | Accepted |
 | [ADR-005](decisions/ADR-005.md) | File tools and `gh`, scoped per job | Partly superseded by ADR-012 |
 | [ADR-006](decisions/ADR-006.md) | Flash for building, Pro for review | Superseded by ADR-014 |
-| [ADR-014](decisions/ADR-014.md) | Use `gemini-3.8-flash`; 2.5 ids are rejected | Accepted |
+| [ADR-014](decisions/ADR-014.md) | Use `gemini-3.8-flash`; 2.5 ids are rejected | Superseded by ADR-015 |
+| [ADR-015](decisions/ADR-015.md) | Free tier uses `gemini-3.5-flash-lite` | Accepted |
 | [ADR-007](decisions/ADR-007.md) | Scripts and pytest decide, except the review verdict | Partly superseded by ADR-011 |
 | [ADR-008](decisions/ADR-008.md) | Reviewer job, prompt, model, and token are separate | Accepted |
 | [ADR-009](decisions/ADR-009.md) | Budgets, timeouts, and untrusted issue text | Accepted |
