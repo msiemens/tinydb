@@ -18,8 +18,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  OUT: ${{ github.workspace }}/../autose-out
-  ISSUE: ${{ github.workspace }}/../autose-untrusted/issue.md
+  OUT: ${{ github.workspace }}/autose-out
+  ISSUE: ${{ github.workspace }}/autose-untrusted/issue.md
 
 jobs:
   # ------------------------------------------------------------------ gate
@@ -86,7 +86,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - uses: actions/download-artifact@v4
-        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+        with: { name: untrusted, path: "${{ github.workspace }}/autose-untrusted" }
       - name: analyst (read-only tools, no GitHub token)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -109,9 +109,9 @@ jobs:
         with: { python-version: "3.12" }
       - uses: astral-sh/setup-uv@v5
       - uses: actions/download-artifact@v4
-        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+        with: { name: untrusted, path: "${{ github.workspace }}/autose-untrusted" }
       - uses: actions/download-artifact@v4
-        with: { name: r1-analyst, path: "${{ github.workspace }}/../autose-out" }
+        with: { name: r1-analyst, path: "${{ github.workspace }}/autose-out" }
       - name: implementer and tester (file tools only, no push)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -149,9 +149,9 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - uses: actions/download-artifact@v4
-        with: { name: r1-analyst, path: "${{ github.workspace }}/../autose-out" }
+        with: { name: r1-analyst, path: "${{ github.workspace }}/autose-out" }
       - uses: actions/download-artifact@v4
-        with: { name: r1-build, path: "${{ github.workspace }}/../autose-out" }
+        with: { name: r1-build, path: "${{ github.workspace }}/autose-out" }
       - id: rel
         env:
           GH_TOKEN: ${{ secrets.AUTOSE_PAT || github.token }}
@@ -189,7 +189,7 @@ jobs:
         with: { python-version: "3.12" }
       - uses: astral-sh/setup-uv@v5
       - uses: actions/download-artifact@v4
-        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+        with: { name: untrusted, path: "${{ github.workspace }}/autose-untrusted" }
       - id: rev
         name: reviewer (read-only tools, no GitHub token)
         env:
@@ -225,11 +225,11 @@ jobs:
         with: { python-version: "3.12" }
       - uses: astral-sh/setup-uv@v5
       - uses: actions/download-artifact@v4
-        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+        with: { name: untrusted, path: "${{ github.workspace }}/autose-untrusted" }
       - uses: actions/download-artifact@v4
-        with: { name: r1-analyst, path: "${{ github.workspace }}/../autose-out" }
+        with: { name: r1-analyst, path: "${{ github.workspace }}/autose-out" }
       - uses: actions/download-artifact@v4
-        with: { name: r1-review, path: "${{ github.workspace }}/../autose-feedback" }
+        with: { name: r1-review, path: "${{ github.workspace }}/autose-feedback" }
       - name: implementer and tester, with the review as feedback
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -237,7 +237,7 @@ jobs:
         run: |
           python -m autose builder --work . --out "$OUT" --issue-file "$ISSUE" \
             --issue-number "${{ needs.gate.outputs.issue }}" --start "$START" \
-            --feedback-file "${{ github.workspace }}/../autose-feedback/review.md" --round 2
+            --feedback-file "${{ github.workspace }}/autose-feedback/review.md" --round 2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -268,7 +268,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - uses: actions/download-artifact@v4
-        with: { name: r2-build, path: "${{ github.workspace }}/../autose-out" }
+        with: { name: r2-build, path: "${{ github.workspace }}/autose-out" }
       - id: rel
         env:
           GH_TOKEN: ${{ secrets.AUTOSE_PAT || github.token }}
@@ -302,7 +302,7 @@ jobs:
         with: { python-version: "3.12" }
       - uses: astral-sh/setup-uv@v5
       - uses: actions/download-artifact@v4
-        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+        with: { name: untrusted, path: "${{ github.workspace }}/autose-untrusted" }
       - name: reviewer, round 2 (read-only tools, no GitHub token)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
