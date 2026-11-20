@@ -1,0 +1,58 @@
+# A3 AutoSE
+
+Fork of TinyDB used for an agentic SDLC workflow. The workflow runner is not in this commit. This commit is the design: views, ADRs, and a map of TinyDB.
+
+Library usage remains in [README.rst](README.rst).
+
+## Repository
+
+- Fork: https://github.com/Anilkumark17/tinydb
+- Upstream: https://github.com/msiemens/tinydb
+- Pinned commit: `edff96aeb2616402e9489d46e90a592c05565621` (`edff96a`)
+- Tag: [`a3-pin`](https://github.com/Anilkumark17/tinydb/tree/a3-pin)
+- Default branch: `master`. Pull requests from the workflow target `master`, because [ci-workflow.yml](.github/workflows/ci-workflow.yml) runs only for pull requests into `master`. `main` is protected as well and, at the pin, points at the same commit.
+- Local checkout of the pin before this design commit: branch `main-pinned`
+
+## Branch protection
+
+`master` and `main` require a pull request. Administrators are included. Force pushes and deletions are off. A direct update was rejected with `422 Changes must be made through a pull request.` The workflow must not merge.
+
+## Workflow permissions
+
+The default `GITHUB_TOKEN` permission is read. Actions cannot approve pull requests. A job that pushes has to request `contents: write` itself. In the design, only the release job does.
+
+## Model
+
+Gemini. Secret name: `GEMINI_API_KEY`. Analyst, implementer, and tester use `gemini-2.5-flash`. The reviewer uses `gemini-2.5-pro`. See [ADR-006](architecture/decisions/ADR-006.md).
+
+The monthly spend cap is set in Google AI Studio under Spend → Monthly spend cap. An API key cannot set it.
+
+## Issues
+
+| Fork | Kind | File outside the fork | Issue |
+| --- | --- | --- | --- |
+| #1 | Bug | `issue1_bug_string_doc_ids.md` | [#1](https://github.com/Anilkumark17/tinydb/issues/1) |
+| #2 | Bug | `issue2_bug_copy_between_dbs.md` | [#2](https://github.com/Anilkumark17/tinydb/issues/2) |
+| #3 | Feature | `issue3_feature_document_in_doc_ids.md` | [#3](https://github.com/Anilkumark17/tinydb/issues/3) |
+| #4 | Feature | `issue4_feature_search_limit.md` | [#4](https://github.com/Anilkumark17/tinydb/issues/4) |
+| #5 | Vague | `issue5_vague_counting.md` | [#5](https://github.com/Anilkumark17/tinydb/issues/5) |
+
+Hidden tests are not in this repository.
+
+## Design
+
+| View | Path |
+| --- | --- |
+| Components | [architecture/views/component.md](architecture/views/component.md) |
+| Sequence for issue 1 | [architecture/views/sequence.md](architecture/views/sequence.md) |
+| Stage map | [architecture/views/stage-map.md](architecture/views/stage-map.md) |
+| ADRs 001–010 | [architecture/decisions/](architecture/decisions/) |
+| TinyDB map the analyst reads | [ARCHITECTURE.md](ARCHITECTURE.md) |
+
+## How to trigger
+
+Not active yet. The designed triggers are the label `autose` or a comment that starts with `/autose`, from a user with write access. See [ADR-010](architecture/decisions/ADR-010.md).
+
+## AI use
+
+A Cursor coding agent (Grok) drafted this design commit: `ARCHITECTURE.md`, the three views, ADR-001 through ADR-010, and this README. It also did the earlier GitHub setup (issues 2–5, branch protection, the `a3-pin` tag, the Actions secret, and the read-only workflow permission). The issue texts and hidden tests were already in the assignment folder and were checked against `edff96a`. The course requires the architecture decisions to be the author's own. Read the ADRs and change any decision you do not accept before relying on them in the report.
