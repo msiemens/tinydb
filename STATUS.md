@@ -33,6 +33,7 @@ Goal: an agentic SDLC workflow on a TinyDB fork that turns an issue into a teste
   - PR #12 opened, but CI failed, so the review never ran.
 - Cause: `Python CI` is red on every run in the fork, including `master`, so a green-CI condition can never hold. The failing jobs are unconfirmed; the logs have not been read yet.
 - Fix: stage 5 now fails only on a job newly red against `master`. Recorded as ADR-016, commit `768108b` on `a3-design`.
+- Run 44784749664 passed gate and analyst, then the builder hit Gemini HTTP 503 (provider overload). ADR-017 adds a Groq fallback (`openai/gpt-oss-120b`, secret `GROQ_API_KEY`).
 
 ## Incidents and limits
 
