@@ -137,3 +137,12 @@ def test_unknown_tool_error_goes_back_to_model(tmp_path):
 def test_redact(monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "sekret")
     assert llm.redact("a sekret b") == "a *** b"
+
+
+def test_ci_regression_vs_baseline():
+    from autose.release import judge_ci
+    checks_ = [{"name": "a", "bucket": "fail"}, {"name": "b", "bucket": "pass"},
+               {"name": "c", "bucket": "fail"}]
+    assert judge_ci(checks_, {"a", "c"}) == (False, [], ["a", "c"])      # all inherited
+    assert judge_ci(checks_, {"a"}) == (False, ["c"], ["a"])             # c is new
+    assert judge_ci([{"name": "a", "bucket": "pending"}], set())[0] is True
