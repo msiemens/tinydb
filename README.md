@@ -4,6 +4,8 @@ Fork of TinyDB used for an agentic SDLC workflow. The workflow runner is not in 
 
 Library usage remains in [README.rst](README.rst).
 
+Current progress and open items: [STATUS.md](STATUS.md).
+
 ## Repository
 
 - Fork: https://github.com/Anilkumark17/tinydb
