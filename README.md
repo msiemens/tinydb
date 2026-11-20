@@ -23,7 +23,7 @@ The default `GITHUB_TOKEN` permission is read. Actions cannot approve pull reque
 
 ## Model
 
-Gemini. Secret name: `GEMINI_API_KEY`. Analyst, implementer, and tester use `gemini-2.5-flash`. The reviewer uses `gemini-2.5-pro`. See [ADR-006](architecture/decisions/ADR-006.md).
+Gemini. Secret name: `GEMINI_API_KEY`. Every role uses `gemini-3.8-flash`. See [ADR-014](architecture/decisions/ADR-014.md).
 
 The monthly spend cap is set in Google AI Studio under Spend → Monthly spend cap. An API key cannot set it.
 
