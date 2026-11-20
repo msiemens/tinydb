@@ -1,0 +1,323 @@
+name: AutoSE
+
+# Issue in, reviewed pull request out. A person merges. See architecture/decisions/.
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+# Default token is read-only. Jobs that need more ask for it themselves (ADR-005).
+permissions:
+  contents: read
+
+# One run per issue; a second trigger waits (ADR-004, ADR-010). Events that are not
+# an AutoSE trigger get a unique group so they can never queue behind or replace a real run.
+concurrency:
+  group: ${{ (github.event_name == 'issues' && github.event.label.name == 'autose') && format('autose-issue-{0}', github.event.issue.number) || (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/autose')) && format('autose-issue-{0}', github.event.issue.number) || format('ignore-{0}', github.run_id) }}
+  cancel-in-progress: false
+
+env:
+  OUT: ${{ github.workspace }}/../autose-out
+  ISSUE: ${{ github.workspace }}/../autose-untrusted/issue.md
+
+jobs:
+  # ------------------------------------------------------------------ gate
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+      issue: ${{ steps.check.outputs.issue }}
+    steps:
+      - id: check
+        # Untrusted text arrives only through env vars, never inside the script text.
+        env:
+          EVENT: ${{ github.event_name }}
+          LABEL: ${{ github.event.label.name }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ACTOR: ${{ github.actor }}
+          ACTOR_TYPE: ${{ github.event.sender.type }}
+          IS_PR: ${{ github.event.issue.pull_request != null }}
+          REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          GH_TOKEN: ${{ secrets.AUTOSE_PAT || github.token }}
+        run: |
+          ok=false
+          if [ "$REPO" = "msiemens/tinydb" ]; then ok=false
+          elif [ "$EVENT" = "issues" ]; then
+            [ "$LABEL" = "autose" ] && ok=true
+          elif [ "$EVENT" = "issue_comment" ]; then
+            case "$COMMENT_BODY" in
+              "/autose"*) [ "$IS_PR" != "true" ] && [ "$ACTOR_TYPE" != "Bot" ] && ok=true ;;
+            esac
+          fi
+          if [ "$ok" = true ]; then
+            if [ "$ACTOR" = "$OWNER" ]; then
+              perm=admin
+            else
+              perm=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo none)
+            fi
+            case "$perm" in admin|write) ;; *) ok=false ;; esac
+          fi
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+          echo "issue=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+          mkdir -p "$(dirname "$ISSUE")"
+          printf '# %s\n\n%s\n' "$ISSUE_TITLE" "$ISSUE_BODY" > "$ISSUE"
+          echo "gate: ok=$ok actor=$ACTOR" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.ok == 'true'
+        with:
+          name: untrusted
+          path: ${{ env.ISSUE }}
+
+  # ------------------------------------------------- 1 Requirements, 2 Design
+  analyst:
+    needs: gate
+    if: needs.gate.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0, persist-credentials: false }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/download-artifact@v4
+        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+      - name: analyst (read-only tools, no GitHub token)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python -m autose analyst --work . --out "$OUT" --issue-file "$ISSUE"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r1-analyst
+          path: ${{ env.OUT }}
+
+  # ------------------------------------------------- 3 Implementation, 4 Testing
+  builder:
+    needs: [gate, analyst]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0, persist-credentials: false }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/download-artifact@v4
+        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+      - uses: actions/download-artifact@v4
+        with: { name: r1-analyst, path: "${{ github.workspace }}/../autose-out" }
+      - name: implementer and tester (file tools only, no push)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python -m autose builder --work . --out "$OUT" --issue-file "$ISSUE" \
+            --issue-number "${{ needs.gate.outputs.issue }}" --start builder
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r1-build
+          path: |
+            ${{ env.OUT }}/diff.patch
+            ${{ env.OUT }}/test_report.md
+            ${{ env.OUT }}/state-builder.json
+            ${{ env.OUT }}/usage-builder-r1.jsonl
+
+  # ------------------------------------------------------------- 5 Release
+  release:
+    needs: [gate, builder]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    outputs:
+      pr: ${{ steps.rel.outputs.pr }}
+    steps:
+      # A pull request opened with GITHUB_TOKEN does not start other workflows, so
+      # CI would never run. AUTOSE_PAT (fine-grained, this repository only) fixes that.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTOSE_PAT || github.token }}
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/download-artifact@v4
+        with: { name: r1-analyst, path: "${{ github.workspace }}/../autose-out" }
+      - uses: actions/download-artifact@v4
+        with: { name: r1-build, path: "${{ github.workspace }}/../autose-out" }
+      - id: rel
+        env:
+          GH_TOKEN: ${{ secrets.AUTOSE_PAT || github.token }}
+        run: |
+          python -m autose release --work . --out "$OUT" \
+            --issue-number "${{ needs.gate.outputs.issue }}" --round 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r1-release
+          path: |
+            ${{ env.OUT }}/pr.md
+            ${{ env.OUT }}/pr.json
+            ${{ env.OUT }}/state-release.json
+
+  # ------------------------------------------------------ 6 Review, round 1
+  review:
+    needs: [gate, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      verdict: ${{ steps.rev.outputs.verdict }}
+    steps:
+      # Fresh checkout of the PR branch. No spec.md, design.md, or builder logs are
+      # downloaded into this job (ADR-003, ADR-008).
+      - uses: actions/checkout@v4
+        with:
+          ref: autose/issue-${{ needs.gate.outputs.issue }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/download-artifact@v4
+        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+      - id: rev
+        name: reviewer (read-only tools, no GitHub token)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python -m autose review --work . --out "$OUT" --issue-file "$ISSUE" --round 1
+      - name: post review.md (script, not the model)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.release.outputs.pr }}
+        run: python -m autose post-review --out "$OUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r1-review
+          path: |
+            ${{ env.OUT }}/review.md
+            ${{ env.OUT }}/state-review.json
+            ${{ env.OUT }}/usage-review-r1.jsonl
+
+  # ------------------------------------- rework after a review, round 2 build
+  rework:
+    needs: [gate, review]
+    if: needs.review.outputs.verdict == 'code' || needs.review.outputs.verdict == 'approach'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: autose/issue-${{ needs.gate.outputs.issue }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/download-artifact@v4
+        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+      - uses: actions/download-artifact@v4
+        with: { name: r1-analyst, path: "${{ github.workspace }}/../autose-out" }
+      - uses: actions/download-artifact@v4
+        with: { name: r1-review, path: "${{ github.workspace }}/../autose-feedback" }
+      - name: implementer and tester, with the review as feedback
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          START: ${{ needs.review.outputs.verdict == 'approach' && 'analyst' || 'builder' }}
+        run: |
+          python -m autose builder --work . --out "$OUT" --issue-file "$ISSUE" \
+            --issue-number "${{ needs.gate.outputs.issue }}" --start "$START" \
+            --feedback-file "${{ github.workspace }}/../autose-feedback/review.md" --round 2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r2-build
+          path: |
+            ${{ env.OUT }}/spec.md
+            ${{ env.OUT }}/design.md
+            ${{ env.OUT }}/diff.patch
+            ${{ env.OUT }}/test_report.md
+            ${{ env.OUT }}/state-builder.json
+            ${{ env.OUT }}/usage-builder-r2.jsonl
+
+  release_again:
+    needs: [gate, rework]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    outputs:
+      pr: ${{ steps.rel.outputs.pr }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTOSE_PAT || github.token }}
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/download-artifact@v4
+        with: { name: r2-build, path: "${{ github.workspace }}/../autose-out" }
+      - id: rel
+        env:
+          GH_TOKEN: ${{ secrets.AUTOSE_PAT || github.token }}
+        run: |
+          python -m autose release --work . --out "$OUT" \
+            --issue-number "${{ needs.gate.outputs.issue }}" --round 2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r2-release
+          path: |
+            ${{ env.OUT }}/pr.md
+            ${{ env.OUT }}/pr.json
+            ${{ env.OUT }}/state-release.json
+
+  # ------------------------------------------------------ 6 Review, round 2
+  review_again:
+    needs: [gate, release_again]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: autose/issue-${{ needs.gate.outputs.issue }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/download-artifact@v4
+        with: { name: untrusted, path: "${{ github.workspace }}/../autose-untrusted" }
+      - name: reviewer, round 2 (read-only tools, no GitHub token)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python -m autose review --work . --out "$OUT" --issue-file "$ISSUE" --round 2
+      - name: post review.md (script, not the model)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.release_again.outputs.pr }}
+        run: python -m autose post-review --out "$OUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r2-review
+          path: |
+            ${{ env.OUT }}/review.md
+            ${{ env.OUT }}/state-review.json
+            ${{ env.OUT }}/usage-review-r2.jsonl
+      # The workflow ends here. It never merges, closes, or deletes (ADR-002).

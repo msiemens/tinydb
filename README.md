@@ -62,7 +62,7 @@ architecture/
 
 ## How to trigger
 
-Not active yet. The designed triggers are the label `autose` or a comment that starts with `/autose`, from a user with write access. See [ADR-010](architecture/decisions/ADR-010.md).
+On an issue, add the label `autose`, or comment `/autose`. The actor needs write or admin on this repository. See [ADR-010](architecture/decisions/ADR-010.md). The workflow file is `.github/workflows/autose.yml`. A copy for the submission layout is under `workflow/`.
 
 ## AI use
 
