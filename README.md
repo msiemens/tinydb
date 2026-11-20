@@ -37,7 +37,18 @@ The monthly spend cap is set in Google AI Studio under Spend → Monthly spend c
 | #4 | Feature | `issue4_feature_search_limit.md` | [#4](https://github.com/Anilkumark17/tinydb/issues/4) |
 | #5 | Vague | `issue5_vague_counting.md` | [#5](https://github.com/Anilkumark17/tinydb/issues/5) |
 
-Hidden tests are not in this repository.
+Issue texts and hidden tests are in this repository for grading. Model tools refuse to read `experiment/`.
+
+```text
+experiment/
+  issues/          # the five issue texts
+  hidden_tests/    # four tests per issue, not an agent input
+architecture/
+  views/
+  decisions/
+```
+
+`workflow/`, `results/`, `report.pdf`, and the demo are not in this commit.
 
 ## Design
 
