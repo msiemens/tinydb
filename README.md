@@ -1,6 +1,6 @@
 # A3 AutoSE
 
-Fork of TinyDB used for an agentic SDLC workflow. The workflow runner is not in this commit. This commit is the design: views, ADRs, and a map of TinyDB.
+Fork of TinyDB used for an agentic SDLC workflow that turns an issue into a tested, reviewed pull request. The repository holds the design (views, ADRs, a map of TinyDB), the workflow `.github/workflows/autose.yml`, and the agent code in `autose/`.
 
 Library usage remains in [README.rst](README.rst).
 
@@ -50,7 +50,7 @@ architecture/
   decisions/
 ```
 
-`workflow/`, `results/`, `report.pdf`, and the demo are not in this commit.
+`results/`, `report.pdf`, and the demo are not in the repository yet. `workflow/` holds a copy of the workflow and agents in the submission layout.
 
 ## Design
 
@@ -59,7 +59,7 @@ architecture/
 | Components | [architecture/views/component.md](architecture/views/component.md) |
 | Sequence for issue 1 | [architecture/views/sequence.md](architecture/views/sequence.md) |
 | Stage map | [architecture/views/stage-map.md](architecture/views/stage-map.md) |
-| ADRs 001–010 | [architecture/decisions/](architecture/decisions/) |
+| ADRs 001-016 | [architecture/decisions/](architecture/decisions/) |
 | TinyDB map the analyst reads | [ARCHITECTURE.md](ARCHITECTURE.md) |
 
 ## How to trigger
