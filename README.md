@@ -65,3 +65,11 @@ architecture/
 ## How to trigger
 
 On an issue, add the label `autose`, or comment `/autose`. The actor needs write or admin on this repository. See [ADR-010](architecture/decisions/ADR-010.md). The workflow file is `.github/workflows/autose.yml`. A copy for the submission layout is under `workflow/`.
+
+## AI use
+
+A Cursor coding agent (Grok) did the GitHub setup and drafted the design, the workflow, and the agent code. That includes `ARCHITECTURE.md`, the three views, this README, `.github/workflows/autose.yml`, `autose/`, the `workflow/` copy, and ADR-001 through ADR-016. ADR-014, ADR-015, and ADR-016 were added after real Actions runs.
+
+Claude Code (Anthropic) explored TinyDB at the pinned commit, drafted the five issue texts and the hidden tests, and later edited the component view, ADR-005, ADR-008, and ADR-010.
+
+The course requires the architecture decisions to be the author's own. These ADRs are drafts. Read them and rewrite any decision you do not accept, in your own words, before the report relies on it.
