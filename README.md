@@ -27,6 +27,8 @@ The default `GITHUB_TOKEN` permission is read. Actions cannot approve pull reque
 
 Gemini, free tier. Secret name: `GEMINI_API_KEY`. Every role uses `gemini-3.5-flash-lite`. See [ADR-015](architecture/decisions/ADR-015.md).
 
+Fallback: when Gemini stays overloaded or out of quota, the same call goes to Groq `openai/gpt-oss-120b`. Secret name: `GROQ_API_KEY`. Without that secret there is no fallback. See [ADR-017](architecture/decisions/ADR-017.md).
+
 The monthly spend cap is set in Google AI Studio under Spend → Monthly spend cap. An API key cannot set it.
 
 ## Issues
@@ -59,7 +61,7 @@ architecture/
 | Components | [architecture/views/component.md](architecture/views/component.md) |
 | Sequence for issue 1 | [architecture/views/sequence.md](architecture/views/sequence.md) |
 | Stage map | [architecture/views/stage-map.md](architecture/views/stage-map.md) |
-| ADRs 001-016 | [architecture/decisions/](architecture/decisions/) |
+| ADRs 001-017 | [architecture/decisions/](architecture/decisions/) |
 | TinyDB map the analyst reads | [ARCHITECTURE.md](ARCHITECTURE.md) |
 
 ## How to trigger

@@ -137,3 +137,58 @@ def test_unknown_tool_error_goes_back_to_model(tmp_path):
 def test_redact(monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "sekret")
     assert llm.redact("a sekret b") == "a *** b"
+
+
+def test_groq_translation_round_trip():
+    body = {"systemInstruction": {"parts": [{"text": "sys"}]},
+            "generationConfig": {"maxOutputTokens": 100},
+            "tools": [{"functionDeclarations": [{"name": "read_file", "description": "d",
+                       "parameters": {"type": "OBJECT",
+                                      "properties": {"path": {"type": "STRING"}}}}]}],
+            "contents": [
+                {"role": "user", "parts": [{"text": "go"}]},
+                {"role": "model", "parts": [{"functionCall": {"name": "read_file",
+                                                              "args": {"path": "a"}}}]},
+                {"role": "user", "parts": [{"functionResponse": {
+                    "name": "read_file", "response": {"result": "text"}}}]}]}
+    out = llm.to_openai(body, "g")
+    roles = [m["role"] for m in out["messages"]]
+    assert roles == ["system", "user", "assistant", "tool"]
+    call_id = out["messages"][2]["tool_calls"][0]["id"]
+    assert out["messages"][3]["tool_call_id"] == call_id
+    assert out["tools"][0]["function"]["parameters"]["type"] == "object"
+    assert out["max_tokens"] == 100
+    resp = llm.from_openai({"choices": [{"message": {"content": None, "tool_calls": [
+        {"id": "x", "type": "function",
+         "function": {"name": "read_file", "arguments": "{\"path\": \"b\"}"}}]}}],
+        "usage": {"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5}}, "g")
+    part = resp["candidates"][0]["content"]["parts"][0]
+    assert part["functionCall"] == {"name": "read_file", "args": {"path": "b"}}
+    assert resp["servedBy"] == "g"
+
+
+def test_gemini_overload_falls_back_to_groq(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k1")
+    monkeypatch.setenv("GROQ_API_KEY", "k2")
+    seen = []
+
+    def fake_http(provider, url, headers, body, retries):
+        seen.append(provider)
+        if provider == "Gemini":
+            raise llm.ProviderError(503, "Gemini HTTP 503: busy")
+        return {"choices": [{"message": {"content": "done"}}]}
+    monkeypatch.setattr(llm, "_http", fake_http)
+    resp = llm._post("m", {"contents": [{"role": "user", "parts": [{"text": "hi"}]}]})
+    assert seen == ["Gemini", "Groq"]
+    assert resp["candidates"][0]["content"]["parts"][0]["text"] == "done"
+
+
+def test_no_groq_key_keeps_gemini_error(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k1")
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+
+    def fake_http(provider, url, headers, body, retries):
+        raise llm.ProviderError(503, "Gemini HTTP 503: busy")
+    monkeypatch.setattr(llm, "_http", fake_http)
+    with pytest.raises(llm.ProviderError):
+        llm._post("m", {"contents": []})
