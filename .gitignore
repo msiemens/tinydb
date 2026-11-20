@@ -28,6 +28,11 @@ pip-log.txt
 nosetests.xml
 .pytest_cache/
 
+# Run files. git add -A must not pick these up, and agents must not commit them.
+/autose-out/
+/autose-untrusted/
+/autose-feedback/
+
 # Translations
 *.mo
 

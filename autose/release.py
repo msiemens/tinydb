@@ -73,7 +73,13 @@ def release(work, out, issue_number, round_no):
     _run(["git", "apply", "--index", os.path.abspath(os.path.join(out, "diff.patch"))], work)
     _run(["git", "commit", "-m", f"{title} (#{int(issue_number)})"], work)
     subprocess.run(["git", "fetch", "origin", branch], cwd=work, capture_output=True)
-    _run(["git", "push", "--force-with-lease", "origin", f"HEAD:refs/heads/{branch}"], work)
+    refspec = f"HEAD:refs/heads/{branch}"
+    known = subprocess.run(["git", "rev-parse", "--verify", f"refs/remotes/origin/{branch}"],
+                           cwd=work, capture_output=True)
+    if known.returncode == 0:
+        _run(["git", "push", "--force-with-lease", "origin", refspec], work)
+    else:
+        _run(["git", "push", "origin", refspec], work)
 
     run_url = (f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/{repo}"
                f"/actions/runs/{os.environ.get('GITHUB_RUN_ID', '')}")
