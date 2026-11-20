@@ -65,7 +65,3 @@ architecture/
 ## How to trigger
 
 On an issue, add the label `autose`, or comment `/autose`. The actor needs write or admin on this repository. See [ADR-010](architecture/decisions/ADR-010.md). The workflow file is `.github/workflows/autose.yml`. A copy for the submission layout is under `workflow/`.
-
-## AI use
-
-A Cursor coding agent (Grok) drafted this design commit: `ARCHITECTURE.md`, the three views, ADR-001 through ADR-010, and this README. It also did the earlier GitHub setup (issues 2–5, branch protection, the `a3-pin` tag, the Actions secret, and the read-only workflow permission). The issue texts and hidden tests were already in the assignment folder and were checked against `edff96a`. The course requires the architecture decisions to be the author's own. Read the ADRs and change any decision you do not accept before relying on them in the report.
