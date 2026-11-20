@@ -31,10 +31,11 @@ Goal: an agentic SDLC workflow on a TinyDB fork that turns an issue into a teste
   - Got through spec, design, code and tests.
   - Model ids changed twice: ADR-014, then ADR-015, `gemini-3.5-flash-lite` for all roles.
   - PR #12 opened, but CI failed, so the review never ran.
-- Cause: `Python CI` is red on every run in the fork, including `master`, so a green-CI condition can never hold. The failing jobs are unconfirmed; the logs have not been read yet.
+- Cause: `Python CI` is red on every run in the fork, including `master`, so a green-CI condition can never hold. See ADR-019 for the confirmed cause.
 - Fix: stage 5 now fails only on a job newly red against `master`. Recorded as ADR-016, commit `768108b` on `a3-design`.
 - Run 44784749664 passed gate and analyst, then the builder hit Gemini HTTP 503 (provider overload). ADR-017 adds a Groq fallback (`openai/gpt-oss-120b`, secret `GROQ_API_KEY`).
 - Run 44787871458: Gemini 503 again; Groq returned 413 (free tier 8000 tokens per minute). ADR-018 tries `gemini-3.1-flash-lite` before Groq and caps Groq output at 2048 tokens.
+- Run 44790059127: builder passed and PR #17 opened; release timed out waiting for CI. Cause of red CI found: `py.test` collected `workflow/autose/tests` (duplicate module) and `experiment/hidden_tests`. ADR-019 sets `testpaths = tests` and waits only on pull_request checks.
 
 ## Incidents and limits
 

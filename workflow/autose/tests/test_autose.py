@@ -139,6 +139,15 @@ def test_redact(monkeypatch):
     assert llm.redact("a sekret b") == "a *** b"
 
 
+def test_ci_regression_vs_baseline():
+    from autose.release import judge_ci
+    checks_ = [{"name": "a", "bucket": "fail"}, {"name": "b", "bucket": "pass"},
+               {"name": "c", "bucket": "fail"}]
+    assert judge_ci(checks_, {"a", "c"}) == (False, [], ["a", "c"])      # all inherited
+    assert judge_ci(checks_, {"a"}) == (False, ["c"], ["a"])             # c is new
+    assert judge_ci([{"name": "a", "bucket": "pending"}], set())[0] is True
+
+
 def test_groq_translation_round_trip():
     body = {"systemInstruction": {"parts": [{"text": "sys"}]},
             "generationConfig": {"maxOutputTokens": 100},
