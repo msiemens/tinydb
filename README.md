@@ -52,7 +52,7 @@ architecture/
   decisions/
 ```
 
-`results/`, `report.pdf`, and the demo are not in the repository yet. `workflow/` holds a copy of the workflow and agents in the submission layout.
+`results/`, `report.pdf`, `experiment/variants.md`, and `experiment/seeded_prs/` are in the repository. `demo.mp4` is not. `workflow/` holds a copy of the workflow and agents in the submission layout.
 
 ## Design
 
@@ -68,10 +68,19 @@ architecture/
 
 On an issue, add the label `autose`, or comment `/autose`. The actor needs write or admin on this repository. See [ADR-010](architecture/decisions/ADR-010.md). The workflow file is `.github/workflows/autose.yml`. A copy for the submission layout is under `workflow/`.
 
+## Demo
+
+The run to watch is issue #1, from the issue page to the posted review. There is no `demo.mp4` in this repository. Record that path, at most five minutes:
+
+- Issue: https://github.com/Anilkumark17/tinydb/issues/1
+- Run: https://github.com/Anilkumark17/tinydb/actions/runs/44799110233
+- Pull request: https://github.com/Anilkumark17/tinydb/pull/19
+- Review: https://github.com/Anilkumark17/tinydb/pull/19#issuecomment-7048813902
+
 ## AI use
 
-A Cursor coding agent (Grok) did the GitHub setup and drafted the design, the workflow, and the agent code. That includes `ARCHITECTURE.md`, the three views, this README, `.github/workflows/autose.yml`, `autose/`, the `workflow/` copy, and ADR-001 through ADR-016. ADR-014, ADR-015, and ADR-016 were added after real Actions runs.
+A Cursor coding agent (Grok) did the GitHub setup and drafted the design, the workflow, and the agent code. That includes `ARCHITECTURE.md`, the three views, this README, `.github/workflows/autose.yml`, `autose/`, the `workflow/` copy, and ADR-001 through ADR-021. Later the same agent wrote `experiment/variants.md`, the diffs in `experiment/seeded_prs/`, the sequence view of run 44799110233, the ADR status lines that name those runs, and `report.pdf`.
 
 Claude Code (Anthropic) explored TinyDB at the pinned commit, drafted the five issue texts and the hidden tests, and later edited the component view, ADR-005, ADR-008, and ADR-010.
 
-The course requires the architecture decisions to be the author's own. These ADRs are drafts. Read them and rewrite any decision you do not accept, in your own words, before the report relies on it.
+The course requires the architecture decisions to be the author's own. The ADRs are drafts. Read them and change any decision you do not accept before you treat the report as yours.

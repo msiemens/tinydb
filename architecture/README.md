@@ -26,5 +26,10 @@ Design for the AutoSE workflow. These files were committed before any agent runn
 | [ADR-012](decisions/ADR-012.md) | Model-written code runs without secrets; test command is `uv run pytest tests` | Accepted |
 | [ADR-013](decisions/ADR-013.md) | Non-trigger events get their own concurrency group | Accepted |
 | [ADR-016](decisions/ADR-016.md) | Stage 5 fails on a CI regression, not on a CI already red on master | Accepted |
+| [ADR-017](decisions/ADR-017.md) | Fall back to Groq when Gemini stays unavailable | Accepted |
+| [ADR-018](decisions/ADR-018.md) | Try `gemini-3.1-flash-lite` before Groq, and cap Groq output | Accepted |
+| [ADR-019](decisions/ADR-019.md) | CI collects only `tests/`, and release waits only on pull-request checks | Accepted |
+| [ADR-020](decisions/ADR-020.md) | Raise the tool-round limit from 8 to 16 | Accepted |
+| [ADR-021](decisions/ADR-021.md) | Edit files by exact replacement, and strip the Groq key | Accepted |
 
-TinyDB itself is described in [`ARCHITECTURE.md`](../ARCHITECTURE.md) at the repository root. The workflow, when it exists, opens pull requests against `master`, because `.github/workflows/ci-workflow.yml` runs only for pull requests into `master`.
+TinyDB itself is described in [`ARCHITECTURE.md`](../ARCHITECTURE.md) at the repository root. The workflow opens pull requests against `master`, because `.github/workflows/ci-workflow.yml` runs only for pull requests into `master`. The sequence view is [run 44799110233](https://github.com/Anilkumark17/tinydb/actions/runs/44799110233).

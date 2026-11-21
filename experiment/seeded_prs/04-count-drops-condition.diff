@@ -1,0 +1,19 @@
+--- a/tinydb/table.py
++++ b/tinydb/table.py
+@@ -706,14 +706,10 @@ class Table:
+         self._next_id = None
+ 
+     def count(self, cond: QueryLike) -> int:
+-        """
+-        Count the documents matching a query.
+-
+-        :param cond: the condition use
+-        """
++        """Return how many documents are in the table. `cond` is ignored."""
+ 
+-        return len(self.search(cond))
++        return len(self)
+ 
+     def clear_cache(self) -> None:
+         """
+         Clear the query cache.

@@ -1,0 +1,24 @@
+--- a/tinydb/table.py
++++ b/tinydb/table.py
+@@ -470,7 +470,9 @@ class Table:
+                 # so the operation is atomic: either every existing target is
+                 # updated, or none is.
+                 updated_ids.extend(
+-                    doc_id for doc_id in requested_ids if doc_id in table
++                    self.document_id_class(doc_id)
++                    for doc_id in requested_ids
++                    if self.document_id_class(doc_id) in table
+                 )
+                 for doc_id in updated_ids:
+                     perform_update(table, doc_id)
+@@ -653,7 +655,9 @@ class Table:
+                 # so the operation is atomic: either every existing target is
+                 # removed, or none is.
+                 removed_ids.extend(
+-                    doc_id for doc_id in requested_ids if doc_id in table
++                    self.document_id_class(doc_id)
++                    for doc_id in requested_ids
++                    if self.document_id_class(doc_id) in table
+                 )
+                 for doc_id in removed_ids:
+                     del table[doc_id]
