@@ -29,6 +29,8 @@ Gemini, free tier. Secret name: `GEMINI_API_KEY`. Every role uses `gemini-3.5-fl
 
 Fallback: when Gemini stays overloaded or out of quota, the same call goes to `gemini-3.1-flash-lite`, then to Groq `openai/gpt-oss-120b` with at most 2048 output tokens. Secret name: `GROQ_API_KEY`. Without that secret there is no fallback. See [ADR-017](architecture/decisions/ADR-017.md) and [ADR-018](architecture/decisions/ADR-018.md).
 
+Spend cap: the Gemini and Groq keys are on free tiers with no billing account linked, so no paid usage can occur and the effective cap is $0. A dollar cap can only be set in AI Studio once billing is enabled, and billing was never enabled.
+
 The monthly spend cap is set in Google AI Studio under Spend → Monthly spend cap. An API key cannot set it.
 
 ## Issues
