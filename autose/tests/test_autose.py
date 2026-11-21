@@ -219,3 +219,21 @@ def test_second_gemini_model_answers_before_groq(monkeypatch):
     resp = llm._post("gemini-3.5-flash-lite", {"contents": []})
     assert resp["servedBy"] == "gemini-3.1-flash-lite"
     assert len(seen) == 2
+
+
+def test_replace_in_file_edits_one_exact_match(tmp_path):
+    (tmp_path / "tinydb").mkdir()
+    f = tmp_path / "tinydb" / "a.py"
+    f.write_text("x = 1\ny = 1\n")
+    replace = tools.toolset("implementer", str(tmp_path))["replace_in_file"][1]
+    assert "replaced" in replace("tinydb/a.py", "x = 1", "x = 2")
+    assert f.read_text() == "x = 2\ny = 1\n"
+    assert "found 2 matches" in replace("tinydb/a.py", "= ", "=")
+    assert "found 0 matches" in replace("tinydb/a.py", "z = 9", "z = 0")
+    with pytest.raises(PermissionError):
+        replace("tests/t.py", "a", "b")
+
+
+def test_clean_env_drops_groq_key(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "secret")
+    assert "GROQ_API_KEY" not in tools.clean_env()

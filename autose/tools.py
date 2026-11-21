@@ -70,7 +70,30 @@ def _write_file(root, allow=(), deny=()):
                    "content": "Complete new file content."}, ["path", "content"]), write_file)
 
 
-SECRET_ENV = ("GEMINI_API_KEY", "GH_TOKEN", "GITHUB_TOKEN", "AUTOSE_PAT")
+def _replace_in_file(root, deny=()):
+    def replace_in_file(path, old, new):
+        full, rel = _resolve(root, path)
+        _guard_git(rel)
+        if rel.split("/")[0] in deny:
+            raise PermissionError(f"writing {rel} is not allowed for this role")
+        with open(full, encoding="utf-8") as fh:
+            text = fh.read()
+        count = text.count(old) if old else 0
+        if count != 1:
+            return (f"not changed: `old` must match exactly once in {rel}, "
+                    f"found {count} matches. Read the file and copy the text exactly.")
+        with open(full, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text.replace(old, new, 1))
+        return f"replaced 1 occurrence in {rel}"
+    return (_decl("replace_in_file",
+                  "Replace one exact snippet in an existing file. `old` must occur exactly "
+                  "once. Use this for changes to existing files (ADR-021).",
+                  {"path": "File relative to the repository root.",
+                   "old": "Exact existing text, including indentation.",
+                   "new": "Replacement text."}, ["path", "old", "new"]), replace_in_file)
+
+
+SECRET_ENV = ("GEMINI_API_KEY", "GROQ_API_KEY", "GH_TOKEN", "GITHUB_TOKEN", "AUTOSE_PAT")
 
 
 def clean_env():
@@ -100,6 +123,7 @@ def toolset(role, root):
     pairs = {
         "analyst": [_list_dir(root), _read_file(root)],
         "implementer": [_list_dir(root), _read_file(root),
+                        _replace_in_file(root, deny=IMPLEMENTER_DENY),
                         _write_file(root, deny=IMPLEMENTER_DENY)],
         "tester": [_list_dir(root), _read_file(root),
                    _write_file(root, allow=("tests/",))],
