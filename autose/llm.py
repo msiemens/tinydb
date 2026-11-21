@@ -15,7 +15,7 @@ GEMINI_FALLBACKS = ("gemini-3.1-flash-lite",)
 # Groq free tier counts max_tokens against an 8000 tokens-per-minute limit.
 GROQ_MAX_OUTPUT_TOKENS = 2048
 RETRY_CODES = (429, 500, 502, 503)
-MAX_TOOL_ROUNDS = 8
+MAX_TOOL_ROUNDS = 16
 MAX_OUTPUT_TOKENS = 8192
 
 
