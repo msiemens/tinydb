@@ -5,6 +5,7 @@
 | #1 | [44799110233](https://github.com/Anilkumark17/tinydb/actions/runs/44799110233) | [#19](https://github.com/Anilkumark17/tinydb/pull/19) | [comment](https://github.com/Anilkumark17/tinydb/pull/19#issuecomment-7048813902) | approve | 4/4 pass | 231 passed (228 + 3 new) |
 | #2 | [44887740431](https://github.com/Anilkumark17/tinydb/actions/runs/44887740431) | none | none | n/a | n/a | n/a |
 | #2 | [44888518600](https://github.com/Anilkumark17/tinydb/actions/runs/44888518600) | [#22](https://github.com/Anilkumark17/tinydb/pull/22) | [comment](https://github.com/Anilkumark17/tinydb/pull/22#issuecomment-7060476290) | approve | 0/4 pass | 231 passed |
+| #3 | [44889133139](https://github.com/Anilkumark17/tinydb/actions/runs/44889133139) | none | none | n/a | n/a | n/a |
 
 ## Issue #1 notes
 
@@ -21,3 +22,9 @@
 - Run 44888518600 (16 rounds): every stage passed. PR #22 only adds `Document` to `__all__` in `tinydb/__init__.py` and adds tests of behaviour that already worked. The copy path in `tinydb/table.py` is unchanged.
 - Hidden tests `experiment/hidden_tests/test_issue2.py`: 0/4 pass, each with `ValueError: Document with ID 1 already exists`.
 - The reviewer approved with "Findings: None." This is a false approval by a reviewer on the same model as the builder.
+
+## Issue #3 notes
+
+- Fork issue #3: allow passing `Document` objects to `update()`/`remove()`.
+- Run 44889133139: gate and analyst passed. The builder's build check failed with `SyntaxError: unterminated triple-quoted string literal` at `tinydb/table.py` line 820. The implementer rewrote the 854-line file with `write_file`, and the output was cut off. By design the run stops without retry (ADR-007). ADR-021 adds `replace_in_file`.
+- The same fix adds `GROQ_API_KEY` to the secrets removed before model-written code runs.
