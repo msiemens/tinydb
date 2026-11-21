@@ -59,3 +59,10 @@ Goal: an agentic SDLC workflow on a TinyDB fork that turns an issue into a teste
 - Record `demo.mp4` from issue #1 to the review on pull request #19. The links are in the README. There is no video file yet.
 - Spend cap: both keys are free tier with no billing linked, so the effective cap is $0. See the README model section.
 - Read the ADRs and change any decision you do not accept. A Cursor agent drafted them and later updated the status lines. That does not make the wording yours.
+
+## Update 2026-11-21
+
+- Issue #2 retried (run 44893468505): still 0/4 hidden tests, approved again. Recorded as a known failure.
+- Seeded PRs #30 to #34 opened and reviewed per model with `review-check.yml` (ADR-022). Results in `results/reviewer_check.md`, Variant C in `experiment/variants.md`.
+- `roll_number_a3_AutoSE.txt` added. Component view updated to eight jobs and the fallback chain.
+- Still open: `demo.mp4`; the ADRs in your own words; the report's token total (see `usage-total.yml`).

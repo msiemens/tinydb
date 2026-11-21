@@ -1,0 +1,20 @@
+target,pr,branch,issue,seeded_label,model,served_by,verdict,caught_problem,label_match,tokens,check_run
+01-string-ids,30,seeded/01-string-ids,1,approve,gemini-3.5-flash-lite,gemini-3.5-flash-lite,approve,n/a,yes,19092,44893677770
+02-export-only,31,seeded/02-export-only,2,code,gemini-3.5-flash-lite,gemini-3.5-flash-lite,code,yes,yes,15716,44893677770
+03-truncated-table,32,seeded/03-truncated-table,3,code,gemini-3.5-flash-lite,gemini-3.5-flash-lite,code,yes,yes,12074,44893677770
+04-count-drops-condition,33,seeded/04-count-drops-condition,5,approach,gemini-3.5-flash-lite,gemini-3.5-flash-lite,approach,yes,yes,3881,44893677770
+05-test-locks-the-bug,34,seeded/05-test-locks-the-bug,1,code,gemini-3.5-flash-lite,gemini-3.5-flash-lite,code,yes,yes,17242,44893677770
+pr22-original,22,evidence/pr22-original,2,code,gemini-3.5-flash-lite,gemini-3.5-flash-lite,approve,no,no,4330,44893677770
+01-string-ids,30,seeded/01-string-ids,1,approve,gemini-3.1-flash-lite,gemini-3.1-flash-lite,approve,n/a,yes,57234,44894297904
+02-export-only,31,seeded/02-export-only,2,code,gemini-3.1-flash-lite,gemini-3.1-flash-lite,approve,no,no,86647,44894297904
+03-truncated-table,32,seeded/03-truncated-table,3,code,gemini-3.1-flash-lite,gemini-3.1-flash-lite,code,yes,yes,36090,44894297904
+04-count-drops-condition,33,seeded/04-count-drops-condition,5,approach,gemini-3.1-flash-lite,gemini-3.1-flash-lite,code,yes,no,56309,44894297904
+05-test-locks-the-bug,34,seeded/05-test-locks-the-bug,1,code,gemini-3.1-flash-lite,gemini-3.1-flash-lite,code,yes,yes,78695,44894297904
+pr22-original,22,evidence/pr22-original,2,code,gemini-3.1-flash-lite,gemini-3.1-flash-lite,approve,no,no,39842,44894297904
+pr22-retry,22,evidence/pr22-retry,2,code,gemini-3.1-flash-lite,gemini-3.1-flash-lite,approve,no,no,29180,44894297904
+01-string-ids,30,seeded/01-string-ids,1,approve,groq:openai/gpt-oss-120b,openai/gpt-oss-120b,none (HTTP 413),n/a,no,2793,44893677770
+02-export-only,31,seeded/02-export-only,2,code,groq:openai/gpt-oss-120b,openai/gpt-oss-120b,none (HTTP 413),no,no,7230,44893677770
+03-truncated-table,32,seeded/03-truncated-table,3,code,groq:openai/gpt-oss-120b,openai/gpt-oss-120b,none (HTTP 413),no,no,5592,44893677770
+04-count-drops-condition,33,seeded/04-count-drops-condition,5,approach,groq:openai/gpt-oss-120b,openai/gpt-oss-120b,none (HTTP 413),no,no,5273,44893677770
+05-test-locks-the-bug,34,seeded/05-test-locks-the-bug,1,code,groq:openai/gpt-oss-120b,openai/gpt-oss-120b,none (HTTP 413),no,no,6477,44893677770
+pr22-original,22,evidence/pr22-original,2,code,groq:openai/gpt-oss-120b,openai/gpt-oss-120b,none (HTTP 413),no,no,4102,44893677770

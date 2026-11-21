@@ -6,6 +6,7 @@ issue,run_id,outcome,failed_stage,cause,tool_rounds,pr,verdict,hidden_passed,hid
 1,44799110233,pr_opened,,,8,19,approve,4,4,231
 2,44887740431,failed,builder,BudgetExceeded (8 tool rounds),8,,,,,
 2,44888518600,pr_opened,,,16,22,approve,0,4,231
+2,44893468505,pr_opened,,,16,22,approve,0,4,231
 3,44889133139,failed,builder,build check: truncated write_file,16,,,,,
 3,44889802429,pr_opened,,,16,25,approve,4,4,232
 4,44890273513,pr_opened,,,16,26,approve,4,4,231
