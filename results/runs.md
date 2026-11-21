@@ -5,6 +5,7 @@
 | #1 | [44799110233](https://github.com/Anilkumark17/tinydb/actions/runs/44799110233) | [#19](https://github.com/Anilkumark17/tinydb/pull/19) | [comment](https://github.com/Anilkumark17/tinydb/pull/19#issuecomment-7048813902) | approve | 4/4 pass | 231 passed (228 + 3 new) |
 | #2 | [44887740431](https://github.com/Anilkumark17/tinydb/actions/runs/44887740431) | none | none | n/a | n/a | n/a |
 | #2 | [44888518600](https://github.com/Anilkumark17/tinydb/actions/runs/44888518600) | [#22](https://github.com/Anilkumark17/tinydb/pull/22) | [comment](https://github.com/Anilkumark17/tinydb/pull/22#issuecomment-7060476290) | approve | 0/4 pass | 231 passed |
+| #2 | [44893468505](https://github.com/Anilkumark17/tinydb/actions/runs/44893468505) | [#22](https://github.com/Anilkumark17/tinydb/pull/22) (force-pushed) | [comment](https://github.com/Anilkumark17/tinydb/pull/22#issuecomment-7061206934) | approve | 0/4 pass | 231 passed |
 | #3 | [44889133139](https://github.com/Anilkumark17/tinydb/actions/runs/44889133139) | none | none | n/a | n/a | n/a |
 | #3 | [44889802429](https://github.com/Anilkumark17/tinydb/actions/runs/44889802429) | [#25](https://github.com/Anilkumark17/tinydb/pull/25) | [comment](https://github.com/Anilkumark17/tinydb/pull/25#issuecomment-7060664003) | approve | 4/4 pass | 232 passed |
 | #4 | [44890273513](https://github.com/Anilkumark17/tinydb/actions/runs/44890273513) | [#26](https://github.com/Anilkumark17/tinydb/pull/26) | [comment](https://github.com/Anilkumark17/tinydb/pull/26#issuecomment-7060711541) | approve | 4/4 pass | 231 passed |
@@ -26,6 +27,8 @@
 - Hidden tests `experiment/hidden_tests/test_issue2.py`: 0/4 pass, each with `ValueError: Document with ID 1 already exists`.
 - The reviewer approved with "Findings: None." This is a false approval by a reviewer on the same model as the builder.
 
+- Retry, run 44893468505 (with `replace_in_file`): every stage passed. The new head of PR #22 changes `tinydb/table.py` (+4 -5) and adds tests. Hidden tests still 0/4, and the reviewer approved again. The first head is kept on branch `evidence/pr22-original`, the second on `evidence/pr22-retry`.
+
 ## Issue #3 notes
 
 - Fork issue #3: allow passing `Document` objects to `update()`/`remove()`.
@@ -43,7 +46,8 @@
 
 ## Summary
 
-- Final outcome per issue: #1, #3, #4 and #5 fixed (hidden tests 4/4 each). #2 not fixed (0/4) but approved by the reviewer.
+- Final outcome per issue: #1, #3, #4 and #5 fixed (hidden tests 4/4 each). #2 not fixed after two runs (0/4 both times), approved by the reviewer both times. Known failure.
 - Total hidden tests on the final PRs: 16/20 pass. On the pinned code, 3/20 pass.
-- Reviewer: 5 approvals, 1 false approval (#2). No rework round was triggered on any run.
+- Reviewer in the workflow: 6 approvals, 2 false approvals (both #2 runs). No rework round was triggered on any run. Seeded reviewer checks: [reviewer_check.md](reviewer_check.md).
+- Tokens: 2,936,253 in 393 model calls over the 14 runs listed in `results/` (2,448,454 in AutoSE runs, 487,799 in the two reviewer checks). Per run and model: [usage.csv](usage.csv), summed from each run's `usage-*.jsonl` artifacts by `usage-total.yml` (run [44895348926](https://github.com/Anilkumark17/tinydb/actions/runs/44895348926)). Earlier runs from before PR #12 are not included.
 - Hidden test results were checked locally against each PR branch, outside the workflow (ADR-003).

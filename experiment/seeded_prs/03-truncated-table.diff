@@ -8,3 +8,4 @@
 +        if tables is None: """
              # The database is empty
              tables = {}
+ 

@@ -1,0 +1,37 @@
+# Sum the model usage logs (usage-*.jsonl artifacts) of the AutoSE and reviewer-check
+# runs listed in results/, so the report can state total tokens.
+name: Usage total
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: ["usage-total/**"]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  total:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          ids=$( (tail -n +2 results/results.csv | cut -d, -f2; cat results/review_check_runs.txt 2>/dev/null) | grep -E '^[0-9]+$' | sort -u)
+          echo "run,model,calls,prompt,output,total" > usage.csv
+          for id in $ids; do
+            d="art/$id"; mkdir -p "$d"
+            gh run download "$id" -R "$REPO" -D "$d" >/dev/null 2>&1 || echo "no artifacts for $id"
+            find "$d" -name 'usage-*.jsonl' -exec cat {} + 2>/dev/null \
+              | jq -rs --arg id "$id" 'group_by(.model)[] | [$id, .[0].model, length, (map(.prompt // 0)|add), (map(.output // 0)|add), (map(.total // 0)|add)] | @csv' >> usage.csv
+          done
+          echo "TOTAL_TOKENS=$(tail -n +2 usage.csv | awk -F, '{s+=$6} END {print s+0}')"
+          cat usage.csv
+          { echo '```'; cat usage.csv; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: { name: usage-total, path: usage.csv }

@@ -237,3 +237,31 @@ def test_replace_in_file_edits_one_exact_match(tmp_path):
 def test_clean_env_drops_groq_key(monkeypatch):
     monkeypatch.setenv("GROQ_API_KEY", "secret")
     assert "GROQ_API_KEY" not in tools.clean_env()
+
+
+def test_groq_prefix_goes_straight_to_groq(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "k2")
+    seen = []
+
+    def fake_http(provider, url, headers, body, retries):
+        seen.append((provider, body.get("model")))
+        return {"choices": [{"message": {"content": "ok"}}]}
+    monkeypatch.setattr(llm, "_http", fake_http)
+    resp = llm._post("groq:openai/gpt-oss-20b", {"contents": []})
+    assert seen == [("Groq", "openai/gpt-oss-20b")]
+    assert resp["servedBy"] == "openai/gpt-oss-20b"
+
+
+def test_no_fallback_calls_only_the_named_model(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "k1")
+    monkeypatch.setenv("GROQ_API_KEY", "k2")
+    monkeypatch.setenv("AUTOSE_NO_FALLBACK", "1")
+    seen = []
+
+    def fake_http(provider, url, headers, body, retries):
+        seen.append(url)
+        raise llm.ProviderError(503, "busy")
+    monkeypatch.setattr(llm, "_http", fake_http)
+    with pytest.raises(llm.ProviderError):
+        llm._post("gemini-3.5-flash-lite", {"contents": []})
+    assert len(seen) == 1

@@ -153,10 +153,11 @@ def review(work, out, issue_text, round_no):
             f"Diff against master:\n{diff[:MAX_DIFF_CHARS]}")
     system = _prompt("reviewer.md")
     tools_ = tools.toolset("reviewer", work)
-    text = llm.run_agent("reviewer", PRO, system, base, tools_)
+    model = os.environ.get("AUTOSE_REVIEWER_MODEL") or PRO  # ADR-022 experiments only
+    text = llm.run_agent("reviewer", model, system, base, tools_)
     verdict, msg = checks.check_verdict(text, files)
     if verdict is None:  # rejected empty or malformed review: ask once more (ADR-008)
-        text = llm.run_agent("reviewer", PRO, system,
+        text = llm.run_agent("reviewer", model, system,
                              base + f"\n\nYour previous review was rejected: {msg}. "
                              "Review again, starting with the verdict line.", tools_)
         verdict, msg = checks.check_verdict(text, files)

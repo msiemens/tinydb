@@ -56,11 +56,18 @@ def _http(provider, url, headers, body, retries):
 
 def _post(model, body, retries=3):
     """Call Gemini. If the model stays overloaded or out of quota, try the
-    other Gemini lite model (ADR-018), then Groq if GROQ_API_KEY is set (ADR-017)."""
+    other Gemini lite model (ADR-018), then Groq if GROQ_API_KEY is set (ADR-017).
+    A model named `groq:<id>` goes straight to Groq. AUTOSE_NO_FALLBACK=1 calls only
+    the named model, for experiments that compare models (ADR-022)."""
+    if model.startswith("groq:"):
+        return _post_groq(body, retries, model[len("groq:"):])
+    no_fallback = os.environ.get("AUTOSE_NO_FALLBACK") == "1"
     key = os.environ["GEMINI_API_KEY"]
     headers = {"Content-Type": "application/json", "x-goog-api-key": key}
+    names = (model,) if no_fallback else (
+        (model,) + tuple(m for m in GEMINI_FALLBACKS if m != model))
     last = None
-    for name in (model,) + tuple(m for m in GEMINI_FALLBACKS if m != model):
+    for name in names:
         try:
             resp = _http("Gemini", API.format(name), headers, body, retries)
             if name != model:
@@ -72,18 +79,18 @@ def _post(model, body, retries=3):
             last = err
             print(f"::warning::Gemini {name} HTTP {err.code} after {retries} retries",
                   file=sys.stderr)
-    if not os.environ.get("GROQ_API_KEY"):
+    if no_fallback or not os.environ.get("GROQ_API_KEY"):
         raise last
     print(f"::warning::falling back to Groq {GROQ_MODEL}", file=sys.stderr)
     return _post_groq(body, retries)
 
 
-def _post_groq(body, retries=3):
+def _post_groq(body, retries=3, model=GROQ_MODEL):
     resp = _http("Groq", GROQ_API,
                  {"Content-Type": "application/json",
                   "Authorization": "Bearer " + os.environ["GROQ_API_KEY"]},
-                 to_openai(body, GROQ_MODEL), retries)
-    return from_openai(resp, GROQ_MODEL)
+                 to_openai(body, model), retries)
+    return from_openai(resp, model)
 
 
 def _json_schema(schema):
