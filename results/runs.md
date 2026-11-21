@@ -49,4 +49,5 @@
 - Final outcome per issue: #1, #3, #4 and #5 fixed (hidden tests 4/4 each). #2 not fixed after two runs (0/4 both times), approved by the reviewer both times. Known failure.
 - Total hidden tests on the final PRs: 16/20 pass. On the pinned code, 3/20 pass.
 - Reviewer in the workflow: 6 approvals, 2 false approvals (both #2 runs). No rework round was triggered on any run. Seeded reviewer checks: [reviewer_check.md](reviewer_check.md).
+- Tokens: 2,936,253 in 393 model calls over the 14 runs listed in `results/` (2,448,454 in AutoSE runs, 487,799 in the two reviewer checks). Per run and model: [usage.csv](usage.csv), summed from each run's `usage-*.jsonl` artifacts by `usage-total.yml` (run [44895348926](https://github.com/Anilkumark17/tinydb/actions/runs/44895348926)). Earlier runs from before PR #12 are not included.
 - Hidden test results were checked locally against each PR branch, outside the workflow (ADR-003).
