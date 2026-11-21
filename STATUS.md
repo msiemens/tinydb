@@ -56,9 +56,6 @@ Goal: an agentic SDLC workflow on a TinyDB fork that turns an issue into a teste
 
 ## Still open
 
-- Set the Gemini spend cap before further runs.
-- `results/`, `variants.md` and the five seeded review PRs.
-- Two decision experiments.
-- The report, the demo and the roll-number file.
-- Rewrite the ADRs in my own words, since the course requires them to be mine.
-- Replace the sequence view with one from a real run.
+- Record `demo.mp4` from issue #1 to the review on pull request #19. The links are in the README. There is no video file yet.
+- The Gemini key is on the free tier. A dollar spend cap was not set.
+- Read the ADRs and change any decision you do not accept. A Cursor agent drafted them and later updated the status lines. That does not make the wording yours.

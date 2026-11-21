@@ -1,54 +1,39 @@
 # Sequence view
 
-Planned sequence for a real issue, [tinydb#1](https://github.com/Anilkumark17/tinydb/issues/1) (`update()` / `remove()` with string doc ids). No Actions run exists yet. This is the path the workflow will take for that issue once the runner is built. The issue text and the failing checks below are already true on `edff96a`.
+This is the path of [Actions run 44799110233](https://github.com/Anilkumark17/tinydb/actions/runs/44799110233) on [issue #1](https://github.com/Anilkumark17/tinydb/issues/1). It opened [pull request #19](https://github.com/Anilkumark17/tinydb/pull/19) and posted [the review](https://github.com/Anilkumark17/tinydb/pull/19#issuecomment-7048813902). The verdict was `approve`. No rework job ran.
+
+Every model call in this run used `gemini-3.5-flash-lite`. The reviewer was not a different model. Times are the job times recorded for this run.
 
 ```mermaid
 sequenceDiagram
   actor Maintainer
-  participant Gate as gate
-  participant Analyst as analyst flash
-  participant Impl as implementer flash
-  participant Tester as tester flash
-  participant Py as pytest
-  participant Rel as release script
-  participant Rev as reviewer pro
+  participant Gate as gate 9s
+  participant Analyst as analyst 22s
+  participant Builder as builder 1m23s
+  participant Rel as release 25m43s
+  participant Rev as reviewer 21s
   participant GH as GitHub
 
-  Maintainer->>GH: add label autose on issue 1
+  Maintainer->>GH: label autose on issue 1
   GH->>Gate: issues labeled
-  Gate->>Gate: actor is OWNER, label is autose
+  Gate->>Gate: actor is the owner, label is autose
   Gate->>Analyst: issue body as untrusted data, ARCHITECTURE.md
-  Analyst->>GH: artifact spec.md
-  Note over Analyst: script rejects the spec if a criterion has no observable result
-  Analyst->>GH: artifact design.md
-  Note over Analyst: script requires a path that exists and a function defined in that file
-  Gate->>Impl: spec.md, design.md, branch autose/issue-1 from master
-  Impl->>Impl: edit tinydb/table.py only through file tools
-  Impl->>GH: artifact diff.patch
-  Note over Impl: import tinydb must succeed before the tester starts
-  Impl->>Tester: spec.md, design.md, diff. No implementer messages.
-  Tester->>Tester: add tests under tests/ from the acceptance criteria
-  Tester->>Py: uv run pytest
-  alt pytest fails and the fix budget remains
-    Py->>Impl: failing node ids and tracebacks only
-    Impl->>Tester: new diff
-    Tester->>Py: uv run pytest
-  end
-  Py->>Rel: test_report.md with exit code 0
-  Rel->>GH: push autose/issue-1 and open a PR into master
-  Rel->>GH: artifact pr.md with the PR url
-  GH->>GH: ci-workflow.yml on the pull_request into master
-  Rel->>Rev: issue 1 text, diff, checkout of the PR head
-  Note over Rev: spec.md, design.md, and the builder transcript are not in this job
-  Rev->>GH: artifact review.md
-  alt verdict approve, or two rounds are used
-    Rev->>Maintainer: PR left open
-    Maintainer->>GH: merge or close
-  else verdict code
-    Rev->>Impl: review.md file list only, round 2
-  else verdict approach
-    Rev->>Analyst: review.md, round 2, then implement and test again
-  end
+  Analyst->>GH: spec.md passes the script
+  Analyst->>GH: design.md names a file and a function that exist
+  Analyst->>Builder: spec.md and design.md
+  Builder->>Builder: implementer edits tinydb/table.py
+  Builder->>Builder: import tinydb exits 0
+  Builder->>Builder: tester writes tests/test_autose_issue_1.py
+  Builder->>Builder: uv run pytest tests exits 0
+  Note over Builder: no pytest retry and no return to design
+  Builder->>Rel: diff.patch and test_report.md
+  Rel->>GH: push autose/issue-1 and open PR 19 onto master
+  Rel->>GH: wait while Python CI runs
+  Note over Rel: Linux and Windows green. macOS jobs cancelled by GitHub, on master as well
+  Rel->>Rev: issue text, diff, checkout of the PR head
+  Note over Rev: no spec.md, no design.md, no builder transcript, no token
+  Rev->>GH: review.md verdict approve, posted as a PR comment
+  Rev->>Maintainer: pull request left open
 ```
 
-On `edff96a`, `Table.update({'a': 2}, doc_ids=['1'])` returns `[]` and leaves the document unchanged, while `Table.get(doc_id='1')` returns the document. The sequence above is how issue 1 reaches a pull request. It is not a claim that a run has already done so.
+The back-edges in the stage map (pytest retry, return to design, `verdict: code`, `verdict: approach`) were not taken on this run. They were also not taken on the finished runs for issues #3, #4, and #5. Issue #2's finished run took this same shape and the reviewer approved a patch that does not fix the bug. That run is [44888518600](https://github.com/Anilkumark17/tinydb/actions/runs/44888518600).

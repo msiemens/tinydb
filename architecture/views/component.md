@@ -8,7 +8,7 @@ flowchart TD
   gate["gate job\nno model\nchecks the actor"]
   analyst["analyst job\ngemini-3.5-flash-lite\ntools: list_dir, read_file"]
   builder["builder job\nno shared token with the reviewer"]
-  implementer["implementer process\ngemini-3.5-flash-lite\ntools: list_dir, read_file, write_file\nno shell, no push"]
+  implementer["implementer process\ngemini-3.5-flash-lite\ntools: list_dir, read_file, write_file, replace_in_file\nno shell, no push"]
   tester["tester process\ngemini-3.5-flash-lite\ntools: list_dir, read_file, write_file under tests/ only\nno implementer transcript"]
   pytest["pytest\nworkflow step, not a model tool"]
   release["release job\nscript only, no model\ntools: git push, gh pr create\ncontents write, pull-requests write"]

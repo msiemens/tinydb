@@ -1,0 +1,10 @@
+--- a/tinydb/table.py
++++ b/tinydb/table.py
+@@ -817,7 +817,7 @@ class Table:
+ 
+         tables = self._storage.read()
+ 
+-        if tables is None:
++        if tables is None: """
+             # The database is empty
+             tables = {}
