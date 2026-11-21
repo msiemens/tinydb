@@ -1,0 +1,12 @@
+issue,run_id,outcome,failed_stage,cause,tool_rounds,pr,verdict,hidden_passed,hidden_total,suite_passed
+1,44784749664,failed,builder,Gemini HTTP 503,8,,,,,
+1,44786814645,failed,builder,Groq HTTP 403 (User-Agent),8,,,,,
+1,44787871458,failed,builder,Groq HTTP 413 (tokens per minute),8,,,,,
+1,44790059127,failed,release,CI wait timeout,8,17,,,,
+1,44799110233,pr_opened,,,8,19,approve,4,4,231
+2,44887740431,failed,builder,BudgetExceeded (8 tool rounds),8,,,,,
+2,44888518600,pr_opened,,,16,22,approve,0,4,231
+3,44889133139,failed,builder,build check: truncated write_file,16,,,,,
+3,44889802429,pr_opened,,,16,25,approve,4,4,232
+4,44890273513,pr_opened,,,16,26,approve,4,4,231
+5,44890597042,pr_opened,,,16,27,approve,4,4,232

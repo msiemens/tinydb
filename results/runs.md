@@ -6,6 +6,9 @@
 | #2 | [44887740431](https://github.com/Anilkumark17/tinydb/actions/runs/44887740431) | none | none | n/a | n/a | n/a |
 | #2 | [44888518600](https://github.com/Anilkumark17/tinydb/actions/runs/44888518600) | [#22](https://github.com/Anilkumark17/tinydb/pull/22) | [comment](https://github.com/Anilkumark17/tinydb/pull/22#issuecomment-7060476290) | approve | 0/4 pass | 231 passed |
 | #3 | [44889133139](https://github.com/Anilkumark17/tinydb/actions/runs/44889133139) | none | none | n/a | n/a | n/a |
+| #3 | [44889802429](https://github.com/Anilkumark17/tinydb/actions/runs/44889802429) | [#25](https://github.com/Anilkumark17/tinydb/pull/25) | [comment](https://github.com/Anilkumark17/tinydb/pull/25#issuecomment-7060664003) | approve | 4/4 pass | 232 passed |
+| #4 | [44890273513](https://github.com/Anilkumark17/tinydb/actions/runs/44890273513) | [#26](https://github.com/Anilkumark17/tinydb/pull/26) | [comment](https://github.com/Anilkumark17/tinydb/pull/26#issuecomment-7060711541) | approve | 4/4 pass | 231 passed |
+| #5 | [44890597042](https://github.com/Anilkumark17/tinydb/actions/runs/44890597042) | [#27](https://github.com/Anilkumark17/tinydb/pull/27) | [comment](https://github.com/Anilkumark17/tinydb/pull/27#issuecomment-7060755024) | approve | 4/4 pass | 232 passed |
 
 ## Issue #1 notes
 
@@ -28,3 +31,19 @@
 - Fork issue #3: allow passing `Document` objects to `update()`/`remove()`.
 - Run 44889133139: gate and analyst passed. The builder's build check failed with `SyntaxError: unterminated triple-quoted string literal` at `tinydb/table.py` line 820. The implementer rewrote the 854-line file with `write_file`, and the output was cut off. By design the run stops without retry (ADR-007). ADR-021 adds `replace_in_file`.
 - The same fix adds `GROQ_API_KEY` to the secrets removed before model-written code runs.
+- Run 44889802429 (with `replace_in_file`): every stage passed. PR #25 changes `tinydb/table.py` (+16 -3) and adds tests. Hidden tests 4/4.
+
+## Issue #4 notes
+
+- Fork issue #4: `search(limit=)`. Run 44890273513: every stage passed on the first try. PR #26 changes `tinydb/table.py` (+22 -16) and adds tests. Hidden tests 4/4.
+
+## Issue #5 notes
+
+- Fork issue #5: the vague counting issue. Run 44890597042: every stage passed on the first try. PR #27 makes `Table.count()` accept no condition and return `len(self)` (`tinydb/table.py` +4 -2). Hidden tests 4/4.
+
+## Summary
+
+- Final outcome per issue: #1, #3, #4 and #5 fixed (hidden tests 4/4 each). #2 not fixed (0/4) but approved by the reviewer.
+- Total hidden tests on the final PRs: 16/20 pass. On the pinned code, 3/20 pass.
+- Reviewer: 5 approvals, 1 false approval (#2). No rework round was triggered on any run.
+- Hidden test results were checked locally against each PR branch, outside the workflow (ADR-003).
