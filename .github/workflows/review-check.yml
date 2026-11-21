@@ -1,0 +1,102 @@
+# Reviewer check (ADR-022): run only the reviewer stage on fixed pull requests,
+# once per model, and compare each verdict with the seeded ground-truth label.
+name: Reviewer check
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: ["review-check/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - id: m
+        run: echo "matrix=$(jq -c . experiment/review_check/matrix.json)" >> "$GITHUB_OUTPUT"
+
+  review:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: harness, persist-credentials: false }
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: astral-sh/setup-uv@v5
+      - name: issue text
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ISSUE: ${{ matrix.issue }}
+        run: gh api "repos/$REPO/issues/$ISSUE" --jq '"# \(.title)\n\n\(.body)"' > "$RUNNER_TEMP/issue.md"
+      - id: rev
+        name: reviewer (read-only tools, no GitHub token)
+        continue-on-error: true
+        working-directory: harness
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          AUTOSE_REVIEWER_MODEL: ${{ matrix.model }}
+          AUTOSE_NO_FALLBACK: "1"
+        run: python -m autose review --work ../pr --out "$RUNNER_TEMP/out" --issue-file "$RUNNER_TEMP/issue.md" --round 1
+      - name: record
+        if: always()
+        env:
+          NAME: ${{ matrix.name }}
+          MODEL: ${{ matrix.model }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          out="$RUNNER_TEMP/out"
+          verdict=$(head -1 "$out/review.md" 2>/dev/null | sed -n 's/^verdict: *//p')
+          tokens=$(cat "$out"/usage-*.jsonl 2>/dev/null | jq -s '[.[].total] | add // 0')
+          served=$(cat "$out"/usage-*.jsonl 2>/dev/null | jq -rs '[.[].model] | unique | join(",")')
+          echo "RESULT name=$NAME model=$MODEL served=$served label=$LABEL verdict=${verdict:-none} tokens=$tokens"
+          {
+            echo "### $NAME"
+            echo "model \`$MODEL\` (served by \`$served\`), seeded label \`$LABEL\`, verdict \`${verdict:-none}\`, tokens $tokens"
+            echo; echo '```'; cat "$out/review.md" 2>/dev/null || echo "no review.md"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat "$out/review.md" 2>/dev/null || true
+      - name: post to the pull request (script, not the model)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ matrix.pr }}
+          REF: ${{ matrix.ref }}
+          MODEL: ${{ matrix.model }}
+          LABEL: ${{ matrix.label }}
+        run: |
+          f="$RUNNER_TEMP/out/review.md"
+          [ -f "$f" ] || exit 0
+          { echo "Reviewer check (ADR-022). Model \`$MODEL\`, branch \`$REF\`, seeded label \`$LABEL\`. Not a merge decision."; echo; cat "$f"; } > "$RUNNER_TEMP/body.md"
+          gh api "repos/$REPO/issues/$PR/comments" -F body=@"$RUNNER_TEMP/body.md" --jq .html_url
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rc-${{ matrix.name }}
+          path: ${{ runner.temp }}/out/

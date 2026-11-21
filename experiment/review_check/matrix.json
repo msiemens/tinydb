@@ -1,0 +1,98 @@
+[
+ {
+  "name": "pr30-gem35",
+  "pr": 30,
+  "ref": "seeded/01-string-ids",
+  "issue": 1,
+  "label": "approve",
+  "model": "gemini-3.5-flash-lite"
+ },
+ {
+  "name": "pr31-gem35",
+  "pr": 31,
+  "ref": "seeded/02-export-only",
+  "issue": 2,
+  "label": "code",
+  "model": "gemini-3.5-flash-lite"
+ },
+ {
+  "name": "pr32-gem35",
+  "pr": 32,
+  "ref": "seeded/03-truncated-table",
+  "issue": 3,
+  "label": "code",
+  "model": "gemini-3.5-flash-lite"
+ },
+ {
+  "name": "pr33-gem35",
+  "pr": 33,
+  "ref": "seeded/04-count-drops-condition",
+  "issue": 5,
+  "label": "approach",
+  "model": "gemini-3.5-flash-lite"
+ },
+ {
+  "name": "pr34-gem35",
+  "pr": 34,
+  "ref": "seeded/05-test-locks-the-bug",
+  "issue": 1,
+  "label": "code",
+  "model": "gemini-3.5-flash-lite"
+ },
+ {
+  "name": "pr22-gem35",
+  "pr": 22,
+  "ref": "evidence/pr22-original",
+  "issue": 2,
+  "label": "code",
+  "model": "gemini-3.5-flash-lite"
+ },
+ {
+  "name": "pr30-gptoss",
+  "pr": 30,
+  "ref": "seeded/01-string-ids",
+  "issue": 1,
+  "label": "approve",
+  "model": "groq:openai/gpt-oss-120b"
+ },
+ {
+  "name": "pr31-gptoss",
+  "pr": 31,
+  "ref": "seeded/02-export-only",
+  "issue": 2,
+  "label": "code",
+  "model": "groq:openai/gpt-oss-120b"
+ },
+ {
+  "name": "pr32-gptoss",
+  "pr": 32,
+  "ref": "seeded/03-truncated-table",
+  "issue": 3,
+  "label": "code",
+  "model": "groq:openai/gpt-oss-120b"
+ },
+ {
+  "name": "pr33-gptoss",
+  "pr": 33,
+  "ref": "seeded/04-count-drops-condition",
+  "issue": 5,
+  "label": "approach",
+  "model": "groq:openai/gpt-oss-120b"
+ },
+ {
+  "name": "pr34-gptoss",
+  "pr": 34,
+  "ref": "seeded/05-test-locks-the-bug",
+  "issue": 1,
+  "label": "code",
+  "model": "groq:openai/gpt-oss-120b"
+ },
+ {
+  "name": "pr22-gptoss",
+  "pr": 22,
+  "ref": "evidence/pr22-original",
+  "issue": 2,
+  "label": "code",
+  "model": "groq:openai/gpt-oss-120b"
+ }
+]
