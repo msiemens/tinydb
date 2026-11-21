@@ -79,10 +79,3 @@ The run to watch is issue #1, from the issue page to the posted review. There is
 - Pull request: https://github.com/Anilkumark17/tinydb/pull/19
 - Review: https://github.com/Anilkumark17/tinydb/pull/19#issuecomment-7048813902
 
-## AI use
-
-Cursor (Grok agent) did the GitHub setup and drafted `ARCHITECTURE.md`, the three views, ADR-001 to ADR-010, the first version of this README, `experiment/variants.md` (Variants A and B), the seeded diffs and the first `report.pdf`.
-
-Claude Code (Anthropic) explored TinyDB at the pinned commit, drafted the five issue texts and the hidden tests, and built and debugged the workflow and agent code (`.github/workflows/autose.yml`, `autose/`, the `workflow/` copy). It drafted ADR-011 to ADR-022, ran and diagnosed the AutoSE runs, wrote `results/`, ran the reviewer check (`review-check.yml`, Variant C), summed the token usage, and rebuilt `report.pdf` from `report/build_report.py`.
-
-I chose the project and the approach, opened the issues, triggered the runs, approved the design changes, and checked the results. The ADR and report text is AI-drafted and has not been rewritten in my own words.
