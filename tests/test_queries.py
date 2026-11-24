@@ -522,6 +522,16 @@ def test_fragment_with_path():
     assert not query({'doc': {'a': 4, 'c': 'yes'}})
 
 
+def test_fragment_with_path_hash():
+    fragment = {'a': 4}
+    query_x = Query().x.fragment(fragment)
+
+    assert hash(query_x) != hash(Query().y.fragment(fragment))
+    assert query_x != Query().y.fragment(fragment)
+    assert hash(query_x) == hash(Query().x.fragment(fragment))
+    assert query_x == Query().x.fragment(fragment)
+
+
 def test_get_item():
     query = Query()['test'] == 1
 
