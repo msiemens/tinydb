@@ -338,7 +338,7 @@ You also can mix normal updates with update operations:
 
 >>> db.update_multiple([
 ...     ({'int': 2}, where('char') == 'a'),
-...     ({delete('int'), where('char') == 'b'),
+...     (delete('int'), where('char') == 'b'),
 ... ])
 
 Data access and modification
@@ -395,8 +395,8 @@ None
 
 .. caution::
 
-    If multiple documents match the query, probably a random one of them will
-    be returned!
+    If multiple documents match the query, the first match in insertion order
+    is returned (not a random document).
 
 Often you don't want to search for documents but only know whether they are
 stored in the database. In this case ``db.contains(...)`` is your friend:

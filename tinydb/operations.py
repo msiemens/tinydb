@@ -23,9 +23,11 @@ def delete(field: str) -> Callable[[MutableMapping], None]:
     return transform
 
 
-def add(field: str, n: Union[int, float]) -> Callable[[MutableMapping], None]:
+def add(field: str, n: Union[int, float, str]) -> Callable[[MutableMapping], None]:
     """
     Add ``n`` to a given field in the document.
+
+    Also works for strings (concatenation), matching the documented behavior.
     """
     def transform(doc: MutableMapping):
         doc[field] += n

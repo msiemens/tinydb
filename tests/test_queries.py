@@ -185,6 +185,32 @@ def test_regex():
     assert hash(query)
 
 
+def test_regex_flags_affect_hash_and_query_cache():
+    """Flags must be part of the query hash so the table cache cannot mix results.
+
+    See https://github.com/msiemens/tinydb/issues/637
+    """
+    from tinydb import TinyDB
+    from tinydb.storages import MemoryStorage
+
+    case_sensitive = Query().name.matches('john')
+    case_insensitive = Query().name.matches('john', flags=re.IGNORECASE)
+
+    assert case_sensitive._hash != case_insensitive._hash
+    assert Query().name.search('john')._hash != \
+        Query().name.search('john', flags=re.IGNORECASE)._hash
+
+    db = TinyDB(storage=MemoryStorage)
+    db.insert({'name': 'John'})
+    db.insert({'name': 'johnny'})
+
+    ignorecase_names = [d['name'] for d in db.search(case_insensitive)]
+    sensitive_names = [d['name'] for d in db.search(case_sensitive)]
+
+    assert ignorecase_names == ['John', 'johnny']
+    assert sensitive_names == ['johnny']
+
+
 def test_custom():
     def test(value):
         return value == 42
@@ -295,6 +321,11 @@ def test_any():
     assert not query({'followers': [{'name': 'greg'}]})
     assert hash(query)
 
+    # String fields must not be treated as character sequences (issue #638)
+    query = Query().name.any(['a', 'b'])
+    assert not query({'name': 'abc'})
+    assert not query({'name': 'a'})
+
 
 def test_all():
     query = Query().followers.all(Query().name == 'don')
@@ -320,6 +351,10 @@ def test_all():
                                 {'name': 'bob'}]})
     assert not query({'followers': [{'name': 'john'}, {'name': 'bob'}]})
     assert hash(query)
+
+    # String fields must not be treated as character sequences (issue #638)
+    query = Query().name.all(['a', 'b'])
+    assert not query({'name': 'abc'})
 
 
 def test_has():
@@ -485,6 +520,16 @@ def test_fragment_with_path():
     assert query({'doc': {'a': 4, 'b': True, 'c': 'yes'}})
     assert not query({'a': 4, 'b': True, 'c': 'yes'})
     assert not query({'doc': {'a': 4, 'c': 'yes'}})
+
+
+def test_fragment_with_path_hash():
+    fragment = {'a': 4}
+    query_x = Query().x.fragment(fragment)
+
+    assert hash(query_x) != hash(Query().y.fragment(fragment))
+    assert query_x != Query().y.fragment(fragment)
+    assert hash(query_x) == hash(Query().x.fragment(fragment))
+    assert query_x == Query().x.fragment(fragment)
 
 
 def test_get_item():

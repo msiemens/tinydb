@@ -74,6 +74,22 @@ def test_query_cache(db):
     assert query2 in db._query_cache
 
 
+def test_query_cache_fragment_with_different_paths(db):
+    table = db.table('table3')
+    table.insert({'home': {'city': 'Paris'}, 'work': {'city': 'Rome'}})
+    table.insert({'home': {'city': 'Rome'}, 'work': {'city': 'Paris'}})
+
+    fragment = {'city': 'Paris'}
+    home = where('home').fragment(fragment)
+    work = where('work').fragment(fragment)
+
+    # The cached result of one search must not be reused for the same
+    # fragment on a different field
+    assert [d.doc_id for d in table.search(home)] == [1]
+    assert [d.doc_id for d in table.search(work)] == [2]
+    assert [d.doc_id for d in table.search(home)] == [1]
+
+
 def test_query_cache_with_mutable_callable(db):
     table = db.table('table')
     table.insert({'val': 5})
@@ -92,6 +108,25 @@ def test_query_cache_with_mutable_callable(db):
     mutable = 10
 
     assert table.count(search) == 0
+    assert len(table._query_cache) == 0
+
+
+def test_query_cache_with_uncacheable_subquery(db):
+    table = db.table('table')
+    table.insert({'val': [{'x': 1}]})
+    table.insert({'val': [{'x': 5}]})
+
+    # the sub-query is uncacheable because of the callable in its path, so
+    # the queries built from it must not be cached either
+    for build in (where('val').any, where('val').all):
+        first = build(where('x').map(lambda x: x) == 1)
+        second = build(where('x').map(lambda x: x) == 5)
+
+        assert not first.is_cacheable()
+        assert not second.is_cacheable()
+        assert table.search(first) == [{'val': [{'x': 1}]}]
+        assert table.search(second) == [{'val': [{'x': 5}]}]
+
     assert len(table._query_cache) == 0
 
 
@@ -177,3 +212,23 @@ def test_persist_table(db):
 
     db.table("nonpersisted", persist_empty=False)
     assert "nonpersisted" not in db.tables()
+
+
+def test_persist_empty_does_not_wipe_existing_data(tmpdir):
+    """persist_empty must not clear documents already stored for the table.
+
+    See https://github.com/msiemens/tinydb/issues/636
+    """
+    from tinydb import TinyDB
+
+    path = str(tmpdir.join('db.json'))
+    db = TinyDB(path)
+    db.table('t').insert({'a': 1})
+    db.close()
+
+    db = TinyDB(path)
+    assert 't' not in db._tables
+    table = db.table('t', persist_empty=True)
+    assert len(table) == 1
+    assert table.all() == [{'a': 1}]
+    db.close()
