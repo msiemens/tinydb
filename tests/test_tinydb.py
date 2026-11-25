@@ -364,6 +364,87 @@ def test_doc_id_missing_consistency(db: TinyDB):
     assert db.remove(doc_ids=[99]) == []
 
 
+def test_doc_ids_string_coercion(db: TinyDB):
+    # ``get(doc_id='1')`` already works via str coercion; ``update`` /
+    # ``remove`` must accept the same string IDs (see #639).
+    assert db.get(doc_id='1') is not None
+    assert db.update({'int': 9}, doc_ids=['1']) == [1]
+    doc = db.get(doc_id=1)
+    assert doc is not None
+    assert doc['int'] == 9
+    assert db.remove(doc_ids=['1']) == [1]
+    assert db.get(doc_id=1) is None
+
+
+def test_doc_ids_invalid_are_skipped(db: TinyDB):
+    # IDs that document_id_class cannot accept stay a no-op (#616 / #643).
+    # In particular, int(1.5) and int(True) must not become document 1.
+    before = db.get(doc_id=1)
+    assert before is not None
+    original = before['int']
+
+    table = db.table(db.default_table_name)
+    assert table._coerce_doc_id('abc') is None
+    assert table._coerce_doc_id(1.5) is None
+    assert table._coerce_doc_id(True) is None
+    assert db.get(doc_id='abc') is None
+
+    assert db.update({'int': 9}, doc_ids=['abc']) == []
+    assert db.update({'int': 9}, doc_ids=[1.5]) == []
+    assert db.update({'int': 9}, doc_ids=[True]) == []
+    assert db.remove(doc_ids=['abc', 1.5, True]) == []
+
+    doc = db.get(doc_id=1)
+    assert doc is not None
+    assert doc['int'] == original
+
+    # Only the ID that coerces cleanly is touched.
+    assert db.update({'int': 8}, doc_ids=['1', 'nope', 1.5, True]) == [1]
+    doc = db.get(doc_id=1)
+    assert doc is not None
+    assert doc['int'] == 8
+
+
+def test_doc_id_custom_class_coercion():
+    # document_id_class is not always int. Conversion errors are missing IDs.
+    from tinydb.storages import MemoryStorage
+    from tinydb.table import Table
+
+    class HexId(int):
+        def __new__(cls, value):
+            if isinstance(value, str):
+                return int.__new__(cls, int(value, 16))
+            if isinstance(value, int) and not isinstance(value, bool):
+                return int.__new__(cls, value)
+            raise TypeError('unsupported id')
+
+    class HexTable(Table):
+        document_id_class = HexId
+
+    class HexDB(TinyDB):
+        table_class = HexTable
+
+    db = HexDB(storage=MemoryStorage)
+    doc_id = db.insert({'n': 1})
+    assert doc_id == 1
+
+    table = db.table(db.default_table_name)
+    assert table._coerce_doc_id('a') == 10
+    assert table._coerce_doc_id('zz') is None
+    assert table._coerce_doc_id(1.5) is None
+    assert table._coerce_doc_id(True) is None
+
+    # '1' is a valid hex id for document 1. 'a' is id 10, which is absent.
+    assert db.update({'n': 2}, doc_ids=['1']) == [1]
+    assert db.get(doc_id='1')['n'] == 2
+    assert db.update({'n': 3}, doc_ids=['a', 'zz', 1.5, True]) == []
+    doc = db.get(doc_id=1)
+    assert doc is not None
+    assert doc['n'] == 2
+    assert db.remove(doc_ids=['zz', 'a']) == []
+    assert db.remove(doc_ids=['1']) == [1]
+
+
 def test_update_multiple(db: TinyDB):
     assert len(db) == 3
 

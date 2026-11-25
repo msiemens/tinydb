@@ -5,6 +5,7 @@ data in TinyDB.
 
 from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMapping
 from typing import (
+    Any,
     NoReturn,
     Optional,
     Union,
@@ -311,12 +312,14 @@ class Table:
 
     @overload
     def get(
-        self, cond: Optional[QueryLike], doc_id: int, doc_ids: Optional[list] = ...
+        self, cond: Optional[QueryLike], doc_id: Union[int, str],
+        doc_ids: Optional[list] = ...
     ) -> Optional[Document]: ...
 
     @overload
     def get(
-        self, *, cond: Optional[QueryLike] = ..., doc_id: int, doc_ids: Optional[list] = ...,
+        self, *, cond: Optional[QueryLike] = ..., doc_id: Union[int, str],
+        doc_ids: Optional[list] = ...,
     ) -> Optional[Document]: ...
 
     @overload
@@ -337,7 +340,7 @@ class Table:
     def get(
         self,
         cond: Optional[QueryLike] = None,
-        doc_id: Optional[int] = None,
+        doc_id: Optional[Union[int, str]] = None,
         doc_ids: Optional[list] = None
     ):
         """
@@ -359,14 +362,18 @@ class Table:
         table = self._read_table()
 
         if doc_id is not None:
-            # Retrieve a document specified by its ID
-            raw_doc = table.get(str(doc_id), None)
+            # Retrieve a document specified by its ID. Invalid IDs are missing,
+            # not errors (same rule as update/remove, see issue #639).
+            coerced_id = self._coerce_doc_id(doc_id)
+            if coerced_id is None:
+                return None
+
+            raw_doc = table.get(str(coerced_id), None)
 
             if raw_doc is None:
                 return None
 
-            # Convert the raw data to the document class
-            return self.document_class(raw_doc, doc_id)
+            return self.document_class(raw_doc, coerced_id)
 
         elif doc_ids is not None:
             # Filter the table by extracting out all those documents which
@@ -424,11 +431,40 @@ class Table:
 
         raise RuntimeError('You have to pass either cond or doc_id')
 
+    def _coerce_doc_id(self, doc_id: Any) -> Optional[Any]:
+        """Return a document ID, or ``None`` if ``doc_id`` is not a real one.
+
+        Strings such as ``'1'`` are converted with ``document_id_class``.
+        ``ValueError`` and ``TypeError`` mean the value is missing.
+        ``bool`` and ``float`` are rejected: ``int(True)`` and ``int(1.5)``
+        would otherwise point at a different document (#639, #643).
+        """
+        # bool is a subclass of int, so check it before the isinstance below.
+        if isinstance(doc_id, bool) or isinstance(doc_id, float):
+            return None
+
+        if isinstance(doc_id, self.document_id_class):
+            return doc_id
+
+        try:
+            return self.document_id_class(doc_id)
+        except (ValueError, TypeError):
+            return None
+
+    def _coerce_doc_ids(self, doc_ids: Iterable[Any]) -> list[Any]:
+        """Coerce IDs and drop any that are not valid document IDs."""
+        coerced = []
+        for doc_id in doc_ids:
+            converted = self._coerce_doc_id(doc_id)
+            if converted is not None:
+                coerced.append(converted)
+        return coerced
+
     def update(
         self,
         fields: Union[Mapping, Callable[[MutableMapping], None]],
         cond: Optional[QueryLike] = None,
-        doc_ids: Optional[Iterable[int]] = None,
+        doc_ids: Optional[Iterable[Any]] = None,
     ) -> list[int]:
         """
         Update all matching documents to have a given set of fields.
@@ -462,7 +498,9 @@ class Table:
             # (see issue #591). The list of *actually* updated IDs is
             # determined inside the updater so it reflects the table state at
             # write time.
-            requested_ids = list(doc_ids)
+            # Coerce IDs that document_id_class accepts ('1' -> 1). Values that
+            # cannot be converted are skipped, same as a missing ID (#639).
+            requested_ids = self._coerce_doc_ids(doc_ids)
             updated_ids: list[int] = []
 
             def updater(table: dict):
@@ -625,7 +663,7 @@ class Table:
     def remove(
         self,
         cond: Optional[QueryLike] = None,
-        doc_ids: Optional[Iterable[int]] = None,
+        doc_ids: Optional[Iterable[Any]] = None,
     ) -> list[int]:
         """
         Remove all matching documents.
@@ -645,7 +683,9 @@ class Table:
             # ``get(doc_ids=...)`` (see issue #591). The list of *actually*
             # removed IDs is determined inside the updater so it reflects the
             # table state at write time.
-            requested_ids = list(doc_ids)
+            # Coerce IDs that document_id_class accepts ('1' -> 1). Values that
+            # cannot be converted are skipped, same as a missing ID (#639).
+            requested_ids = self._coerce_doc_ids(doc_ids)
             removed_ids: list[int] = []
 
             def updater(table: dict):
