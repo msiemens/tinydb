@@ -836,8 +836,18 @@ class Table:
             for doc_id, doc in raw_table.items()
         }
 
-        # Perform the table update operation
-        updater(table)
+        # Snapshot the ID counter so a failed operation doesn't leak
+        # state: if the updater raises, no documents are written to the
+        # storage, so the ID counter must be restored as if the operation
+        # never happened (see issue #657).
+        prev_next_id = self._next_id
+
+        try:
+            # Perform the table update operation
+            updater(table)
+        except BaseException:
+            self._next_id = prev_next_id
+            raise
 
         # Convert the document IDs back to strings.
         # This is required as some storages (most notably the JSON file format)

@@ -122,6 +122,39 @@ def test_insert_multiple_with_doc_ids(db: TinyDB):
         db.insert_multiple([Document({'int': 1, 'char': 'a'}, 12)])
 
 
+def test_insert_multiple_failure_rolls_back_id_counter(db: TinyDB):
+    # See issue #657: a failed batch insert rolls back all documents,
+    # but the ID counter state from the failed batch must not leak.
+    db.drop_tables()
+
+    def generator():
+        yield {'int': 1, 'char': 'a'}
+        yield {'int': 1, 'char': 'b'}
+        raise ValueError('boom')
+
+    with pytest.raises(ValueError):
+        db.insert_multiple(generator())
+
+    # All documents were rolled back
+    assert db.all() == []
+
+    # The next auto-assigned ID must reflect the actual table state
+    assert db.insert({'int': 2, 'char': 'z'}) == 1
+
+
+def test_insert_multiple_duplicate_doc_id_rolls_back_id_counter(db: TinyDB):
+    # See issue #657: a ValueError raised mid-batch (duplicate document ID)
+    # must roll back the ID counter along with the documents.
+    db.drop_tables()
+
+    with pytest.raises(ValueError):
+        db.insert_multiple([{'int': 1, 'char': 'a'},
+                            Document({'int': 1, 'char': 'b'}, 1)])
+
+    assert db.all() == []
+    assert db.insert({'int': 2, 'char': 'z'}) == 1
+
+
 def test_insert_multiple_mixed_document_and_dict(db: TinyDB):
     db.drop_tables()
 
